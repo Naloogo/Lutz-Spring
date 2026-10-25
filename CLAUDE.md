@@ -55,7 +55,7 @@ Das Firmenwissen (Dateien 00–08, Fachwerte, Kommunikation, Entscheidungen) lie
 
 ## Ordner
 ```
-/                   Tools (*.html), index.html, lager.json, robots.txt, theme.css + logo.png (Übergang), CLAUDE.md, TOOLS-WISSEN.md, CHANGELOG.md, BACKLOG.md, DESIGNREGELN.md, UMBAU-ABLAUF.md, styleguide.html
+/                   Tools (*.html), index.html, lager.json, normaussentemperatur.json (PLZ → Norm-Außentemperatur, Quelle BWP/DIN), robots.txt, theme.css + logo.png (Übergang), CLAUDE.md, TOOLS-WISSEN.md, CHANGELOG.md, BACKLOG.md, DESIGNREGELN.md, UMBAU-ABLAUF.md, styleguide.html
 assets/css/         design.css
 assets/js/          ls.js
 assets/logo/        logo-variante-b.svg (Kopf), logo-variante-a.svg (Symbol), PDFs

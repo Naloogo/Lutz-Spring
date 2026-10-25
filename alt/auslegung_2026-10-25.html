@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auslegungstool Wärmepumpe · Lutz Spring GmbH</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  /* Datei-eigene Namen -> zentrale Tokens aus theme.css.
+     Farbwerte stehen ausschliesslich in theme.css. */
+  :root{
+    --accent:      var(--brand-navy);
+    --accent-text: var(--brand-navy);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--font); font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{width:100%; max-width:1400px; margin:0 auto; padding:0 28px 60px;}
+  @media (max-width:700px){ .wrap{padding:0 14px 50px;} }
+  header{
+    display:flex; align-items:flex-start; justify-content:space-between;
+    padding:26px 30px; margin:20px 0 28px;
+    background:var(--brand-navy); border-radius:14px; flex-wrap:wrap; gap:16px;
+    box-shadow:0 1px 3px var(--shadow-soft);
+  }
+  .brand{display:inline-flex; flex-direction:column; align-items:center; gap:8px;}
+  .zurueck{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:48px; height:48px; flex-shrink:0;
+    color:var(--accent); text-decoration:none; line-height:1;
+    opacity:.45; transition:opacity .12s;
+  }
+  .zurueck:hover{opacity:1;}
+  .zurueck:active{opacity:.3;}
+  .brand img.logo-img{width:240px; height:auto; display:block;}
+  .brand-sub{color:var(--brand-yellow); font-size:13px; font-weight:600; letter-spacing:1.2px; text-align:center; white-space:nowrap;}
+  .tool-title{font-size:13px; color:var(--text-on-dark-2); text-align:right; line-height:1.5;}
+  .tool-title strong{display:block; color:var(--text-on-dark); font-size:15px; font-weight:600;}
+  .hinweis{
+    background:var(--warn-bg); border-radius:var(--radius);
+    padding:11px 15px; margin-bottom:26px; font-size:13px;
+    color:var(--warn); line-height:1.5;
+  }
+  .block{border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin-bottom:20px; background:var(--card);}
+  .block-title{font-size:15px; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:8px;}
+  .block-title .num{
+    width:22px; height:22px; border-radius:50%; background:var(--accent-bg); color:var(--accent);
+    display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;
+  }
+  .grid-in{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:18px 26px;}
+  label.fld{display:block; font-size:13px; color:var(--text-2); margin-bottom:7px;}
+  .row{display:flex; align-items:center; gap:11px;}
+  .val{font-size:14px; font-weight:600; min-width:66px; text-align:right;}
+  .val-input{
+    width:72px; height:34px; padding:0 8px; font-size:14px; font-weight:600;
+    font-family:var(--font); color:var(--text); text-align:right;
+    background:var(--card); border:1px solid var(--border-strong); border-radius:var(--radius); outline:none;
+  }
+  .val-input:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-bg);}
+  select, input[type=number]{
+    width:100%; height:38px; padding:0 11px; font-size:14px;
+    font-family:var(--font); color:var(--text);
+    background:var(--card); border:1px solid var(--border-strong);
+    border-radius:var(--radius); outline:none;
+  }
+  select:focus, input[type=number]:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-bg);}
+  input[type=range]{-webkit-appearance:none; appearance:none; height:5px; border-radius:3px; background:var(--border-strong); outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%; background:var(--accent); cursor:pointer; border:2px solid var(--card); box-shadow:0 0 0 1px var(--border-strong);}
+  input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; background:var(--accent); cursor:pointer; border:2px solid var(--card);}
+  .unit{font-size:14px; color:var(--text-2); white-space:nowrap;}
+  .segment{display:inline-flex; border:1px solid var(--border-strong); border-radius:var(--radius); overflow:hidden;}
+  .segment button{
+    height:38px; padding:0 16px; font-size:13px; font-family:var(--font);
+    background:var(--card); color:var(--text-2); border:none; cursor:pointer; border-right:1px solid var(--border-strong);
+  }
+  .segment button:last-child{border-right:none;}
+  .segment button.active{background:var(--accent); color:var(--text-on-dark); font-weight:500;}
+  .heizart-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  .heizart-card, .heizflaeche-card{
+    border:2px solid var(--border); border-radius:var(--radius); padding:14px 12px; text-align:center; cursor:pointer;
+    background:var(--surface); transition:border-color .1s;
+  }
+  .heizart-card:hover, .heizflaeche-card:hover{border-color:var(--border-strong);}
+  .heizart-card.active, .heizflaeche-card.active{border-color:var(--accent); background:var(--accent-bg);}
+  .heizart-icon{font-size:22px; margin-bottom:4px;}
+  .heizart-lbl{font-size:14px; font-weight:600;}
+  .heizart-sub{font-size:11px; color:var(--text-3); margin-top:2px;}
+  .subpanel{margin-top:16px; padding-top:16px; border-top:1px solid var(--border); display:none;}
+  .subpanel.show{display:block;}
+  .mode-panel{display:none; margin-top:14px;}
+  .mode-panel.show{display:block;}
+  .section-label{font-size:13px; color:var(--text-2); margin-bottom:12px;}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;}
+  .stat{background:var(--surface); border-radius:var(--radius); padding:15px 16px; border:1px solid var(--border);}
+  .stat-lbl{font-size:13px; color:var(--text-2); margin-bottom:4px;}
+  .stat-val{font-size:24px; font-weight:600;}
+  .stat-sub{font-size:12px; color:var(--text-3); margin-top:2px;}
+  .plausi{font-size:12px; color:var(--text-3); margin-top:11px; line-height:1.5;}
+  .rec-card{border:2px solid var(--accent); border-radius:12px; padding:22px; background:var(--card);}
+  .rec-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:6px;}
+  .rec-name{font-size:22px; font-weight:600;}
+  .rec-meta{font-size:13px; color:var(--text-2);}
+  .rec-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:16px;}
+  .rec-stat{background:var(--surface); border-radius:var(--radius); padding:12px 15px; border:1px solid var(--border);}
+  .rec-stat-lbl{font-size:12px; color:var(--text-2);}
+  .rec-stat-val{font-size:20px; font-weight:600; margin-top:2px;}
+  .badge{border-radius:var(--radius); padding:11px 15px; font-size:13px; line-height:1.5; margin-bottom:11px;}
+  .b-success{background:var(--success-bg); color:var(--success);}
+  .b-warn{background:var(--warn-bg); color:var(--warn);}
+  .b-danger{background:var(--danger-bg); color:var(--danger);}
+  .note{font-size:12px; color:var(--text-3); line-height:1.55;}
+  .toggle-row{margin-top:16px; display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-2); line-height:1.5;}
+  .toggle-row input{width:16px; height:16px; cursor:pointer; margin-top:3px; flex-shrink:0;}
+  footer{margin-top:34px; padding-top:18px; border-top:1px solid var(--border); font-size:12px; color:var(--text-3); line-height:1.6;}
+  .print-btn{margin-top:22px; height:40px; padding:0 20px; font-size:14px; font-family:var(--font); color:var(--text); background:var(--card); border:1px solid var(--border-strong); border-radius:var(--radius); cursor:pointer;}
+  .print-btn:hover{background:var(--surface);}
+  .mini-btn{
+    height:38px; padding:0 14px; font-size:13px; font-family:var(--font);
+    color:var(--text); background:var(--card); border:1px solid var(--border-strong);
+    border-radius:var(--radius); cursor:pointer; white-space:nowrap;
+  }
+  .mini-btn:hover{background:var(--surface);}
+  .mini-btn.accent{background:var(--accent); color:var(--text-on-dark); border-color:var(--accent);}
+  .mini-btn.accent:hover{background:var(--brand-navy-dark);}
+  .uwert-hint{font-size:11px; color:var(--text-3); margin-top:4px;}
+  .verteiler-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .verteiler-row .vt-name{flex:1.4; height:38px; padding:0 11px; font-size:14px; font-family:var(--font); color:var(--text); background:var(--card); border:1px solid var(--border-strong); border-radius:var(--radius); outline:none;}
+  .verteiler-row .vt-kreise{flex:0.8; height:38px; padding:0 11px; font-size:14px; font-family:var(--font); color:var(--text); background:var(--card); border:1px solid var(--border-strong); border-radius:var(--radius); outline:none;}
+  .verteiler-row .vt-del{width:34px; height:34px; flex-shrink:0; border:1px solid var(--border-strong); border-radius:var(--radius); background:var(--card); color:var(--text-2); font-size:18px; line-height:1; cursor:pointer;}
+  .verteiler-row .vt-del:hover{background:var(--danger-bg); color:var(--danger); border-color:var(--danger);}
+  .vt-add{height:38px; padding:0 16px; font-size:13px; font-family:var(--font); color:var(--accent); background:var(--accent-bg); border:1px solid var(--accent); border-radius:var(--radius); cursor:pointer; font-weight:500;}
+  .vt-add:hover{background:var(--blue-hover);}
+  .pg-box{border:1.5px solid var(--border-strong); border-radius:10px; padding:14px 16px; margin-top:14px;}
+  .pg-box.pg1{border-left:4px solid var(--gold); background:var(--gold-bg);}
+  .pg-box.pg2{border-left:4px solid var(--accent); background:var(--blue-bg);}
+  .pg-head{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; margin-bottom:12px;}
+  .pg-head .pg-num{width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; color:var(--text-on-dark); flex-shrink:0;}
+  .pg-box.pg1 .pg-num{background:var(--gold);}
+  .pg-box.pg2 .pg-num{background:var(--accent);}
+  .pg-box.pg1 .pg-head{color:var(--gold-text);}
+  .pg-box.pg2 .pg-head{color:var(--accent);}
+  .pg-head .pg-sub{font-weight:400; color:var(--text-3); font-size:12px;}
+  .komp-item{display:flex; align-items:flex-start; gap:11px; padding:11px 0; border-bottom:1px solid var(--border);}
+  .komp-item:last-child{border-bottom:none;}
+  .komp-icon{width:22px; height:22px; border-radius:50%; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--text-on-dark); margin-top:1px;}
+  .komp-icon.pflicht{background:var(--accent);}
+  .komp-icon.bedingt{background:var(--gold);}
+  .komp-icon.option{background:var(--text-3);}
+  .komp-txt{flex:1;}
+  .komp-name{font-size:14px; font-weight:600;}
+  .komp-desc{font-size:12px; color:var(--text-2); margin-top:2px; line-height:1.5;}
+  .komp-legende{font-size:11px; color:var(--text-3); margin-top:12px; display:flex; gap:16px; flex-wrap:wrap;}
+  .komp-legende span{display:inline-flex; align-items:center; gap:5px;}
+  .komp-legende i{width:10px; height:10px; border-radius:50%; display:inline-block;}
+  .alt-card{margin-top:14px; padding:14px 16px; border:1px dashed var(--border-strong); border-radius:10px; background:var(--bg); opacity:.62; transition:opacity .15s;}
+  .alt-card:hover{opacity:.85;}
+  .alt-card.aktiv{opacity:1; border-style:solid; border-color:var(--gold); background:var(--gold-bg);}
+  .alt-head{font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;}
+  .alt-head .alt-sub{font-size:11px; font-weight:400; color:var(--text-3); text-transform:uppercase; letter-spacing:.4px; margin-left:4px;}
+  .alt-badge{display:inline-block; background:var(--gold); color:var(--text-on-dark); font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; margin-right:6px; text-transform:none; letter-spacing:0;}
+  .alt-desc{font-size:12.5px; color:var(--text-2); line-height:1.55; margin-bottom:11px;}
+  .alt-btn{height:36px; padding:0 16px; font-size:13px; font-family:var(--font); font-weight:500; color:var(--text-on-dark); background:var(--gold); border:none; border-radius:var(--radius); cursor:pointer;}
+  .alt-btn:hover{background:var(--gold-hover);}
+  .bes-wrap{border-top:1px solid var(--border); margin-top:16px; padding-top:14px;}
+  .bes-wrap textarea{
+    width:100%; min-height:58px; padding:9px 11px; font-size:13px; font-family:var(--font);
+    color:var(--text); background:var(--card); border:1px solid var(--border-strong);
+    border-radius:var(--radius); outline:none; resize:vertical; line-height:1.5;
+  }
+  .bes-wrap textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-bg);}
+  .bes-wrap textarea::placeholder{color:var(--text-3);}
+  #print-summary{display:none;}
+  @media print{
+    body{background:var(--card);}
+    .print-btn{display:none;}
+    .zurueck{display:none;}
+    .heizart-card, .heizflaeche-card{cursor:default;}
+    header{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    .mini-btn{display:none;}
+    #kunde-select,#kunde-name{border:none;}
+    /* Bedien-Blöcke und Live-Ergebnisse im Druck ausblenden */
+    .block, footer{display:none;}
+    .hinweis{display:none;}
+    /* Zusammenfassung anzeigen */
+    #print-summary{display:block; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    header{margin-top:0;}
+    .wrap{max-width:100%; padding:0;}
+    @page{margin:14mm;}
+  }
+  #print-summary .ps-title{font-size:17px; font-weight:700; color:var(--text); margin:4px 0 2px;}
+  #print-summary .ps-meta{font-size:12px; color:var(--text-2); margin-bottom:14px;}
+  #print-summary .ps-cols{display:flex; gap:24px;}
+  #print-summary .ps-col{flex:1;}
+  #print-summary .ps-h{font-size:12px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px; border-bottom:1.5px solid var(--accent); padding-bottom:3px;}
+  #print-summary .ps-table{width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:4px;}
+  #print-summary .ps-table td{padding:3px 0; vertical-align:top;}
+  #print-summary .ps-table td:first-child{color:var(--text-2); width:52%; padding-right:8px;}
+  #print-summary .ps-table td:last-child{color:var(--text); font-weight:500; text-align:right;}
+  #print-summary .ps-result{margin-top:14px; padding:14px 16px; border:2px solid var(--accent); border-radius:10px; background:var(--blue-bg-2);}
+  #print-summary .ps-result .ps-r-name{font-size:18px; font-weight:700; color:var(--text);}
+  #print-summary .ps-result .ps-r-sub{font-size:12px; color:var(--text-2); margin-bottom:8px;}
+  #print-summary .ps-result table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  #print-summary .ps-result td{padding:3px 0;}
+  #print-summary .ps-result td:first-child{color:var(--text-2);}
+  #print-summary .ps-result td:last-child{text-align:right; font-weight:600;}
+  #print-summary .ps-note{font-size:11.5px; color:var(--text-2); margin-top:10px; line-height:1.5;}
+  #print-summary .ps-disclaimer{font-size:10.5px; color:var(--text-3); margin-top:16px; padding-top:8px; border-top:1px solid var(--border); line-height:1.5;}
+  #print-summary .psk-item{font-size:11.5px; line-height:1.5; padding:3px 0; display:flex; gap:7px;}
+  #print-summary .psk-mark{font-weight:700; flex-shrink:0; width:12px;}
+  #print-summary .psk-name{font-weight:600;}
+  #print-summary .psk-desc{color:var(--text-2);}
+  #print-summary .psk-legende{font-size:10.5px; color:var(--text-3); margin-top:6px;}
+  #print-summary .psb-item{font-size:11.5px; line-height:1.5; margin-bottom:7px;}
+  #print-summary .psb-label{font-weight:600; color:var(--text);}
+  #print-summary .psb-text{color:var(--text-2); white-space:pre-wrap;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <img class="logo-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA4UAAADwCAYAAAC318FPAACzFElEQVR42uydd5xcZdXHv+e5987MzraE3ntNQk0QAYEERFFAEUmQJogYFAQUFQSFZBFFBETBAhFBQAWzCvgCSpMQQVBIaJJICb0nIcm22Zm55bx/PHd2ZzcJJJAyu/v8Pp8hYbPZzDz39HOe3wEHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHhwEPcUfg4ODg4ODg4OAwmKCq0hvqKiKi7lQcHBwcHBwcHBwcHBwGdSI4zVedGKjiu9NwcHBwcHBwcHBwcHAY9Emg+qpTM/r0iIwqQe+fCKq6keojG6t+dmPV59a23+8m5BwcHBwcHBwcHBwcHAZa4ieqk4wqlZdUXn2/00P13fEaTT5a2zY9QcuXqJYPVdVdVKNn/2F/1ozAnaiDw5Lh2usODg4ODkM12DQw04OZ6Vcqv45Of91GRcZF7qQcHFa1bk4ysIEHUxCREKi6DyiAB0Ro1PZNvH/tQqElIX48gC8fhfcSNL0B7d8GJaR5fR+k7E7VwcHBwcHBwcEBnTEjUJ0RpHeOlqljoEqgOjpQneaKqA4OKzUR1FQ3R/fTzTVR1S21eNHWuqhpSy3+9vcanfOqtm/wopY2U9WtVDWvqqguItQ2StpGWdszqm1eqLqxavTcnfbfcJ1CB4elwTk5BwcHB4dBElROMvZ3LTAZpIWk+s9lzJiwXxC6JvBZ4kcSaDDEtwPzgaMhkwW2micS3GY7iOOqE0URwTEZOjgsf+InMFmgxeqk9Opo2hGsfN8a8NzhdH2zjAwbCz85DtMK9SXQL0MM5IBulCIRIAiK8QLbVEyASoPRqaqDg0sKHRwcHBwGcYA5zYfnBKYAMxFpqUr6BAiw0SNAjMavXIz596aUH4TytdA5Yhsa9tgJ7zX7vd6bQAn4L2AgDNE2/kTTwR7RqXMkOPBsCBApq+rEAK6KHM29g8Oy6+nio6BWR1XjPMlzvyO63lD+XULntlvTsM3O1D8OvAVtf0x6Er/qdWoiqaJrj547ODh8MDgWJgcHBweHARJcpncAZ54Eo2ciQp8kUDXZBh4J6GhJyH5kZ7zdLiW6Jyb+p0/8mNKw2fpIBHQBbRAn0Em5Ktis+sfSiLUZgSaI66Fk3iJ7YYQ3YpzImBfcE3FwWD49VdUNgGZKhyjxGw34J95KcpehfI9P04ZrQxuwEOLI6qYgiBHwfJvwJcsX4qpGNG3kE993l/jbHKg6IxDpOzHg4ODgkkIHBwcHh5oMKCen/9fSZ7xsCd97ADywNYXTE5JnMuS/83PM08AMiF+F/hQxRRIg6fV8Iojn9XYZtK9rVBTiOO1NGAIMdQKdo96g4fgfwRm/E5GC6nhPpNW1KByGqK62AOjSRqpV9UD409Z0nBMRjD+XXMf66O2gr1Jd1qFI1Fc3jWeTwA/ajHdJoYPD8sCNjzo4ODg4rObgsjJedlKfe0U2OcuhWvBEJFZ94pMw72S6L02I7jR07fUp6jMB+ZeAbmg7v/cCkaSBZXWyZ8QApm8SGL1XTCmAn/4sCFUpA95/N4Trf0lxxhGKjrXvzd0zdBhKOjvVE5G4OpxUDT0RL9bw7YPx3/gK3ZMSorsNnXsdTENsaHwHChfBIhJMVfJX0UUjfq9eKm4U1MFh1cJ1Ch0cHBwcVnlACVsY+JbCdOk3XrYVzG2gfE5C+Pb65I7+PeXbIZwK5IbR1OzDQqAAHUBCGal4Mz/TSzKxEvMzNYomJZrrcpR3/QfvHHYI//53mfEjVKQlcU/YYWjose5E2OpTPjPCP+4g/IYz6P5diL6+Fo3DfEvaVIAOtXpqAPUDW2yJWfkEMK5T6ODgksK+Rkug1dDaikxw4z0OtRwkt+JG0BwGp/2dABNIhKWNly06Cm5fn84zEvzjf0hufh08BDwDxapvjICkurVnPBtgrg6GQQNJUqa5IUO887282HAwW98ZMnkS0uISQ4fBqtOTjEhLouV/n0lw70VwP/AIxO29o6BL1dNVrRYuKXRwGNJJoQ1CZgVwuTLrQZFRs6sWltahWvBt9HC/iOwXOapih9UYLAfMmgwjZ0fvdW/KwWGAybYlmZj1xX72N4dqdw4I4fnjSTonUP5hRPkWn/o9P4HXDTwNHSVIiHu9kzE9SZ8g1m3ViN0WgVgjmut9Sl+ZTvay/UESN0bqMHj1GyNCouF9C0n2a6SbBMGkY6BSW3rqkkIHh+XBoLhTaAPs+z2YjIhEQLnqz9YEtqXw2TLep04n/sMhFC8NqT85UE12FpGXK5UvJw4OK1dOp/m2qnp/PzltQLXjI4RXJQRffVzEXaRwGGiyPcnAWFNlg5PU/jYAO1I4oIz/mS8SXXMc5ctD9OU1qW+A3ELIJdD2YAIVkgk/wJASTFReff61moqQ8YxPe1eJptv2Jf7cVLxJ41U38EVOcoGnwyCGzMVkhiGxIIlZXC9dXcTBwSWFK9X/TvXs7yZQHTine6KiNAhpBk6hdKlQvkrpPvLz1K2xK/mnIPo/u4JKwf4Gz4nAQAxAEZhqoBVoramqvO2StEr63vrJ6bio7/c9czZdZyTw8kbw/ZMJpsOi5uHQtsiRVjjUdgI4W6p1zxbVWiqJ4Pbw/OF0n1Ci+3Ofom7jseSfgfhea3YFe52ova1q4bTxgIxNAKMBdiBJ6kteTCgckZGmtxPVEY7EzWEIxI+hS/4cHGrKP/eNQWH8cl1L8mv7w03zYZ7pDbAnVHcAM/b9/y6BrbcjKf+c0lURXRusR/2YEWSfh+ybED4PbUR2nMEIEghJOYHEOGs2kAR9RgC3pYI+OxKZkAp5BtVSRkTKq1EJPZhpmPVF6f8+VDUAfF7eTNno/67Dv2dduq5UOpubaNhlV+r/B8yF9h9GKImlwHdwqDlHUyXjLamMZ1Et1sPzESz8NCz4BoXzynRtPYL6jTegbjbEC6rsr4gtdSiICiJ+rwke6IMa4tGlEfn6PbV48UEi37lDdZIv0hI56XFwcHBwWLn+eYph1s9l8Vi4dbl+ll8bHyi9PSKATk2Jin8p1Z2V9IPvBvdm6ZgohDe0Ik83UrpNiedkaWryqStA1A1tt/UuIxbPszTHlaWnCaA9XHUOtSbcKQk8wLRJHmPB7iqrvgPQiGr7PnSfFVHXuQfRzRsA31KdmqkuHKyM9yaC9o4r/0qhVdJxuTiV0fWAreg+HaJfQfmn12Bmb8ia7yrefvUQQX0XJBG0TS/30OYbPyCJY9zVQoda0kOdaqwt7iPjm8EtG1F6en+ia8+ifHVI8ngTDXnIt0MxhPY51gZjDMb4vUyDWmV5B1H9Q1SIBLx31iD69yGqOg3Glp0kOTg4ODiswhh0Q2BzwpMT+I2BnxQlc8aMmk4KexjpljT+19MBAlU9BF7eje5JMeFfPJKvnYt5DRrnQeGLpAuF7RBo+7vp3xPBmEwvJbm7nlXjFY6eVrdIa9xHFsb1Vtk1Kn4L7+/DKFyQQNsGcPqJ1E0HnoSuX11kv2vCSihW9IypaoUMpnpcOf0Me8OMA+n6SonuoyZQt85I6u6zslf8lp2w8YD2zoTqz2dMppc10V0/cljtupja5arx/NQe2yXx94+l4+gyhUOOIR9uhX+XZQYV6lCgvbvXBotUrYYYIoUOzw9Y1BkxbLeTgF+LTH9SVY2IuEqPg4ODg8Py+mSvdwz0PWPQ/eGf+9FxapnuY46ibo1tCO63vrfMu8BaFYKomkkKVZ/O9I6BSrk3W8uh2t0Ai3zYKyK+8gy8Vz5N1yUhXTvtTv3wgLrnoK4IbVfaCEMA8Tzb8eupPqf3A10iWNtCPsnAeB8uV5jSp9Vtg1Lqmf9XYa1DlfD2G/AeWI+uXyveAXtAJ+RfANqh7fIIQ5lGySJGV9Qzt+OekwVaAKrGVANUy80wKyZ8dRTeBpcRXpdQ/ouhc9uRNKzRSP0LUH6iMi5XiRQ9RC0Vt+ld12vhYkWHWtDJqR7M8nrtskE1boIJCeFxv8H7/WZ0jdyB+nw9je9C8fZUxsUgxvQU4PrY4CE4Ba0JGASmJ7BT6rAnOwFzcHBwcFhGf5xelZrVQt9R0AyqpWZojQnX3RUvcxHl3yWENxk6t9mRhuF5Gl+E0lOVGDShTgwJ85fn31+hSaGCvS/SExFXd1lG9Q/+D6D45RDJ7UH428lEt0ZEL/tkDgzwPKjvhs4I2ukdBTV+AJqOIrnEr8YrHNIrB0qlMyzSEkNLtSxsCG/tQPHQEuVLT0f4NHWtEe3i03BkgImhsRvaH+hhNEREMF4ASQKJ90Fkoe/7m1p1b1X6jam+dgDFr8QQb0v4858T3h4T/TNLU72Q7YZsGQpJr5xSGVeudEicnK5Yuao8tMqY+eKEPg7Leo6TBGZLWviIkbXQZOr+tE/MU/xuK9EDhtzfrQ5qdz8Zx9nhxVAp8jxq6Log9a0t7lgWs7f99bf612qMr/p1Qlohd3euP5yf63/WSzv3ytkPpnM3TnaW6Es/qE7OUmhR0ErnyuGD6GbrVGOPtRLLVK5KCarJPvBgls4zEszGowgvvZjS1Bh9PEdjPeSKkCtBV9viMagmCaIGWb48z//wH2yqB7PE3vsisqtqKqgiA4nf+CHJX7MUL0no2nFr6vc6lNwDwPPQCQgBBiihlCre1RiEqhE7d2e/xoXcq3TZ0hlnKsJNnzt3C8+geBmEv4TCpw8hv9Z25F6G6NuVcbQAD+jsqMwAgxi/N/BaflmwY6qTjV0HMT3qa8SqRpajwjl4rcPp/E4C2fXhG8eSmwm8CJ0398ppe7kqGhZjx+VcErjijeb9HvdPhrHTESHqDU4muINe/vNMdaAlsWMkLZp+fR+YfDBdN28CPz2CpjnQdZFV20JPG9DJ+PufcPrrfAjntzndtWuiYHqy+Ajtsujv4sFpZaRfxOn/h/Fz73/urf1+7r4+jE0G1uquyt2iJAGNIQmGtmyka4Oq/OmK0EmbvOzrw/2xSw6XJ5aRJcQygkb/Ow9pbaBwqcBp34ZXoeFl4NHeGBSgfdEyxKDLT53ifzCjM6tq/K8PI2gWyNP2YzB/8smeewtydx3F3xvMoTtjFkDDa0AXtP037GWk8zxL652kS08rY0huvK62Bb0/O2yfUdBmK18HJ4SfGom34eV0/yqiY+11aByxKbmXIdcBpb9DG6ksGIOIsbKg2IW4FSQf1BD60GrS91ahzPeBRvgxtJ0N+al/wJu2Ll03Kt5+o6EdGhYBZWj7XdiziFeMbzvhSdWoXCUYdLZwxQU1Mz3oYXKtnpvPAM207R1R/5MLMM9/lOJPlfjJEl18Qtany63yWNq5zgjSLnhiR/YfGU707iWYa3emY/MtaDTDqH+x1y6LZzuBPTroZHzZYAxlhYabfg/HfkyknAwh3RVoDWACTJZIWiq6m0W1ONz+/lKPtm/H1P/rCswz21OenqCLDNGTwCv0LjxfF/zdQbZUMocJ4X+PIvu1uSK5hTAhVt3XF5nuqsTv7ecCoIG2O6D5bIivaUXmDSd8UNGXhOQpiGfRd6JnbQj2jsl8xCPZbgb+b74LtxsReRemo3pVACfVcEJubPioSQxxgkaKTwZ8EFk4RH2qB5M9yxrdm9Srag6oo+1kaH47ID7tFngyR/kxYC5E/wEWVumkgPcRkPVisod6sOl9mLt/BBeKiCxIBwWd/+2ThI/0q2Lj6lgmAIbRdnBE/TnnYd7Yh9IvY6LpHt7Ru8JCaOiAtissQ6ZgJ+QwflV8vFJiUFkBAjcCntqK9i+E5L48Cen8COWbY+KnPBrzAhFoGToJUcCgqBgbdKwOEoIAkjCh+XIDp24pIi+65fXL4uwrojIp/U2L9B/ZU9X94PocXWcKwbk3wtMNlG5XzFuGfA4oQRhBsWokWI1v7yXFH0SoyzSSoZ0fSzNnq5IRobyUz7AZvLoTXYeX8D53Gp4eSOkPEckzPg1ZQWIghA6tjKmK7Xp7wQd8b8uviQkxMWvKGrRVG9fK+Q8mY7v4WNMs7S9TqloP7EvpW4boNwne18/GW7AXxVtich0+gWfHGmVvWHTccBn+JbffcYmOaQNP5KRQVdeCFz5CYeLmBMEVJNOFTALdZYgoI2KgwhTq8MEOXJSMCvKTDsl9vwnKg1i2qnV4vOm7C6sZ1UUHU/pGTPzytgQH/5To4Zhkpkf8JOTrBa96J2XcLxYQW1PE2F87yjF1pwte5ifEP7xNMvKQXflxfjQUixW9Zz9Jqu2mqm4FL42k6/Ml/CPPxDCW8O8R0QyfhiRl9q64uCV1/Svn7kOkEA1XzFELyc45lrZbH5ZhslB1RAZmhUT3z4H9tqCgSd8C7qqA9BxEVVKboGkG04CHtx6wMxRff4Oo+BANzx/d93rIYJaP6usBrRXZGAbsSelCQ3RBgn9GC6ZjNKW/xSRz0ng9qdLFJcU9XqqTGSjHIFsoOuFNstFE+MF0Eekaaqt4+ttBGLGkWCYH7EfpEo/oRzHB185ASvtR+kNEdlGA79n4mAja0/uAIIgf9BK2LaedUxLyYogvfUFyZ2y1rEQzsuwffKonMiFW1VHwzlcoX6iUfiv4+x5JXXZtuA9Ki6hMtQKQVL0BMaY2qs0uKVw2Ie8Z/YmXFmSr6lHw2O50TUpIbjc0Hn0avAb8GzrLveywmgpoReREVpQsLDUprDxTLf/8LIKLNqBrxKepX2sruBfC+ZUx1dqR06qkkOHaAVM8+KMOlmq4rVbeLzAZ7p+OjFvy/K+qbguPn0r3d8sknaOpH70P3Au8AOVy7/LzJPVaWYTkiF9Qd9NZINGyGL2hocNTvWoWUY0f/AHRNZ8k07EbtEIHpDsx1U5rIK4TuCKTwvPeltyF6w9WVuElBX6q2gC3/IiOryRI/QY0fGI8PATMtvJWHW0ky6mnBkMCNDUCh0AhPlTq//TX9N8dMgyvqV4n/X2yFn/7PbIXrUNh20PJ5zeBe6C8oNdefpAzt4Vb+y81bQilYf9Bj7pb6s47D2I0vG8O7L/lqkkKTfpB4qjnkyuGHCZtNkAmD7oTyMHQ/fw0dP5fyF+Rgc3uFJH/DXY5qYwOL66X846FX46h874xNIzZE6YB/4VStPR4fXnkA6BxZyivP43M3w4QkXhZE5CBbP/gfmBJY7g9z2NzeOoMus8JSebtSP1H94d/2bMPy70xaNIv4FxRMegHTAr9ZTsABMYnOpf1Ka83jcyma5F5DTLdULjDjv8ZAM+WEVbg+J/DqkdfutsGVDvWgXt8Oo+NyF1+JmbepyhcHNK17U7UN0D9y/Zb2/5Q1epOKxyLycKqSrhmW2OVzJwIbVsg91aNqXrpmGpce3Ia1GdFpI3eESADrA1fU7iyU4SCjeJrP4K348XPCfRfqGpQjdeBh6D4hyb8w24hucdQ/IPSsdbaNG6yDnUvQbII2h4KqXSV8TwktS+CIdGI7GYB7c+2Sl7KquO95V3UOliDAxFJq8MvnUA89ZuYk0bhz0p1QAwiHpKk+1pdMrjiCzxPmMHo83TaJJ+xLYi0RLaT/3Y95b9/Cu+J79BZH9Cw6TY0tgHvQtvVYc8eVvF6R+8Xs7nLFOCAeNDWEeL/0Seub9Xwkufwv3WQiLyiqjKY7zOpqvD8aRmRCaWUsX1disc2wrBbKf8WMi0jYT7Ic0vwcz1Xcz5Y4iYetL0RUv/G7vi/210Le61B3fTzif6ZW3mmo+c+YIQmCSRWBprJQB5Y05LPd4VvU3e8Id72ecpnnQTHCpmvKXW8LCJdcHt6fqODwdwltDuaK6PDeVS/tg7lHf6I97v16Nx9exoSQ+5laPtnrz+V94rXl+c5GWh7IqThyXEk283W+Pa/iBx8jurPs3B6ebBN7qhO83t3qAuqyTrwJBQvy+Mdeys6LaD0e6VjjTVp3Hw96l4CXQhtj1TFMsbr0U3pvzd99fqNZb5TKCKqC8gQvLMWbe+Ue1eMex6GwBEQDCDn0m8UtNIlrThWVV0XCntTODGCYA+SX5xJ922KaRf0aFADdSEUtOKA0ljfD0BTNtAaaXDpwnkkpY2JjGBMUNOMiWJEGrvmWjKetn0ofblE8exj8Nc8HH86dHAWyE94WgNG1c5cWpVMCUyCyS0wGXoNJ6jqR+H1DSh9PaH4cD2l829AHhaSf4D5LUgC9RGECm3vpjJljH1mSxh1UpOQUUO8yXPU/aSk+tF0bGOo6/ckX0QiO9Fx3FgYfwX6FLSXIyBl7V0F49DLHFCQjoCl/z9oOpbFAeILqp4DkwQma//kqnpU0XYh8qj+5TDKPzgN/7/7Et4MvoFsCG3/600ELUN0qrsrwh/E4ElALIp0BfiTRhLLP+0+48mzVTUZCJ2gvufecx1DlxQ8pwyRkn6ukpZf+BjBzz5BPPFcyn+Aeg+CGDpejVESZGXEYzEYCSgQI88r2TmnEJ56CuZY0hKl+eA6uwQbgCqqApHSjG+Tw+2BbaBj2t2YXTqoP9Wgo1+Rxk2/CZemP6sMnJy+QHV8xrJkrp3A/bHqjJovHNjnXc3gn/rUpeplhdhvQtle5bpqOwq37Eny92+RXA6+gkZpnGZMr/1fUfKRroAzJqCLiMycbch9/2wt3WBEjv1u2tkeVImByLhIw8cPgouzFG8PKLb8Hm+GT3I3ZG6yjZB8ZMev2xZaeyiV+LNiD2vXTPnLLQFlUUQCm926nYADwAF5MMXAH9W2uqtZQVv6GcjJHhARte6O/99W8v8GXoL26+kpAkTVrT4RjAS1zQ7r+4hU1lfU8IMCxDPaMfpKuvfZk7pNdiD7KMR/gQ7KDCNjx/10NcsTAjN8uE2ZebvImJlhlbNSS8Ev0KJo9PzX8f6zE53fjSiM/xJ5L0v2McjOhY5Jvb6vs/rBVMvUexhPSULqclnaZ/1Zmj86U3WrrEhLaYgnhBmRlrKW7t8FvnEX3LM2bW/FdshH/Nqy1wKqEeCR64kMrQkZFC7Fr1EZmeYz80Zh9BTt6wsq/qBlse/v/b4W1ehfX8C78DPw0yPhngpzOHTGVlFXtj9QtZV1FaWtq0Tzjzehu+skybecojo7Qw1e4rTB+8zUZrZI345Vy1KuZkz1YEJlWbWq6qZwxjl0ful4gkczdHQrHkJXVFnT5CHqrTzlqRBbCBRVkV8I5qE0d9Hl03tMOroex/Z59rMBBkHXh+AwofDiH4in/5PgCI/c6bE0bTgF7sO+6EkG0zt0AcwGWhPL7tha7js50lKjOpmygjIZe11E+h18S5/3bqeHxppUL1VVA40f+zXF4z5Nbs5G5B6yeglKOb0e0FMoWFkxUAKCT9koxSeUYVefpfGLicgW59T62K7VtS0MjE4FeabAi0l/huOeK3TRM9/E+8FP4d/Q0A4dk3vHcDv7XYw25v1jmQHvuWwy6OaNajo4TMf2Zp0kvQupewzK+vAbj+IvffzJf8F/q5Fy8QuSPeMxmG3HB6IHivh/DWl/NUT8jN1z0ocdtteAu9GzFfjgQmj830mEnb0dWDEGY1id3Z1eVsFWoDXu3aMDMAzVhZtR+F5IsMuhmDVOJ7w6IrzLJ/7E1ngGGuZCx5/7dpXFD5AljTUti0wJoIZ4/ZC6b5dU5xp4K4E5Q1jnp3oiE8racf0ovHOn0f1AM2XKeCbTMx5US0hUaV7Dp5yF4luv4+1jCL6U4NcNR0+uJ15gKYMGqn3Rd2rizHsYomdNBmYjMq7c1xe8GFA4MiFz2PaY9X9J+bmvUnfBNHSKD1MQGRdaVvE/b0txeiuFw7eisd2wqKuM8Xyru/1ZaldFTUEFMVk654XUXTlBi1fdAxP/T6dO8GRCa7z6zz1lUZ51UcUHh1V/Vg+sTWFCSOar38dv25/uG6+TfOsPVSdlbI43oWzHRG/dmPLjPyXebm+89nVJ3lLaiPA9H10N526TQ9s5jh9bRlYKkyaCUWivlMSKIUOj58PaUBYovfU65mMxuVM9krk/J/7zrQS/CMjzjC06nguciyoGRnswERgdwG2R9UuzQ8uuCbaT3bURxX/7JIdH+OefRKb7CPj4niLbzV/dZGTWn84K4HJl1oNSzQqadpE3hOsN734zoeGSH5Nt/gjxBj8Tf49fqd5Vb8diSVR1I6L/nEJ8xhF492wOT/d2BEU9O1+7iicvJBGMUaLpEdFpx6nqJTC5Xe0YWk0Yc9WnM1ZmbldmzaxsUFjMZujTZBiJMmuEMHIkUAxUp4ZEeiT8X0R7RxkkQLylxDIwEK8Q+DgM4EBwkllSpbHf2N5u8NpWdI9PKD/qU/r2NWRmZJDZEB0O/hiIP1EPwPMdqYlvMrBWYEljEt/dB12FaO9MxzxM1ZhHEq8aeUrHUez4p/bKkyg9Ffh6VDuPJP6zR/niGLbbH37wZeRvoBfa6WE/tmMrhQVKsdIu8PzeauWH7CKoJjQQ0PnaY9J8yvmqeCKEQ9cOjLcVzNI9O2Cu+ifxA82ExHiSJoS1BAOaKNkdEvjCvXh7/kOa97tYdbov4kdauuuX1K9zMu0LImCA7BUT2/kQtZ18BaKZumplYJKBycpkkb66O64f6UT7ofDrOjovNZQu+R3ZJ3y8lyH+XkoseOPfUZpFTipCgEb/OpLSmSeQvevj8LS1RzYpydg72au1siAkfkD4zloEC24BhsmE1rZVeb/wPWxmT2tAVRuBgylfZij/IqF05mlkk48ij0D5L3b0No43UUWY2aIyhlD1jb3gvP3Ry1vQOyFKLIO7GB+T+Kv/7NXeNey/E01VqU64FOm509hMAMOAj0Ehiuh4+CYavxHg7fmYNO3zE3gY+6r4CBuO6HNbZdl6F+X5jwmcHsLMCE6ir81fA9VXjqb7OzH60nZw+STM3SDtEH0FMhtD/MmbgI/bSZcx4SqVDeiRj77+FFR1HZj7Sbq/WKL49c+Q2+xoin+Fhi6IToTs7qA/2Mgms5/ssgyzd44lbPkN5leQzE1lQzzbqV/NNl/U0GUimmetR/Ha70hdy9mqa2SxtEerNUYWQUVGlfs9p1HADlUZnAFmichT9rez01erJTGMXngD1tgNOm13dJDtT3dJ4YAK/mYEMAWYAkLUlzE1HcsgRqN/T8SbsTedk0O6P/l56hqbqJsDdQl0XApFFDFAEpIL/cXLGZV7d31m2x1WTXwZrMpRA9tJuFFsV0BCKmXFlt7dVbZT8MQUSr+H6MZGOOlzeM9A3YvAI9CGIohdOhNVsWiJsYH9ShhblAwEJ+TgSuy9kdYhahOmesxq9VR1R5Lv3Enpr82UvRiTeLU50GFskSO3tw/nfE18eckyuU02qrFQ7jC13x00lmWUOKpEwngEZNJwOANEDTnoYmV9Fhtw2m4eMjP1BS1WYVsqrj1Co/av4s3Yg8L3Y+L/ePDFL9plyIug4zupLwDwIIqVIBOL5Iqqb38OWr4AP5iA3lnRcftxjdZAUlKxAzFEqoQXRjSeXer1hStJ36ZN8xnbKHASMLMygltlM1M6QdUR8PjZdP+4TOeOI2nYc3cyj0BmLpQv7rWZUIIkQOkWQVW7N1SdPJmuw8dTPytPW3uCST9QLQT8i8UJPW4iAlUCAnz63lX1d4dkT2i79qv4GxSo/6Ehv+OrIjINvpvKM5a00o6BpnsPZiPSWpZt5pTsFEhfG6/xa5dj7hlG508TWLAenPRJ6h4Fnoe2uyrnm1YgIw9kFSSCFXK1k/r60x750LRI8PIvKP1RKP9aKey0E/ntdqLuKdC7qmRDFLQEcQbNd4igGs78HaVjx5J9aVMK/4pJh237jm2vdq9kdzoXXlYyt31GVf8IMqsyfrlqEsG3PCZPiXtj5J6z90he+y3JP4TSVI/k7zGFAz5JftS61l4D5KF71lxtlztR8TDbxPj7gmxp8HZK0Lc/QrEdWwEffHBJ4UBIBGddJIxsTfqO7TWi2r4VxUMjzH774W96LsVfxsT3eJQ+txl5zzr+rruhjXIvubSXwaQX3RWDzQ4dhow8qYFWHy5KRyfG9atY0kRx9xjv/CmYF7emeENCR12Gxs02JLvA3gdsm9K7ZxLjYYyXJrL9WLRWkoMyGLrKERqMt19oTYbosxS4Xxg5VYh/ej/RL5soJwlerSaE1SgAr6+rOu01mJdW0FEt1aI5kqpEMIrQBAwBjQTQBGwMHXOLlNd5ldxJGeLMFXgXt6pe7ffv1H3I5x3ASdiRs+qRxGGoLtyc0s999MII74ffxbx+IN1Xh5R32JK6LOTfsEF8+61Ve1j9wPqCVH0SBFlYp6VLXqJj9EY0dvm0LyqBCTBqavO6gFrq9fqST/mGqXDsZ2xS0bICz70S6Ntx2mpDpBpvBv8ROn9QT+7UW9EHfco3K53Nw2jYYBh1b6csyv/t9cHq+RixY7eqHokx4ImWfvELktHjMe+uQ/JO2pGtLKuGmi6WNDX6sB50vL2IKFxI5ktgDlBKvzqUeP8Oct9VGfazV+wy9J3sp3maDCMnKnxcYASqlyuzpoiMaqn2SY3AWhS/D/wQzPVT8f+9Fp3XgTlgM+i21xPohrY/pgSIIhg/3beqYklrxKT+acUX5cBbij9dD8hTnKAk3WuRHd9K6ValI5+lcYv1rT+dD9HrsOiplMHfmF5/iqCapesdIdv1HS1+ZSL+0ZsRP2PHRL0gQCP7GWtNNgRDWUPy0QiiO7aWQP6rOmul5hv2WUz20jHilIW1a3M6PltH3Ul/Jfm7T0eTT+OmG2E6wX/X/sXue6Ht3urlHErAOjTyRStDrwK3pNW+PJQ7obywl2fDJYUOKye4syxSUKnI2hJ0byKYQbV0HPE1Pl3fSPB2GwNnnIx5HOSvVnaD9NX9FrRX7m95HoZM70hG3Fvtdhjkyd9kKjJlq9A9LHZVjqt7f/jjZrR/K6J8zgVkOjfCewk40PrQTDoO1/5M2Gvu/Sp5WtUXqI1l92r8hM/Cvd+AK4bwUxYRIdK2fY6i8T9NlEoxnngD48q3ARojkXFRGljVSPKHHU+u/qKokMRKgJDPBDAGuuojOu65AX+PhLpLDI2b3SjSeA98s8rGjvuwvoDKKJ71BdLvXtorX6D7myH4H4VLv4b3Z6AN9ESrklkbKxNW3+X1qogPqvOm9D0XJ0Iu2gxRm5QYL1vzzD92T50Q3bSx/cL9H+LcAVo0vTWnCtLvOsZYeHtzus9MiO7KEZ13Jf5/ITcN9I6Kq7ZH295uKegtE2um915+XC1dPl0J+JnTkFPtLtYyIRjfdmRrvd4lYBQ66n9J42V5GsdcJrLef+Eq4Nfp99wLnI3qiAzPbyKwNWw9KhE5qaw6RUSm9GfV3Ame+ghdx5Uonnkyubrd8e5IFzGlcXod0P5Mb5e254wrE05hX51eGf4UJO18VXM2HAi3bkjXKRGllovJvrs2/mOgL0Byu43PPKB9VnVxweDJkpkpBSF5HaKDhuOVh9NOCOmYqNbyjYk4DTHvS+i67XWrliuW6CcdDUWEpPpZ2PHa7+9N4f6t4LRzyN4L+n9WFLJA+9NhH5OvxsOYTJ8fHmlCR2yfqxbpwyat+D3de5cUOqw4AzPTS0dQ+o0ZeKmkxqgmhuiO69Hf+3TfloUvHIr3EjR1A/dB231Jb/WxSkhFhJU1tudQw4WFmX46XpxU9tT1BuA+IqFq+Man8N8+jsI5CfGdhq5PHE59yaOpAIULodv2C3qjrR6ZCnq/Fq3ODxqTQyjITxg+vpTeJ4yH3vOe5sNY1VLr8WQuuJZCKYKBkhDWUEBbWYqtkR1/UyBPYMmdPAhD0LWg7mihvMYrdP70OzRM9Kk/7nUReQDuwr5ISTBiZTLCZHRZySz6dqL6jZxhp/tVY4/oheuQP2YoXJ3QseXmNI76CHUzgTegrTXt/vWb+e/jC1gGfxBCt2UTweAPHP9RgvCONHKbvow6NCOAmSx+7umzB4RQVZ//NszYna4LQgqf+jz5+ow99/nQ9oPqO3TSr2az7EysYVF785haGxN9z0NMyBqD+b9FIh/5eq8eJKkcTvV5/gFh63+oyOyyvZt1Z3pUGez2nHgkvHAuxV9AeC10fXQ/6tdcm/pXKqO2SdUoaLVs+70+acX6pT7+tHVJ/jRAKKtq5+fguSMo/iQhbDUUDziCXBnqF0LXZCiyNL2s8qfv96xjKMe6uEzVOjyP7i5D7vyLVM89CKR7Rdz3TZl5EWlJn0lg9bR41ffIXr0DndvuSkNma/JPQ9u/ksU6en3OHpAlFLalwo5E77atPrXDwetnXVK4ymznJAMbeFUOKKkyQOvAE2tTOijEXHwp5u1d6f55Qrvn07TJerAQgi5o+1PY64DEYLzeEYn+LMYOQyER9GGK2ERQ4t6L91lUi9tS/rNP8eiI7Pc+i5/9BoVfhXSPXI/GNTPk37bf2vFA73gxvo9J2QQXk6Ea2WunGpPZKkM5vE9EiqqjA5gZDzFb4tsOm+5OZtq1dPy3TOIHmMhdAF6mRNADTWJIkp67cc0EsAGwNnQ8+xLeXmWC8RD+7TDMGwvhZ4YMBclOWgjHA8en42+jFa4TmB1X3ZfR92K/7ykKzjwJRs/sM5KYjnAPp/Q5JXwqS/bMW0nuydHeYGjaYD1oh8YFkITQ9mKqt0Z6fUH/ETn9IEc0sFhfxXh0JCGNe43W6I6zRIZdpDoj6HvdojoRrBTOqv5c1kST+SMpnR3Cpgfhb/Jtwusjwrt9yvtuQMaD+rnQMavvdQzjZ+z43pJMkC7nmQ9g/x3P+Zrq1POhQWCdpLfgPaFc+YC2g/N8htLxMbLHTnijfkbxtxEdjcNo3KCR3HzIdUL3f6p8kufZUdtkxcj2MhYJQKJef5pHtWtbuNOn9I0InXgkQW4i3VeEdGy6IY3DPXJzIRdD+71KiXAJ/vTDvfclFWpr39QaIoFGxgIZEQqqIh/8+Uzz4RRjZSqL6rztaN9OyXzuVrixCc7ZALohKKTyU4mRoxUQywydmNolhSslaKssnO1N/NILrxU2so0gPJjCCUL8e6X7hG9T17El3iLQo60MZ1I5bH+5V6JN9ehPre4FXL1mqGfMY2ZLZY/D4EOxh8WsSgAaUX3iZIoXJcQPrQM/bCHzT8sEmkyyopLFTtW0LYx6QxBTNV5c4/KkkhCoRzj8v2QunKe6uwcHx9aRDykkqpqj+xsn4F9r7wab2CWEiyV/llmgb5iiQhJBIx6ylgc7AqOg49abyIxfSPbLQuP2p9nC3T/6/zxU8e0y6ZFqg5OZ9u+/tz8w0Ns5rGamTP3BOLhlJIWzypTOOotsaQuCJyB4GaKvVuo80P581NtvELEjT7W/DHnVaASKKWeIHh9uvzDXqE4yfcnYoDcRzKPa9VXCm3zCn0aYDfeEc48l+DskT1pTWBk3Ky5UuomXfB3D+WCbFD76jmQuK/fXQdV3j4Pf1dF5kUd8/i/wnofMS5A8ZI8uSL1023PVPslgJLPiFqwva4xWXURoRvW5kym2xCQzNoaffA/+CZm3If5Wb4xWBtrmV713z8PowPCnK99hW66cwiNl8i/qB39WkwzSopUxbi3fvg/BLz4O3zqX+nkQ/7I3LioS22RQ3DNwSWENhSNS6e/nUO02IpJo+MBY/DfPoHNyma4RO1A/chvy/7F/oftaWERim9XStyLUs3Qa3CjoUk/cqO4apKO4qZH3E+txBouIV8aKDYwuCRg0fvFyzD82oeunCckbjXDqx8k9C7wAi76f0If2pWrnm6mWqYEUTCYR+foMbW/dJ8N2f2IoLqy3wcxIgRuaqJs2kfaifZ5Dfmy00gEkJYNR698aMVZ3MnYUNBoVUz/eo/zalcSP3Unm6x7+52Jp+u1f4VLsq5LITaKXzrwyvSXR8izBVlXPjp55qEZGxEtU28bBS6fTPTkhvNNQ2POT5CVH/i3o/kmVL+intyJ+7+iSuxrQN/gEaAOeTAP7T0c24M+mshGiGtUTP/x74lah9Mc8HHUAwUsQvAA8Cotu7XfulZ8tYqnn3Zkv9fyTZ3Ng0Oj5s/Hm7E73T2LC+zw4+rPwFjS8C22TrOCudp+UExFPIVbIpiSfIRo/exXmwfXovjwmemU4TBxL7unUnz6yFH9aGbN2MdrS0ebBix/A16ln7823RDbeeepqOHFNur55AMGr9bSVIjvmmT4L27333f5slxTWWMCmUDh4A/LeNsRfuInicUbbAqVwYDNNzRka5kNYhrb/lXvm5MXz8Wp5bK9m40BND75TZGaINKLavjOdZ8R4+V3JjLmYYksjXWG6HmGgnWVlrD2OIBaEhVq++SY4aX9tG5Yge68DEdQvAMrQ9rdy6rQELwj6Vlp1gMuUgFFDPLxI7vvzVd8aogvrxxuRCbEWJvyRzFMRlgJxiLJGpfcBiUNUQaOUFTQbwOZQVuh66Sn8g2OyX/Uw/JrkX3/GO8cXv/ltaAcOq9huD8Z7dr3J+NAWl1r6JZ3L7w9EJNZFbEnz9w4muuz72jEqpGODNWlcM0PdfKgrQufDdtzJAPj9fMFA19tViQIkz6a68Mxw1as3IPro5cibIyj9MaEjG9C47hp4nZBZCG03lnsJeIzBM35v19Wd+zKaZUNRQf+zqXZuPpdoz7XxMlD3LtQptP3dst0awAQZOwKarGbZHmU7TjpsR6KLfgtPbUb3DQlmf+tP6xYAJWj7a7mnK+/5QV/ZUCcb74s0uY/+A0xYTts5ydhimqB63o4U/nUmZsLR8BJId8q+6lfYV91Ru6SwVjEiEJGydmz8A3jnSxT+zzarMjZuob0rqnig3tEfV3384DZHfMoK/ohx2rVeB7poO/juSTT8A5Kn7GhHj/0eIIZD04vpBus8NYE8eRgLwVZ1dB82jIC18IH2hQmV8ReBXoa7ava1QVNxSagXn853n5Xmr16gU/FkwtBaWK863oPWRMs37E1y6g6ExtQkHfmKLgbYu6SJXQ5PhW3S6wk6GghgE2Bv6DbddNz3axq/5+PtM1uaNr0Kbsa+KmhJz3NfH8ZiX+NikdZ4Re27TMkQEg0X7k885jY4v44Q6w8ioL2jaq6plka4xXZbJaW9tBvTBkjRoRuil1Mm2/V2hdJdlA63jeJKfa39terrGJleB7G6R3Arcp4kKXEcCANjD5oCvGvw3l2bEkqpKqAxnt97vrVirrVOi2f+Ci7/IuWTKrwx0N5eXZWX2vKnVfJRaVEOGL0sYyt0y2o7rwpETgq1rHsRHPdJ+Nu5BI9Ce6VSJh5G04RwVcD0+h9NvyCOfdRhmTA7TVZeKwAxamLKGiw+CuoSwRVkJz26gab545B542AetD0W91T3EEsnP5CC5sY6QymGMBvj7Z+Q+ZShPO0M/M88R+7IWYS/PZLEKFGcYCQNd4bI6IoayH5ZVdc0VteG2sL6Dl9EStp1w3HkvXVYlIR4BIPvc5rUNWmExgqqZMmQMUAGJID2khLsnyD7KIVffwHdpZP6iw11678jIo/BsWmAgWcN7lSBWWrHQRURUZHpkWWqbFkJn6HBF6GkMSfir1VH24tFjJdFozS+q9ER7soYcgMeBBAb6K71Ce3K+Oi7EN1tvxTNifAXxESSEPsp2YTW7nUM1QQ0ooEM4ls57yoMrHpP2SqWVd4aPOPelczDyI75IotKMSZreqrHIl5VlltD7z0lWEMTGiVAsqA+dHYOIOHYxLP7/t5PDcZnRL5a1sLNHyM44Q74exNt80KMeIj2ez6r4ugF4iShDkNgQLLQXYYwZrCmhS4pXGnWRz1IkgHPKlbrwYABOuamu4IqbFNLGgEaEB8nRL/5NMGoGyiefS382MffNpLgtEVwE3AU2k4dElfKhkOpAGAoxTFmzqEiv0hUGVLEKqrTfJFxJVXdn+TLR9J+dxnPzwzCi/QxdIVoFNJIHhkObAmdr79JWd8kOEIIxiuZe8eTO3QR7IzI9xbZgOOv6VmNyNgx0LFJ7465CX2DrJUfBFUuS70LkdqAJqnyBlqL9kcJmgVZT+h4eQbBWAhObyZz9dYUb1aMLzUvb+Ib1UiInhIwnh3irS4Mas0ZNlShfrjB2z5Dx2NP4u8REnxJ8B/amfBKzzq5pPbeN8JiO/UGhk+KCdsiDL5dR1DDo6CC3e7RtIkHm3t0PjmT4DTF28WDz+9S85wACTGNjR7xLTfD6HEwzYNx0dITwtayzt99d8z376MwOyCkjGcyq2VfpwCRKs1bGzrbXqOcfZvgRMEfuQ36pSaiDh2MHUOXFK6sZMVhVVZzPFKWiQEbJNvbpUa8H+3a+8XtUmOJgQMD+HuZDhmCNIMGkgQaP+3ReUyn3XOlMJTywvsn21+7vuJT/588EA5Kxknxm2H3gOZDAwpP/wN4mPwPsjTsOUVE5sDl2Bf0joHicf++wtix9LKCtvBeHUDLUtwqfbvNS+o8j09fULVyYnmiIr+XtKSW4YHESvb7IXrc16RunWvgLlTv3Ad/+nSKRLZFW+OISl0ioho+NjBG61QSsmoorT+T3PV3S9Ooc2Aa8CDafV4bHk3Eq9PY9Ywtxn0Msqd2ZfhA9bY9Ow5r3u/FZDfyiCc/iHfcP6QxNxnOt6LTRozB1Hy4KQIqze+pBoov0lrWwhZ74c2+m6TDJyLGyOpJCDG2Q5jbWJE/PUnjLp8T8V+FSWj86u0EzQfR3hFD9eSBSwodHFwSvqI/yaKN1qD5y4vSgLYy6pao3hmJiGr7kHy+EXkM3YtaaDhykepRXt9lwkMB021wFv85QBdVEo5B9Plm2WpOkPkBfOwaOA3y/FtEuuE+KwXT8Bk7XmGEQEtcFXPE9nymv0fQ8XTGJn1vKbOmiIiUl+19tfYki3YdxVSTEtEMvsqfjyHcpiS5Da5RJcP9+yZA88C4n+z7dEUxTSefoPrLP8B/FzAgrlwlMVkM7bP/Id5W56iS4/59I7a8P4DJqyERTBmuMUBYtgROamjGtxfv6qEcQXmtEt6mGeLpbhXOSi5zkN3YI9z2r+J7l6h+s477m0J2/U0zvDmQ8vB4yXZZBSYYmCpauPBeokm7YZI8JUkw6q3W2E6JyW0awMj7RORVXXjtMJ54uRMtZNzyegcHh1UUI7wei7Qklrmw57LMEIaBJEkItvMJ139aREpDbWG9qoqIRKpJE+Vf3UjhFBA/GEyjo5V9ciIHPAc8B6enn31EBq5XGB3bdRCt7+PHbV3aEr2sLTAZmJ6IjCr3O9P1gS0Ib0mIHjVEDwP39/tp24B/HNQdD2ygIt5DlTFU1aneB+sc1rKgAVIS1TAPUpRx0xNVBsjlGTGERNRvuIlNZMvlAWU7jTSo/ikDExIZNz1SRSiusrOzamPvrSkag8RCk5+BTYG1of2Rf+HvFJM/08Ns9SANf/gB0SH/g3EbU9Bk4JCeDDzTCCFIV7MtbM2OZdyESBcSD5wTT4B30t/3t7ETjEhrrPN33I01X92fQmj3DXo10AEVsPdNCw12suTJUMZ9KdLoqEE9CuiSQgeHoeJbKsyCJL0tpgBviZtQaidQTcjiUfZmkD/3OdW/DMGF9b3LsUhezQ8oNt3lToAnGbuHcTxAYjt6Y5aaLEOrgVYsc2jvRdu+CVsdGs2bhNwjRH/zKP4mpvuYCdSttT3BLAgWVAUtUpUhzQP+D3gW2BDtGn0h+T+WYatfiMh8+15nS+XfHkSyFg3ct96dUriKDDDBT0QmlFXJrMTMc3H77+EhKvZeIx6sAewFbAed15xPw5EJ8bFd0rzdJTCD6ru5Gh5SxmEVCbYXi4wqq07NDLz3n0A8Z0m23hdpibTw44/hX3MnpbYSkfgY9WrHvQlgEjut9cSQkDaXFDo4DFoY7FXLJIE4RlUJyJD3PKgDGqDj7UUojRi82swzkohcQ4b26EnJ7vz0UFxY39eTvpLQh3F2kIU/acdw6UngrAAuV+gZAU0TsnpUO+utwH8iJrnoMsyrIynclBD/PYt36G6wADLv2BVBpT9AG9HizaTqc10I/Af0P/Z/m/NnwwmAd6TGt08X+dxEuxR9X98ymTrUgARVlle6i/02mUiZTeMYTVL7bzzIAk3QvijCjCqQO8KjOOsMyjOepuk0Ax8vSePFj8IFwAXp6PS+2M77jSIyJbTrcBwclgVBP1s+3oOWWLV9O/jGHXS/nKPsCSZ2HWeXFDo4OKyQAEBV00vdIEmMJoImSh0+mTUNjIKudxfR0fEY/uFC9iuQe+EvhIeej8TDiZLacvIqiqeGKF8g++3nVF83NgloGaLP+F7QNwZ/3tuHWXaqDRLu/6XY8VHKVUliMxR3p/PQMsFeRxBecwLh3RHxkz75sRkwkC+CFqH93nKfWFk9H1O9IkiXkEek3fVKntFeCNEHlCzbkJuzjXZt5xFPuk7k8H+qYkRInB1a3fCG6Odekv1XQSMlh0+20cBI6Opop+O1GfgHK3XfEZoy54A+DiM9CYJu2yQ+oKKHAYwXOEtFxoT2zu64lPjMwWF50N80tiqoT/cJn6Hu+ibC2K5XcqUclxQ6ODh8gAAAkzLCVRaLqRCkDKxGIZv1YRRwIHS/8STdr/yeup9lqd/xPhF5GC4FLkULxzxMPliDtjC2C8FrLD3I4dNZelWGfeUnaeA9xDsygzHo3cKoThPunwxjp9P3GfeOgapqBt45n/IvhOKFSmHsx8hvvRcNsyC5CwqAkMEAXf120ohJx67S5G+ZeIqqF5sDQoAYKCcJpdeh8fUTML85QUvfPFHkst/qjNGBjJkZOvu0WmxF+muFiStg8DYL38f+i0LO+LAFcAh0t8+i69HfUT85S/0np4vIg/BH7KuPtU2rH5ZxV2RCWE205OCwwiRYSFRRMm9fREesGBOsHpZRB5cUOgwBpGOTxBGqBtHBVNkMUS2jcUITOSQDNFtV7uxYQO4oQ7LDWxRajiX4LATnQh2viMh82Cl1/qMDXp7vsdnLPp2ZkCSs3a1/CmSO71Tdy4MJro44qIL4om93U43pTwJTD2RZtHNC429uQB5fn9K1Ce1NjTTtvB2ZVyGTQDwdFk2PbChrBMSzMbKyuM6vqIAjsTszBeiUGP+ukPycq7X7k4HU3XWl6r45kelF93xXF+YDbwDrDFKfFoVoSgbTRMZuCWkCstDRvpC6zwjJR+ZS+M5R8BHI/xTqeE1E5sKBVr9mEDB6X4VLBUZHFSbd3k63SwQdVqLl16m2slm67lq8u0MUu8PVwSWFDg4rztJUKOI1QROBRGnCJwSKDCYSz/Uxm2VoHgEdD/8b2XAhDacK0d7zaPjT8TBZxNTHaAE4L32liSBXAaMTmCBsNrNE+PMzaNjqY7T/L7SdlJqr1AmxJPDXz4j8PB5qC+sHv+tZd55Ia1lVNwe2o/h9pfwroXzJlchzG+G/niDjfAyQK0EQQfsDZeyabEWNh2d8e61wdSw3Vo/IM3S8ENH4zq910YaJyPQp9r7MSFfAcPjQAoZKAklCgoFEaSaAjYHtoeOxR5Dmd2n4mhAdvIDGG4+1d/5QyX5Dq7uB1v5PBCYmIpKOgo5xR+ywGnCREZkZatsW29FkAjSOnWd3SaGDw4qDBxi1pNiZBg92BD4OxZduIZy2Dbm5IymWFRnQpidJ/3s2HLA2nCc0bvRzW+U9qerb0oXeU/EYP0lTJsc0ELBBgD6NJ6NQbTuzRFAhC6i1hNCAJpA92NB9HHA4Q25h/eCFIXwbZNqPtPCJtyh89iDym25FbjrkClD4js3zBENnzxioffBiMr0joMnql1uJBcWjozOm2VylnQfGIq2/VZ2SZWAs+HOoWYQZ8mqQRgM7A5+CrtsvRzZ7gfxkj8atL7f7Wr+NfS3N/s9SkZbQ+omT3LE6rAZUamRreDAz1PDhT6FHbEB3GCNiHC+USwodHFZERGbvTyQbdJI5oZtki1l0nncamaOFzMlCjlnIhH+Q+T+7+2YAZxR2ZyHIMP4Iv8G++lSANSXisN8/YcmELJZGvyXU0r92wbvgO3T+PQYT1F5SqCENBHS9cg71n39Tp+FXfz6HgYrIJnvFu6DxuQn4c6G0ENoIqXQA8Xz7u2QljoGuUDMkqDEU2ovUL7hai1MWiEy8xT1rhw+lKJnPLyLMT6X866tpONaDr8TS8OP/wkP07QCOhpkTkTFjwvez/w4OqwfZilgbUCU68xPkgg0pUK49LgOXFDo4DFBomQYytL91hQQ/OUe1ZCR7QgKnYF+ghUObBtMFZksNPlFsIjg6sh3A5akAt4gIiRb36sJbd11iIkytUYsb0ETxNleSzZ4XkVBnTAxgihP5QYMytD8bAQqeh5G0MJHQs2ViIEESIRSP8BEF71BVvV9EFjrafocPJE4iCt76to4ZkRb+UjKYiV5f+z8TZxsdajhqAX09/f0fReRbqu/yGjlSHlvXJayx6MvBYcAbHbFM9eKrYlQnGdWrAlUVROLB9ElFiESmhCJjwgpBwHIi0ac1Q3zSJErvKKYWRzcqb2kPIX9DEwCjJzoxtxIwmITZRyRAYmMD3wFevPEkoEBMdsEXKR++cSrKLil0+ICIUY2k16epESH5kPbfwWGVyzH6SPr7mWVV3ZKm44+igKKea0y5pNDBYaUmTYldgH1v4pzmEs9HZZSU0UePIhGhJslb4oiGwKf4xM14TX/WGaMDGO1GR1lI1Zq+QYAl7QYcyB8nATEexWdjZPwNACSJ41l3+HD2OvVpIuJkyWGAIluR5wiijfEbR1MiQYzLQVxS6ODgsFpiVp1kVBENr98PeaKDWLX2gnIB1QRvY4M3yYhIO6O/aFyCD/BxkPXcMdR8oms84ke2VlVxLtbBwcGh2n0vKENb7EZHXVLo4OCwWjHbF0EJ7/gh+fpGlKjmGFlVlQCfYudcggMus4H1aY7FEYDhINvEPcmzQ20GP5JAfHt3WshwD8rBwcGhgvAJgXe9xZNFh1qAm+d1cBgKoaqqgCSq2kRHXTdxUanVopCPIfpCRmSNf6oivUuVhzyE3NpZOtxB1HheqOhrvursNUm8yOWFDg4ODhXcD7yFSwprE65T6OAwJHCSL0JE6UdfpXGrcXQSgqlNKugEJdjjz6rqqKorWYa9+1miFN1FAKhLlGszbRehTEzD5k0k9T/GmHmu9urg4OBQgY8rlLmk0MHBYbUipSwvtRRhdmqTay2v8EBFye4vFP72XbuYedKQ9x4iotyPJyLddJx5Ljk/gTh2Ml3LCIG3y+CLq4Y7ODg4OLik0MHBYbXDLqwnUv3njjR88nw6knRhfa29UVGMQrLHOzRdP0zVlRN7MQkQaPzdRjDO2HzeNVJrF2WI/iuQcUfh4ODg4OCSQgcHh1pACyIoi/ZpxzzYTAJIrS3VFiAKadzA0P2v74jICzDat+tFHBg7OVFVQ/a4Z4n0STIYN0Ja63DN3NUT0gTYTq2Dg4ODg0sKHRwcqqGq6pM77WeUF1rqlpobafPSt7Q71P+5zn7tKvfkKimzSAJbBSIym8LsO8k3eBC73Y21+8RwXcJVfd4A6wHrYHd6ukEDBwcHh+WBuwHv4DDoEwoUJNL27T9JIDV6xymKaAwCuv53K/Vr3KC6ry8yxpX7++CmRPU2Q/yZhcQTOpFCzn59oDcMBTApeU4MMhiKlTEwF1d3XdXIpr860+HgUJO2vngxBFGN8ho4OI/l4DCIYRfWq2h40yEEc8rEWoNWWKxvMOsLmR/ViUg3nOJs02LJ/ZgQZov4oy+ifMg8GhMfTQbIjGJV4lf9EkDUJlH52FCPGdi8LJU3X4D47wyOpH1AJeOO1cfBoaZRBNyQS63CdQodHAY1ZvsiUtauQ75Jvq6J9jBEqC2SGbuw3qO7ax51486xXxzvSv1LxAi1xEFnf53ohTvwbvOIPMWLpbaSKUlfHmgUgSqoUkcGX7AdHQ86wgRv15jsQR5R5u/wQhv5e4+i8GKEiD/wmDslTQzzYA6q+prDqsnHc5Xqg7vQ6eDg4OCSQgcHhzTXShfWv7k2hW0Too6EmpwOEPBU0BMbRYY/BukaBofFT0paEtXxnkjub9p52kFkt7kZec4jNAaTmNX+HDGgmiBJjKqgidJMAGsDG0PnCy9SkoXUfVnQ/Tth0mHUnxTD8RkC3iV68Cf4D/aE+AMXHsia2C6hSwpXhbHDR0jmvY2hE4IGtwrEwcHBYfngRrQcHAYtKgvrrzyK/Ob700WE1OTCesWQ4G97pap6bhXF+yWGrbHqpIw0XP43Sjt8jsxuQpCAEq38BKTPGGicvhIMYBQkhnxiaBwe0LSXT/O3A7p2vZnCxy6En11Mw6KPSOOiMeJfOlqCT+8rzY++K/KlRSDzRCRG5zYMjtEixd1rW5VKEYU04NH586tE5DkiWcON7To4ODgsH1yn0MFh0GKK7RZ2NsQEXVq7C+tjJfi0R+GViyWQ2I5Htrgy/3smhi1l1ameyIS/a+eNn6buT3dh7jK0d9vEUFhBo5cmTQKTGEliEhVElQYyGAPUQWKgs1DGjIrJHeORdP+VzpuuJPdlD/9LsTSsex88Btxi0yXFg/HY14RUIH+egdNLqJ8Mis6aKqAxSSKu9LoqFSObVy0K0VPOfjg4ODh8AI/v4OAwyKA6yYgQUvrH9jR8/BI6UcSrPY58FcVDiEe+RH5yve0STnYPcJkSwwmx6tSMNBx5N+aWg+GrD1G/qU+T+iQaWvO+vAlWpRNoFCUiSWKSKKIh8Wg0GZo3D2jaJ0Nn/im61vkXnP0wemMrxXhNGk5dF//ba0ru4gnSOPs+CU64R0Tug7mojs+oTs2oqogQi7TGIhNiEdSy464/eIJ4BaQe/D2GY0qxGx9dlWefJG703MGhltHguTOoXbhOoYPDoESL/aXz4+1kG7KW6bHWuBcEiMo0bJKl678/lAZ5XnV0ICJu7m7ZE8OyKkZE7gDu0PLkU0mu+xTNhU/R+U4v30v0PpvUPTybu1g+GAKETODDdsB+0PXEfcQPPUjmCEPuuISm7Sbb4Pv7VT/kxPRV3Q2cCpCISBlah4pXNZQWFPGab8IkY90Y46qEMx0ODrULhahzoTsHlxQ6ODis0mSBRFV9yt+8hvLPqM2F9QaIhWRUTP0fs6rNAjOBMe4BLv+zFpgQiEy+Ql/S37DZR8cQnHw9/GldSrOVprXqWSwvVMADMtA+P0LyZfyPxWR290jWn0HHN88hd7Ah+FFCPY+LSAF+jH2BKj5MAkaqyIRYoUfIRIhtEtjbJVNVD2Z5zJoAI0cCU8NB19WxTLqG4ryCNG92u8aLPoNxRJgrWQPScd1h4O8APEDvvkIHB4ea0FFrHnOUfvtbiicCxnMFM5cUOjg4rLJkQSJt33wM2QpNfq0F0HFEYyZD16u309B8FYzxRWa6Uv8He9YKlFUnBiJSBB5U/fe2sJsh+2lIbr4R89JwyomCpplaArJ+TDDGw3/i2+QvexpuN/YPKEv2KwoXYl+gSgYmKnxcYHwoIlFPRzoNzVPHL73J4CSB2cL9c8V+fyUznc2gHatUwBthVP/rwSKXEa4yNIAZlSaFDg4ONZlzmObdKJEWqh1cUujg4LByY1Kd6sH4hPINR6Ff9Qg1QcTUVmKYVvdlLcheWC8iseoM47qEHzY5nBKm7K2m7xjuPoct83PpkaNqQpjx6QjoFOyrWt4QmOZx/2QYOz0Rkaryby9hkKruCW8cTOGIkPwOAVzwS5G13rDEQoPmCaRJ4ThPRGKN5zuimVWajbul2A4ONa2kGnUiNLiNMS4pdHBwWCVo9UQmxNrx8SNp8JsoESJaW6FpZWF9ofwu+d2/ar842kV0KyQxROk3K6o67T1s/ViAuP8oZ+8IaOsSHt+MAG4TaIXW2bFMGJc+uwDVcjP8z2fhwRENlx6BN38i3T8r07X1COo3bib/NLArILcBb8DIQVQxFiAB76PtcIUTxlV+9i4Dd3CocT11SuqSQgcHh1WUa6UL65/biMJeecL2xBrhWivLCRgV+NoaIus8Z5MQxxq48hLFcdGHkKf0/8anzrwVkTFVXcgGVN/+FMWzY3h5M8Krf0V4a4I/3xAd4REEkC9Cdwztc8pATFOnB1558CUlSUKuUShMOTT9oguAVhlioOCOwcHBwcElhQ4ODpZshLJ2TTmI/PrjaJtXwki2Bu8UKp5RZK0fqaoBSVcTOKzmooKByQZaECHqm6i3xr3fVzgbbl6HrgsTkoVrw9ePJfcIMBs6bgNJ2UwjoL0cI4CKQYIMGkYgPoPtUqH4EIcKX/TIXwZkwDgXu2qScQWawewO3OBCGwcHBweXFDo4DHW0qqp6FNYLSN5JEExNLqxPYiU41KPY/DsJJHEL61dbEigwK4DLFaaIvTdoBcayhTKcjtMErlByv7sW78FN6Pp9AvvsDF1Q/yrQBW2/C9MUTxDfRxN65E6we6lE068N0sccRyHDhgcU37icXPB0esKOXm+VoR7Y3oU2Dg4ODi4pdHAY6gH+JCPSEqrevxX5j15B+18TxAQ1lxSqJAQI0QazyB1nVI83MFmrmSwdVkbyZzM0i0liu4GSAOWq79sEHt2NrqNKFL/7FYLmzyB3xYCH+SoQQ30IbTNiILF7EAWMl8pZwpAk+1BRAoWo8W38o+8AKUF6HG6AdBXBKGRdYcnBwcHBJYUODkMck9OkqmtcF7nKnq5aa1QIEIXUb5GlMPfXEsjz+tyBWdkmDaIdVmAiOM2H+0mTv36ZWktlfcR68Np5lC6C0i+ha6/9qV9zG+rnQnQRdAEGDwW6ir3CZIwH6tmun2N9BCLygUfhI09K/fi7Va9uhBM7nBSuKmEHWEPIjM660MbBwcHBJYU1Eoipod2xKzmsjqQQ1cnTfEq3TyW5tJKB1RgMEBuSzUrkr0F1qjBzZgJ3uue3QpLAeYZZk4HZiIyr7gCuDYUMXdsnJEdsQ37rqyhOieloGkbjNhuQfd3u+y4/BG2ko6DGQ4xBYxt191mu4KYiqwodiqdCYWshf8VXVUca2KfszmVVCX6S0EBA4f7HyOfsUk3fuH2nDg4ODi4pXGXJX/U4VnrTfV8jIom2b9cJbwLt7qAcVm14KuMibVt/C/I1u7A+pikbUFhwl9Q3/lKVQMbgArjltj1SKQQIk1FA+jOMajj30/hXNtB5oVK68Fqyc+oxC8C7xJr+XASRQtvMsLd8YDyMVI2CuuTvfRQOYhIa1/EJv3uHyIYvqyYC490Y4ypTCBSvzsBxDSIyr6Il7mAcHBwcXFK4EoOxaT7cKDBF+41jqQ3S/llU1REk5x9E4aIYxMMRKjqsEtmc5AOJlrf8CnpqIyWNkRqUPwVoguyP6+BAYAZuYf3yPGek3+oOpcUDYlWddyw8P5bCqQnxTIP/5RPgdWgoQ+c5UMQ2ahWlHFZ+hmBM0DsG6pLA5UIsEXWJEG5wK8EXP68zCHCztKsWRgzd3WWy+5+r+mtxq20cHBwcXFK4kpLAdBxr5GwVGZd2NAyq8SbwkFC6qB5zyl/RBz3K1yR0rLEG9ZnhhAXFDDLKdYfaxfN/8GSbOZG277EfjdpIkTKiXo0lhHZhfRdtmC2PsV/88AvrVdWHmdJ3d95gs0UqIqIiWVUtbgq/9lh4ckz9Fafjzz+Uwi9COnfZhoZGyL9i/1L7bTFaIYPxfbsXMgaxX+n96S4R/GAPxVO8OCTz+TrKv7kFhiujW0Vkgro+1SrLCEESIbtrRrzxU3Eu18HBwcElhR8OIyWlxAdQEdRW5KvHsTxU536B+AcBhT9miSb/Bv9JMPcAt1lflFMIgQ4SPIxrEjqskth00iTDGy2x6rNbUPrE+pTba7NLKB5oDNnTmyUY9Ros+8J6OzI5OY34+uupDIHOTKtRnWEo/ulHcMm3Kd9qGfjlNIjV3gcsAu3pfUAFxPNtYaDWGUHXFnjZqGIoxwMkqhcgTmgYU0d47NmSXfN61fN8kRZ3l3CVGj9J8PNCeMQ9qjMbaJ3QLRN692k6ODg4DG0sH8XJEE4KFcBXJRCZEPY9QA+RSDWa+y28J3eleGFMeXoGTjwC73/QOA/aW2znw9bcterHCkaMu9LgsMowfrYvoyhr4Yo9qWvahzZqdGF9kpD1IY6/r1r00oX1ydITwUkGNvBgCiIS0ucDGcBYPdW3J5GUGsXb9NuqUz2RCYMqKLSJ74RYdVojuUe+Tft07WPHKvZHRRCCnml2avkYFMKO1P6OCytZq4bNYc13e9QASUTThj5de58rDYf+WHW8J9LixkZX6XPwgahM3dE5wjPPE5FOfenaHLik0MGhduG6+av0rM1WLilcNgQA80QIVXUNeHkd2vaOyP34fPy39qH7qoh49KZ4Gci9bUkZ2m+pBKaC+AGSjmNVS7mAu0fosEoxrzVRVZ/CtmsRPZdgpPYW1osPcZTgHxbg73mHiMSq4z1o7ZP8wAwfpgAzEWkJ6V2kLsBWlH5iKF2QUHfZDzHP70n3NSXYdwviyXOAb8OsQexxIqVgipggZ4tOUV8vO6CuUvkQbDQ/tb9NwEa0jS0T37YmprN2Iwc1ipeUqF8zR2mn70vDZT9UPS4H17mVKqv0OQiYJKJhixzRqB8RMEv1qsAu0XRwcKhZJM+6OHmVxl5NLil8H29iA454HiS//7q259+m+0tfpy7ckfwi4Bib52WAIkqRqDfo8oJeMgZXFHaoAWm2d80i1X9uTH77y2h7Ti17ZI0Z3EQTMhiiukfxP15KiXFQxVS6hSIo9N4LVNV14JnD6Dq9TPGY/cmNOgqvFepLkJxo9dQDWJigC98ZIk/ctzPqA3XrjQIYogXAFSdqOy9Q/NIXyTV/jPzzEE2HTkDway9oECBJqF8nR1f2HGn424Wq+/oi1xWdJVrlcpQQqEfBv0DqTz8XTk9txlTPnY2DQy3D1c9WLZZvcMIfkgdkEAq/gMbm8wnKUPodtFUIGSAdCgURAaoC7CEylSK+76o4A+Zh2V8Kh8WYRank1uDCeo1D6rbM0u3dKoE81/f9B0CMatQEz15D8VqP6PqYrm23pX6rUdQ/CbxjddTSpGjvByemrs4H3x9Sz3sg21/B0H0nND52Fo1AWGV/EbETGDV25gkRokrTqICuMedKw3VpQjjdVQdXtfjHnuLHBu8kyF55nupkA5PVsY46ODgftvKhg/q8h2qnEJgH7fPScVDPx2B6kj75oA/f2IDcbA/6Fuiiniyz5k9FZwTM/1VGlYjCrPmOg2jgaLzqVEPx4VvxfiZpRlhbVleN4ieGeMM26n77nOpvN4VFwykdWSbuaCL4wi1Efxc68j6NG6xJbhHQBtFb0PZcGUEQIxjPtzqaSJU6y9ApYCyEQbPSsQvaX7L2VzwPI559trX2LA0kSZkmk0H2h/gT35eG7/5QdZ+cyPTB2iEUODVQfSipuRgh9hUviskdouhXJsD9WZgdioij0HVwcFhJ8fFUD14KVAmIZaBltctVuBzCkb+AVJY0r8AOoAKyBuiCgVRFSFI6/xDq0dLXjiU8sZLlOtT6E5QJsbavMdxek61FxEpGArpfn4fZfA288TPJtq9Jdhboa1D+l5W0AGh7IepJaUUEYzJukXoFHwe50dnfVfHeVBMU8BJD8xYZWP9O4l/cI/52P1XFH7wJoYhIUwk60mCI+aC1kasrMUEE2f09os8eJrkxt1qCH0cs4+DgsLJgJCWvWwSgUVIaWIVos5ZLCpc5e1tZDzYcQAFsBNKc1/Dff8Dc0kT3DVkyFx5A+6sgeC4Qr2EJ7llYv/npyJnr0a0xiKm9VRQYuhVy87ciY66i62IoEqd/oqiYHp00UjW6rAyZke1lwnCQrXoTF2d/VzA8UI0gEerFw2uArhEvweanMuvGe2SUlFN228E5MmoAok4tv/sRgpvPo/PimI711sf30jue0ep7Y5rENGQ8zN5QOOEzUn/0bYORadjBYfBjIMWUBhKzSMt//jrBUwfReUWZ4qd3x8yvOIxafvOCKujjJ1c5XZcUrh40DICjTayj7/wv6HdvJbdOA3RD/UJoezPqG5zXagQjQBwxZDPXP3gicyJt23EUTd0NJDW4sJ6qHKbYrhQJwQ8w9I4L9rkK5K4FvU/iEju7vZKSDo0TmglgQ+gsP0bDVYJ87jMi8rrqTaI6I0gnKgYhYpvz6QlrwfHTCZpzNCyCpGSJf8xqGtNWSTBJTGZYAJ9/nGjSD6R+k9tUp2ZEJridkA4ONZyTpHFaDElVRal+YCSuhoDORyFZ83SCTJ7Ag4Y26F5o+z4yACqzqvD26fcsb2TtsEITFcCMABk2MN6yxuBFDbS/GdO+MKKDyN7d0to5U5UEJe55CSAJaGzA85HGRvu9I4aMpNkdfnMi1f9tSzYcSakjBlPbzHsigkgGiSSNQJ3JWLan3etlcyOyaIURy+EDBSpqNLUliY1ZEmjCo/mAgPgj9xB+5dvSOH+0yGG7Sr28rrqvD8rgTQirxEwKHqaYo/2diPZSRKfErPIrNMbuAE5IyKqh4WMBcuyPxPvtrhJscovqJOMSQgeHGop7VbRPjAZgNI3RQg+tX7vn271tpbIEoPZtYgR+MU/UDu0LI9qTiNDowHG/Ak3rLlcy4irOKwUDLOCNUES82mBZNekridBEIVGyZMgKkAMy0F6MCfZOyIyL4PeHk5RnqXYIzB5CTIC3eyKE2nXBCPKyB22UMWQGSHLjsHy5tOpUPKCT7ju/S15/TFcc2ZE+h2WzKZKgcWy3YWqGRt8jyUJXqUzd54TOV46j4ZR5eJ99UHwpqo4O4KwEJiSWYXSIJOF2qld7ZWtV6qwHmkRokhCQIb+hUNjsbjjqYsl+416713SEirS4Ow0ODqsz0bCj9gnEMSSKIUODeGgGpA46u0A+2k394R7MOo8gM83uISZGo9B+0wBB3POxU5s4kMyPgr6zXAG9CypWuLIAZmNI8mnldQCwj8rqZnBMR0E1sQZGE2jCRxqB7aDz1dcoL3qD4CRD5pCEpkfHw2fbYDsR+X571XsfQlnHzERVA7p335pwdm0urHdYcVgbu49yAf+irg7odhn2+9pikxLGJAkBPnkxsD10SkJUfgT97gJKZ36Bxl+LNK7bDodaI6ITA5EpIUwY4o5sVcUtRiGJ0Ria8WEPiNZ6i+SsGeT3OszuYcURyjg4rM4YTUVtEqi2g5bBp64+takdZTpffwz/iITcVwy58mT85F8w1hfJLYISVodNUTvW/zz1eg8drrC58i15I7A28KJLCldPACKJrbLmPaTeHctiZyS2Ck2SpCmcIbBLwFAgj4dsD3wcCk/fhbY9TP0lGRr2uVpEXoKfYV8A300DODxAKwvQhwLShfWx6t1rUrfuRbQDUoMEM6tKppAhQE06CWiBxl83wR+ABwEPR8QjabCSJFVf8vDUjsZnMAR7GbrXnUvnX39NwykBDcc/LlL/Z/hy+hfWQhUDUwXGJyIS4rAS9VUTVBUweAiSCHl8OAS6nr2S+l/Ox9/lRhGZrTrJOIZRB4dVGaNpYi+j9WQJHprYe8V14sOmwIFQLLxC539+R8OPM+Q+9i8JcnfANdhXdbyCwHgDrVgyuWKnjY+73JGv1CQ+AbMr5I4CTnJJ4cpXHq/S2YpRFYiVhiSDl4dyrDCyhDyQG9ojc5VR0KhsWZAUhAxNngcNECoUpRt/74jMET6l5y5H595G3eUZ8jwsIkXYt2JYfBivcLLAuJ4AQWQoRsVpIX/h+Tmy/4qHFkusSXUvjmxXWSMI61BtGtQfe+xYmxRySBkqC9OH6r1CzyaCEoUkCqI+TXh2vLwRCgVg63ayJwfEC38LdVOpO3W+iPwPTgFOwd4TPEWRCQkKtqg0ZDuDq8BXagyxDTYDMtTVQehD6HVjDu2g48+H0/gtpOEzD8Cu1uZPm+SLtETuDB0cVnKMpnGEaEKi0EAGz9BDmNhRLJD9pKB7LKLjnCPwd1bqfi3keFVEXoGPLyFGuz+BFk1jNIXW2I5/t0Jwkgd3gj5uydLdhNNKRAh0L9ffcEnhskDRdK8WtsKpikZKAz5exoONgO2g498zaTykE81fgtf8U3LB1nSECTKQCH0q1dzkg52TVBin4hhNQBOhmYxtYW8HxRA6XplG4/d8vDGP0HjW9+E2D4glqCtCEbjK/rinR2QYeb3C6FhEIltpanXyyHijOkIptt1K8B+PrmiAydjyypSp6F2CJgKJ2jGz4cD2AbzxLMIDqirQOiirMCLjIlUysOF9dNzyCxrkdLqiEGp3O+WKlQEBFZAkJonB4NNIBjaHaBh0Pj0d79Mxdad5ZNf6A968G2BsIEF9BxSA09CnyTDyKoVtVGRcBNOHdm690p6X6GK+Mo9P0OzBztDxzlzY/n/IF58k/7Oz4Fojdb8rwNhKx9aH8ZG1+Q4ODis+ljWgSYIm9PrTNYHtoWP2LCSeT/47go7toOPHE2i8OQESyZ1Zhlt7jKaN0U6vsqnvFaONt38WfE7hmQQed8Z3lST9yweXFC75ENUqDPa+XWDp0FCFLIK3IfBJKMx9gPiRu/AnGOrOT2gMLhaRMlyHFn85gjC6aMBIfeVeh6+WeTR+v8QxNSqootgRA5PuRZEY6nwfdgN2gc7rzkd2LVJ/gSE35nmpk6nw9X4/r3rMYDzpGFcZxjiRXAytiJBoW0NAZrA0SnuKERH2QroCHgGCJpBB8DG2i/ApKNx/E8qT1F8S0P7RX0mzvKv6phFpGcSd4/GISKLFMzKYm4T4TfAGwJ3l5ba/6aoZTQUjwEPVstnlAh/2he6Ni3Rcdz6Nh3r4J78qjVtfDzdjXz0oWrvSQ1BSXp4xGodlfF6VKwHWX3oEav1ABsFvBg6D7q5HKL90M/W/zNI48nYReQxu6dF9ew1gKpbYxzGLOjh8eH9aKaZW62bKH6Gxva7DrsD+ULj/eqThf9T9xKdxzM9FpAO+v6QYzUvjM2C82hhtWW3q+PTX3QLYzqB274O7ArEyEVXcoEsKly8IMaBxaBOcxJ5Ls3jQCEkAXe+24+0YkTnVJy7+ntJfryV/YZb8Ok9Z5fkx9gWWte7gmPtPuZyP1P0QKa4GFrflsR0GkiSExKdpuE/nxgWCiYr+oJ7knfR8EtI9nYndC6iCxkqeDEEADIeO9pCkqZvMp0E+rnRefhgNh3fCGSqNVz0Kd2FflTGDScBIrV4+XBkzcN3A98jddWIA68da3uw7mHO3oNAZIbW+U3Jp8Kyz0XS8WNTQhG+bX8OhVIZQFpA7LiBu/htdLT8l/1mP4LxYGtZ+BJ0P7JGey1BYZD01VBUPTriI7js/R/2ba1EkYUCvFqqMF1bZX8HQZHxoAgLoaGuj7lAh2fN12s77Es3HGeqOaRO59n9wGXBZalP2BSYDYxMRSXrtiruPtsL11vqCGE0Unwz1vgfDobsM8bAF5I4JiPN/pnz9r8j/OEvdOrNFZCGMSvXVju9WdNZeA3Djuw4OH9KfKhqFPVea+utmlG3H3y8mc7hH8aFzSOofIX++L/VrPgwLsIX86hhtLLYD2BOjxR9iYitRJQAeo3DLFBo4ke4hMu2yWvwqIFtA3bFYDg5lWXpU/tA6JO1tn9uuRGJJThLs0uI8sDMkGeh49C7qv+KR7Ps8jZ85Df5oYGQiUhfZzHtdqzxPk2HkRIXTBEaGIJHITNXul9cn9yOfRVPA92xlpsbyC1QgTmKGZQM6t07guHto+PaJRJdtTXbDe+mYG4Lx0UTRGLJ45MjAxvacOv/7PKX6OTRcENC4/vnw94dhsh0FzR4TwSPAt+wtklkjhJGTSTuAkb0f5bD8uM+IzAm1ffMNaFyUTxfW177uqfbTOyo6YWg2GdgSWA86Hrgbb/uY/A89/A2nkf3mJXCZb0eLwTqqSanuVcaLb4sHf0KYrqbQ8YiMelWLP/0bwblfptCVWKqlAWKDF5ODlMmumQCywE7AGtD+8N00fV2IDn6HxrO+BH8Sa1e+kcCxwLG9tnfmaEROCu046DhnIlaWzxQU1Spf0GhgF+jq6qSz7QHyF2TIbPd/eAt/BWP93usA6/bT1xcTkQm947sODg4fNIazcRxJgsa2G9hEBjYERkHXwi46F/yT/AUZ6ra/DW7+JUz2gUiCL0S2k/QDO6U1a0SQXteJemO0FRenWf91oBGRDu344gL8oiF5OcQMpGkX6Tn6gZEUrgNssFx/cxAnhVWU5JXgw+D3tM9RyOHZyuVY6PzLDyGzgIbJgjngHWmS38Ol2BdUKpxpFSUddamMOE7Bvuy/q6oGNp1L2PgH8rmj6S7HGGpksXg69umJwSjU7eHDxlcSfOtukd1vge+gxW+Nwo8E1Qx1EQQN9oy6G56j/aYpZD8B2Z9BQ8ONIvImfK7q51tiAHs3ZLzYkbcJIczGVYLfV07f8w6NXVjfEqk+MYrwxL3pfikG49feRW2TdhIqjJAKPr5dZpvqneSBgyDeFNp/8W2aDgVO6JCm7afAU8Ah1WcU9ehd63gYP3THi0VaY9V9fZEzTtT2NT3quo6nW2KMerVtf5cmB9sAn4COu36GdLxGw3cMHN4mzfIbuAD76nVyveNLU7XX9jqsYN21Vwls4OORSa8F+Ah+A8jBUMw8Q+cjV9FwYZb6Pf8tItPhC9U/KFqyr3TXAQZuoDnQz1jigS0fi0XvKcuyQq7Og49B9xZK+2++g79nQv4nhvrNZorI/X11sydG63tdZ9Sq0M8TItVGDy67ndIex5BjXUqSIGpqVGYA7FqjXh317Bq3gYDlv5Y9yJLCCjNhYpnONFZyZMgGBtaAjs6IsNhGMF4JDhG6bjyWYLM3yVxhpHHK41C2AQopRxqTtH/73AZm7zXqosAkIyJdqs9fDS8eTemWCPUNEq1GQfIAjUiSmAxZMg0FSp95FHb6hsgPnoCp6BsT82xwVTfF48uw+bvUH6Ikmz3EwsnnMfwMn7pxr0v+pnfgt9gX6IzRAaMvUbg/qV4qbNn8HDHM0oNlUYjCnlHcLBlydVnLoLhwKX83XVjfffb65DpGU6iVhfX9ltlqomTIUIeBRux48dwCunUnueM8ik98nWTa/6g/y8MbXZLmS2bBxcDFqd6NBiYCw5N+48WxkymwhByneDD+Kvji8RRviEgkwRCsvsByKXKdIUNdYKAeGAYd73Qh47rIHO4R/udkwq5nqb/Ck6b6xywhzPgq+zsROFKXPL7kCApWCuz4rtDoW+KJUKHozaXuaB/d+J90/WQSDecE5HZ4XUTegb36+YF5urjOumLgUm0miWVRTtzFqpUTD/rY3XqhAs0DKkbAB8p2Mk2juM+fqyq60Vz8z3vEe7XRdcph1B8n1B1dlPxVz1T7yffQzVV+XUdkQqw6yRdZ819auu5JMmceRPGdMkYy1VswaiCHSGOZlC05j7FsrMOgWIDygoHhgqQ+Wt5q0wBNCtOn0TOKVPFmiaCJ0oCHt4FnR1teeZmw+DgNkzPUrf8rCfb/m+qNvpj6CO1Oz+sX6DR8xo4WG4iMRmRM+EHb5yItkb37tdWDFOLTaRz+czoXhiT4q67CUDmjlCFH45Rhak8ftnyH8hafkPoLn4I/pF29aUZkXCGtvP8DzFrInak4lYD9qoK10ViG0NGx3enlRraW+gy0Yul65NQ+Cw+PhkzvKG7htfl01f2L+h8m8LGl/LyZiapm6DpgT8rPJois4lUUS9A70QRVSRkGPYK8JYPpWjSPjqf/jX8Y1J0BjcPOFtliluq3jOQ9O7adViV7E4DKGOBMHCHI+9mXGQHMnEk86Ws0+b+GP8CicoIvZuU616XItCUvSOXaZGA9YDR0vTGXzgX/wf8C5E6CxsazRNb7n+odRvwTUzn4fWqD8FK7ktrf6gkMh5Wu24kquc2EeJOYrhduo/78AHZ7VJp2alG92BfJRrZwumP61EenejsxcX5geWIVUn2JlHrqYA0I1htup2m2Epjjjm2FxYNlpZ6sZT/nvt7zr9n3XonX0jVn5GEkyJppQtsgoMgatMGb6yK/Bp2CXTtwDHBMlT+dCIyuOd20/muaD2PH03Xv/TT/5SMsKsT44q26xHAJfkxSdnNNlDo8Ms0GdoRC1wI6HvsXwed8ghMj/PxH0f3XJmzX2u0Ypmzd7OAvb543QJLClJFO46gnBhEM2ZQVVIBMvUeyM5iDofuZu5C2W8n9PEv9JneIyByrMBWhlKoRx0nA5PRrKy4YFZkSqk4RqedyXbS+0py/nPZCghpBkpV4TmmrW9Nx2SyCQQg+A92FX1P39Vnw2YckK09VsfIlMK7fm0pAS/Q9JxBpSYN2Nwa0uHGvVPgiy5xo2Wr9HlsvQDBckE9Dcd1OOq/5LuYgJX+RkM89LCKPqe5leqt4vVBFRIh1QWsDw/3JdNhvWrn+rfJ5kqhqz6SQtUwT9vPgoZuDOQKK8/9D8Z7raPxehvoD/ykij8N12FeP7iVpAkCV7oUu+F9e+zImVEXE50otvbIQeeAghr19LG2dZUS8FVMwqHT/UFttT2Xax7eeI5W9AEE2BPkkFNdoo/OK72H2VPJXCPXrPSgiT1aTcfWVgx4ZSKzRccWA1eZjvVjxzyuT/dJ4EbkNvrx0nzm54gtOcgWc99IZazM9spVrK9gxXNkOzKFQmHktfttMMsfOglOBH0Wus7qi4sFdwBwE5WfuomtRqzRs+dv0B0Sr+b0rWmVPK3EaagcT/bXS+OoA6LrjCur3fBbdbKb9+51R3xitzBJi2QFQULs/gXElusbvT26XO2h+bB86uotgMkhiVrxOVvQyjm3SrZCxfOa9sUzWgx1ADoLiu4/T8c/f0DgpQ37/h0TkUbgBuAGN5txGXfPBhO0x1CjJn8YxdSqEd11HcPR8nYonsmzj08uU5aYBqeoCNqGeVyiykjPkSjBqQMOQ1MTafXf1wFqQKHTFb5I/wZBsNZvkrK8j5xsyX0mAl+zic/pXNONqVrpV8mz0wKzInSXt2uF08gt+RucbRWJ8jO9/eNvUf2yPtNUtwHpQiMEc8DbleZ+n6ZyFIp/7X2U0UVVFRAbtJQbV8Z5Ia6zdn5tB9vbRK2dfZOX8kxiSuGeVQjMZu0NvGHS8uQB/VJHMBEOy3VsUzzmaxqkGRnTaxa/V73l0IDIzfE8d7J64JdGU/wHByrFFacOGKLQjKhW984F1sGyQb71J/jBD8tE3KX7jGBgvNE5V4E0Raat6zwHsq3CppJfX3aWZFS7n03w7Xumh8VnXYO75EuVHoZsyIgYx/rJTfpvegIuwTJLKs0eGBoO1vetAx7wiBIsIDoLg01D+4xFEhXk03iSwZqeIvNpfruFghUOGjByoPp0RGVXWeOGVmANOon1GiJigdhc1e+DHYP7SIbnDm1R3TX3mNtr/+kRtn7tlIVZ9Y2/47j9puyFaMb72fc4OAaJ+OhNYfSlFUGp7m8ynI4KjfaI3LoSn7yZ7VSCyxn+Xfl2gVs8YI0Ki4bQXYL8tKOhK3pO7nPFgvNVstCceVOBFESn26KTqWkRXz6PwFZAAu+B7Zb73CitoGPashmgynh1HXAcKHaBrvU7upADN/5n4l79ELvDJfDoSGfY/aBukNnKSEWlJ9J1JDQx76y4yd+5J4VUIjeKlq6g+bBxjr5ItITZrho43FyLrFqk7Skh2mkfx60eQ+QZkzwV427IlV8cyl/qwb0TceAfefgfQ/kaNMr8LJFqieZssnVtMkMY7W/XpERkZNbu8rBK7mpNCqYw49vxzVP+uWWwLl62h496/4e3WSf4bhmSnF8Xb+CzLZpssVvyxgUjPiONq9cT63FZZ2WZOSctnnUrw7OVwGyyKE0z/MxSWeK66xJ66NS+KksOQrQN2hK5kEcmTd9J4RQYO/rvIJlenDsvWQ/Qqv/9dLZcULqOa9H0O2mNoGjGYYVZGGQHt90wj85l55L7swZiTRby59PAMhfQ1NH3GPOL3+jzQmlA89XGyV+1ER/lDOuL30zuMZTDbGToevg/x3qXhfEOy9zzxRn2td8hgSXq3+H1Ah5Up61cFcFIk4qmGM3+BnLkP3vwd4DFoS8PU97L1kgZZvVbF0OQBmwCjoNDdTfTQHWQOTsidYwjX+YVkNpzeyyQe9hWfPiPmLw5JORiQSaEXgz+1k8z4dUWkMDDPfWUmhbIkX6y9OgOwEXZ8vrtI8txfafxBQLzDg+LvcpnVF0ltZtLPZm6RDJTVKSsvKVyKn11qPPiPO/B26yJ/uiHa6UUJ3i8enBFZBsyVkRS+x3tXwGBozAO7AMOhfdqfyXwmJnemB5vcJbLW1aqJiPh9lkRbMpir/NXR0FiliaFqHeGV1xGevw/+W+vSTWSnXSoTniJL+QFLjo0rsVkDBm8YsL2Vmc5p0/E/9Q65YzwYfZpIw5u9sUz4nrGM6oxAZEyo0bN34e33idpNCk2ClyRkPvYG/i1fovXkfzJ+PMvqh1fD+KiXPrI4XVKtikfQE18YBFkDvHHA7tB941l4R7xL5mSRpvWuhnuwrwrKqeIglfY5oLaFXhsjjrLNnJI1pBddoaVn3sGsfyjD4iMpTum7YSxUiAlTga4Eaz51/QI6+2kFXRuCzwtFeZL2v/6cppMy1H/pcRF5pHqkx57PJIEWtXe2HJapMtkzNqd2kXqu6mkJAttD8Dmh+42/kjx+G5lTPILjYmle67dwJfZVQdLjUPuO4i7rmEcrIqi2XxWS+yC7nVMSkGq9MwQ9NDWCIAJmLJhPQuHmCzAbvETuIk+adv+N3WH0taqfF1V9Hkh1L9U7N062SqU11WnVwzyRnb+uquvC5YfQ1b4WzTtfSHQ7aHHpvqvy7P29gB2gvBF0/GQiwdiI3PcN+S2eE5EHLIvk1D62d3EZcCPmA9/2EblzSG1m9ciZLXcEfXjETUbwPw7lUdDx868S7FYmd5mhftM5lpH1i9UOvsof98Qrqc2cObT9rMSR3a3H4vGg2QjMx2w82HXNWQRHVsWDd2Nf7x8Pqq7I6bYqdmVJ4p73niHoiRIMgtkGzMehtEGJjimn0HiqwBGLpFn+DDdiXz15jy7+3iWN2QanT7UJIQJSkgwTVH+2I5TuI/P7NSn9t7eUWVLQNDaWNOkTFtdHAcQTGAP+IUL3638jeehmMt/yCD4f08A1dlJlypL00iyeQwzEc08i8rkMba9Nl2FrT9PntsqKtJaWs7zxvpWhD9EplN5E0N61qhpHagbWg8653cjGb1F3akC88GLia/9G7lofdotEMi9UPTQPRpu0A6iVew4DpyoyMbB3DdUDNqPz+M3Ij7mG4q1KfJ8ga65Lw0ZZG2yl5xZ1QPdLr0IgeAcouV0g3raN+IufozQammcAvCsii6qeV9olnZgs6xzx4KtALW+nsBIARGFV/TegOSOwHiQGCgtexewXk/uyR9LxO6IHriP3qwzwgjUg1Un4RD/tAH7ocbnKwnrCjc7C/GgS3S8ZVN6HabIPG2TU+3kQO3KzEXQujMB7lbqvZwi9a+C715O7wYdjIpH6FywbZE8Q4/clAXGoTbm31Uz7fxlUH9qStk9Bwx//grwznPBVkLQSoGFEsJlPYq4nOuJ3yFUB2YkhEIvIy/18QH+CqcSd9ns9h4HaKWztJHP4mnZ9xEA89w/TKay6jlEpnilKIxlMk41VOt5YhKzVTvYLAnuVKF7wWRonl+BTsYh5uW/HfPSAHMFdhnjwQ3QKTVXBtToe9HvjwY63ujEj36JuYkDc9hPi2/9O7jIftvtQ8WDlyswH7xRWxus1RuMkndLKkM0Cw4C1oPPV+ZgDOslO8Agf+zK8/SK56wxQqh6rX54poaFjM6dmRCaUtaCbUHdKhtK238R/7DN0/THEX2dz8mtj956WsSztGeh4oR26F2F2UuoOFOIdniU+7mvIRYbs6QnwuoiUFo+nlh6bqarArIBZLTByFjArFpEB0ikUQCLqN4hIrrsaf7/TYYq3PM2gFZgUVrE+ab8vKpBBqGsA9oBCUiR+8M8Exyi5bwvRdtdIINNs678vg6pV/IkGJg6KYLT3DlB/QxOh2nkg1B9NMi+CxGCaDXH7bPHXvTClr67+SSwetE0EPu7G9t4zKZReRtZq4a38XzNix+ZGQ9lA+bHrafi+D/s8L7L1ZHo2hSuLBQAzR8PoFZMI9v0sW2VF5pS0be0LaOr6Hh2FEnbTN/3GVnQxvfMR6gNgJygNg/K9v8fbNyF/iYFNbhFZ9+al6J2B0V7quNx9wAEl+2rgJA+mJHYlQMXOLG43ehaUL9WejB7SxSWXFA7GpLDHZiaLfVGBPEKQAbaz8t/5n4cxmz1H/twAdjlfJPdsrx+oGgOdQcDonsLJoNWZZUsKlyUeXAPY3caD+tif8Y5QcmcKbHy1iJluB9lWXDy47ElhP/mwJlKozG7VI/gbprHsGy+icx8iczwEE4F1zhYxr1t7Gy/Bpl416IoEKyNu61OkIUKjuV/BW3sfkmdjkpc9zA4xZgOPcvliyWaf6hsf9/dlS47NbPI3WaDFNgcn27/Yn+SvSn58EYlqOilUlCygZ3dJ3YWNldxtZRgBy5+4gE20hGobibaLarun2iaRtlHueZVRDUU1NKolVEvbqeqZqsWWF7Rji6NU7/+iqn5sSf9G1cuoTjJ2WfegDNrEfj77eavPeGnnv4SX6T0ndUu7lmBcALT7sBma1Km2mV4Z7UI1RLVsrJyWM6rRgap6gWrHiFO14/CjVV84RlU/+T7PYaWffyonRvXtHTX8+NNaINT2TKxtpq/elSp656V6N1xVv6ZanDxPFzUdrfqLY1U7P7FU3R4Cejc09aAiP0u0IUu0ue75r5ikEEDjhVeqjlFto6ztRrWdGn15ql2ollo7VDUzcM99qrX7+sbeqseqLiLU9sB+vnZfq2xmqGGVzSyLavd6qnq6avfJD2rbsGO09KNjVfUYVa0fqrHK0pJCAA2nvaChqLYRW9n2lxIPpn625KmWdlbV76sWz5+jhdFHqT66yuLBip9W1bU0/I1qG2plo/LeCavee2Tlw1jZKOVVix9T1UtUS9/8mxYOOVL1reNVdYulvvdJLkb74PGx9VnvFxu/d1y2+LmrTvNVJwY2Qe8PS7KmqsNUn71BC1+9VnWvG1TbjrN/96E6AI2evUt1Qysv7VI7NrzNU+3wVPWjqtGsr1XyjJVlBKqSQl+1PQ2wF1HWGFXNqOqGqrqTalvDy1r8/BwtX/OMFsdtq4Wvbayqm6jqGn1+5tNk7MN5OmMr2w6qUz3VpzP69NMZey5PZ1TVdyfzYZLCA/+tUZo0abOqjlTtWLtdO7aco8VvzdFo2hwtn7abFv5vE1XdhH62Qp8ekVG9Klhdz6Hnc5SP3EN1Z9U2OnURZQ1T26nrqeqOqu3Z17Vz7+c1/vUcXTRhNy2MrOjdOovr3ehAdWqmEkA5ODi4pHDwJYXHqy6S7p5YpY1Q1aSxyraqbczRrr2f0ej6ORrecaUW9t5YVbdQ1fxiP/fp8RnVGYErmPRJCp/VMKPabkp948G8qm6mqjurtje9rMWJc7Q89RktfnJbLXyv4peGr+p4sE9SWP5NqG2Baltg3/ciyqqoapOVDR2h2rH+cxqfN0fLf7lHF6y/iRau3jR975nFY4Se9+6Sv5Xy7Kb5vTHx1Or42Lx/TD0jsDFP3+BOVTdQ7d5Ku0duqV0HflSjK17Vzr1f0bbM26ojVHVNVf2Yqi66zn7/E/W1mxSKagdlDVmo5UO/at/vvv7KNAJWmd5kUy1aonrVjVR1gmrnqAe1beOrtdhyjcav/ea9HpLOILAPV10w6rBqgoPit+aonqbasddj2nnQlaqPXqOqH7XftSSiVzydMTqwieA0f/V/DoyqZrTroB9bvRuuqp9U7drlCW3zrtb/b+/O4+uo6v6Bf77nzMy92ZrurGVHsWURU5FHQFqR7UFUwBQXRJGHomzPzw0ElzSogIobqI9F8XkUFWzEDQFRsC2LLDYi2BZZLbQUumfPvTNzzuf3x9y0oWS5aZM2Ld/36zU0JPfOcmYyOZ97zpxTuPRG8pkfkRwz8O/d7FFxPEppKNRQuG1C4XtIj9IHZyeR/AjZOuZHZOOP6B69dsD1LEJINgRZhVIr+n2HwgUbGKNUxgeSPJvsOOQ+tr/pR4z/58d0KwepD9Zt0/pgr1A4mfw52QKSIcnDSX6YbN/lV+w67gbyDzfSbfjSwNfHxn3XBo1RcU3S9O4V0//r1p9CXnceW2s+ysLl68jZZDI+6zlWLC0FZPfrDegi3xKTrdeN7lAoZCuKZI4svP/ObF8b8ltallLuL5OIkJ3v2B2Vp76IwpLr4F9aiMrvRcCU20Sks6+bBjZ2ts3+0eeS1Da8SWTXbPLHmQhOnADgXhFZvdk1Smx8qGr0XaMbn+UlK4FFnei68Wbgr79C5Xcj4Ji/9D4e/b1TanSFQn2mcLvc9202KMSqo4Cn7kfnpy6D2OdQ+WWD9O3dEsptfdwvsem+qffMsv+2Fm//AKIVP0f3I98B7b2ovD4ColFdH8w+NKgPEP/vlQjlUhR/chGCE19G8FkrMmYe0I5+rg/9mzrKrkHghiAbRbTZifS+sRqQTkQMyWX1wMpZ6PqsQ7rQIjfjvci1Afgn0JkA6cYpm16Zh8QKvE9Qe0QI/On7IrUXko+OBR7phDvqdtgTjkfbyu3/TKEAcPCogIHUdyCcdwIw52FgDrbJYHBZGueuwJjNvr+p+VwvVzVqbyQbuwDteJ/ukZz46v7x0G4rSo3SUAhoS+F2vF+GWV0l2uxvACKyISIXhXqVDks591MfnDsq64O9/05m+77pMuA82Gzf5+n1MRqvtUWLSj24EL6yNbASJN/A4o8PYRvewOKVX2J65cts3+0Ftk1wpR7hWQ/HFni2oMg2FNka+OxZ475a+wyzLsVHkFz7P727ntK13UZOGQUthUK2WMdOS7rTWhn/oW7za3xLDKk7WSl5vpxt+NggG7Jnhss+VVyK8uZbU2pb/hGYZ4F6AeCz67RphzwOEVm76fduBrLjaYzLn+dQKaVeG0pTBL2ctfYca7J75gyIzIyBRmSL2tq/rSLST33w/NF6XbA0mIiIyMvZaKYNUro+XDZi7Cw9uds3tEtPo13vFkCZ3nu02bEg778IXZ/zwPN7AV+5DNHdQCiA+2I2aG3PwLKt69KNEVKMhSACPDDYjHbsiUgTOkWQkJ0XAD8XFK7aH7YdgGy/xgWWhj7OOUF4egvc+SdJdGJzNq3H1vXykC05adp0rtS2v1nq751SO8rvq3Yf1Xum/l3SfVflfLgAbDDADRBp3mx+kBzIQulRoEdvRPDXyWifQ0g8FtVHHgP8E8BKoBUOgMCAoJSCJUsJR2ToXTwlm5Ik2tOApy9DesM/UXPcqcAqoLgIKG5JehquArMEHJAXgflwB4ofPkaqZ/6jZzqerV39kAee0F8ipbY9/b1TSim9Z2oZ677v6B8kAM0B8CkCC0VkVoLSpI6lUWn3RucsIGkC8l/+Cdz79mBrRASnTARSoGZ99vLWu+KNoc8EYbYKD7zqtG7JaWYWMeMVQP67+6CC+6D19hSAhzEBhGbbP0toAE+HwCWoOjSPwoQLsOrbv5S9xq7nvOEJhFsUCpVSSimllFJqC8J40iskTgfuPA4dHy+i8KEPIr/bdFQtyn5Y/Ez2yghA20rXK+EJjM26geIVqxvmnQVQ8B4FeBhbGlRmW/b2kFJXURLiDWpgYT5uUThxtlS854dZN9oGM1yBUEOhUkoppZRSasRk4aXRk4unAsVvofvbQHoT0HlQHarGTUD1GiD5WdYVdGPXzJ7n9giI2Fe2zrlts+MCA8Bss+0B2ebAFKRHgAhhpQBvS+GOvgnxp26Sior5JIwIvEjjsKZUDYVKKaWUUkqpkclW0uhJ5pDesgTBJ4GK0swl3U8CrYghEIg1MGKzAEa8MgS+Fnr7GgBCOOcwFgGwH9Bl2+DPeQy5y+tFqlcBnwcXzQ5FbhiR5lENhUoppZRSSqkRUZpGwsEt/1/4lz6EAgiBAGJgpNQV1L2GSsSUuoZ6D0AQwIAeAAQ10wO0F36JmtOeQeWVfxKRe4ErSuU4z5aewxwRGgqVUkoppZRSI5aCRCTlGnwNE3E2Cj0ZZPMWwZ2ZBQgPOAd4wiBCdWjh8kBXsQsVZxm4o58Bll+Emi/el00D+CWQDYFIYwoAw/n8oIZCpZRSSiml1DZUD6AJqL5wCrDQwi9OYQ1G7zQ9w4AgshkyCHqCjsghQD5ngIOBzqQL3jTDf3oFaj57LnCjRYBiNs9qA8iGCJjmRGal22qXNRQqpZRSSimlRsg8T4oFPvwvxPf/BXkciwQOgN05jk8AStYdlMgGqAkhIIGQgtACeAfQVfks2h/4MWquiFB1+gMi8mfgrE3rAEDWW2Ce3x7zxWooVEoppZRSSo1MZBIheUAgcsRyth26ADUT3454bfHVo4ruSGypNdAl8ASEEcbAAjVAYoBCZwsqZgXwr78XXdc0ovKCEJXvWiYiLwJnlALgsQFwIXt3CxVpctg0BKuGQqWUUkptczqht1JqhPzQkQsM3FErkH5kPSxq4IQQyujfdwFIZmFNAHgP74AQFlUSAa8HOiuA9n/ehZpzQsg7HsJT75qDup8HIpXdQDeAd2c32cWIMG0ugdleRFJg4Wg6SqWUUkoNW7Li4kjk4Jhuww9gjj8fbYsSiAlH5/MzBqAlbOIQ/ipBdMbY7dFtSSn1Wrg31oUizQk739uMytvehNbYwXCUdSE1pRDoeubGyL4ZwYDIOrxGeQDHA4XJaxD/5KsY8/kA6ceelHDX3/Z93LDZc5VTOdxzCw4nbSlUSimlXjMEm7o9pUk2IroPUWUCxPF6LR+l1MhZlHLeLIvKK85F1313w66qgRezfVsLTSnpuRT0HvBZFKxFBFQAGAN4A3R1r0X+HAsc/AQ6P3shqi4OkD9+rVTcuAyYA2AOuAgh6hoITNusSygc0DTqz46GQqWUUmpnDYAbuzwBEHp4CpASASyqKiNgKtAZeWDxHSh++VLJfSAmYUR25mEBlVLb5Y4kQrIeIof/gx1Xno3qO25H20MO3hoYN8LBsOd+WPpawOz/vYCeqEUAVALYH8Drgba758NO70DV2Qb+yH+j+sBLABiRSpd1Bz0BAEAiBGYDeD9FZiZA4w57fjQUKqWUUjtDAIQB4N3Gig8J5BBASvWgCBayJ4D/BArj16LjF3NQfVGAqvf9WyT/e2BpqeKmgVApNVLmeXKOAb6wGKi+BPjnF1DdOQkdSGAkAIaj1bB0P6R32Y0QACnI94x2SsBAEEYADwHkVKBr0S3wj/8V4Ucscp90UjvmeuBuZMtGrnRrNUBD6X7ZmAA3IFt2/L8iSimllBom2+6ZQtMTBNNsHiwQVYgQCIDxAMYA7cvXwR6VInwX0H3z6ciNaUHudwaobhWR5Zv2GSGAVEQHm1FKbcP7ZXHmNHD9g8g9W4PWDg+Iz8LhUO6XplcI9A6EACDGIILY0v2wAmh7YRXM/g4V51r4mvtQ/OIcRJcZRJd5AEtFhL3uiQaos1kr4OsoMjPd2c+FhkKllFJqVIdC6Vnxpq5PIDdWfGphgLEADgc6VywBl/0LwSct8h9wwKHnitjWrGNQgt4DjJJ14WupwqOUGk33SQowJyfSWGBxyeGIPvs5dC05A5XPAa1wEDEDD4gsm+Jbz72wCibrA/k6ANOAjocfALpfRuUnDNyx7RLN+HD2nqB0L0w326e6EKhDdl+sS3uHRKWUUkqpIYdCAKDb8ANyOtmKmG2GbEOZi5Btlmy1nq1I2IKELfAsghuXBGRyCMnPk91n3syOQz9Kzv8YyV363y+YbGkwZIPRM6WU2u73ywZsvBex0PAeurffQB5JdvW63/W3xCBTSyYHk7yC7DzrbrbhPHZ/+nxy9XkkwwHuh7LpfkiThdTXNm0pVEoppYY5FA69pbCn+1OaZCsBIYgwJgSwK5AQ6F61AsHJKXIfD5C+9F1w6a+Q/3oI4CkR8b0qO6UWwNkApmuXUKXUKL9nUoBZoUhTDNSCvOJAxFN/AvviFCQLPbjOABGABJDdAXOQh93fgFXPouvd5yH3SUHuagJYISLdm4W/jfdDkemJlrZSSimltlkoBPprKRSyFZ5tcBuXVni2lBaC5CSS7yQ7TnVs2/0m8sabGf/j8mzttrTIZtusC8m5obYAKqV23HtnQ68BMHuemZY+lp5pJEwf60DIRbNDclGorX9KKaWUGiWh8M1kaxCzNUjZhpitiNlV6vYUS7YUQ9K9jfSXkW27foxdR59F/v1skm/frLIjPf9u1vVJKz5KqZ3k/gnJ7msb73ODLUbvhUoppZQazaHwe+S0mC3oYAqSFSQPJNvGtLAtepaF859jcsez7DjrMPJHe5PcGz0jpvesa/HUKGsBnK9TSCmllFJKKaXUjhEK78hloXDtL8gPkfwg2XH4I+w8dC75h/9jccUbs1dKH+9FwEU9XUE1CCqllNo2tJlVKaWUGtZQSCMinlxZB/x6f+CjACr+LCIbeoU/g2xM9Gwo9dJYMDoEulJKKaWUUkrtrGFxY1dQHQxGKaXU6KIthUoppdRIhEDOs8ASAWYAWOBFGr2WilJKKaWUUkoppZRSSimllFJKKaWUGh20+6hSSimllNrmsi7WANAENPXzovqe/9RTRLQLtlIaCpVSSiml1I4dBBeFWHK2NBeWcvp0JEN672JEmFZH4DIB6p2IOC3R0XRuaYAlwZIlwLRpg716mheRVI9niPu0eHGEaeW+eloylBGtNRQqpZRSSqmRrFwLMMcCjRRBKcgFIJPpACRJ7gaSewH0npozBRAgrHwngUMECDtFZOkr13tsAFxIkVkaDnfQEDlaW39JiAg4mo6HbDBDGbCMgAigoVAppZRSSm2vSvU8++qwFiKN7/uMjRuDuPjXimj8J74ArAHwAoCXNquWEoABsBeAiUg7c4nr/E6DqZjhw5pvGuDw+0Tk/t6VeICiXUy3X7gjeTiAkwA4ALafl3sABimellB+1fd1st2Px4qIKxT4+lwOp5d1PMBTInLrSB8PyUsH2Beg186KRFcDCTZOhzuIQC9lpZRSSik1XBYtmh2KzEqAPMjuHHDXQfD3fDve8C3Y8BMzED6HqKoVhdVznAg4UBMF+YhkaQ9hbjKuAh4H8AkUN6xvpat/1LtPPmfCIy8UCQuAcDSGjJ3fdAvAJx0nzQyrx1wFdJVyUl8kix/BfiD5fmDOPJLBaOlKmrVqg+y6Zi9vz7gHsHsAhQHeUToe7D9ix0PWW5Em57puvAGYdR5QHDDk2dJ/Xdc3j7CVF5+WhXYM+mGJhkKllFJKKTUMBOQXA5HGJI55RChNH/TJJecmbT8wubG5iqgmRXHNgwkEFAGMDaOscst+K7kikq0XYHFdmoDrBVzIIEAt+OwMU7x7huMxZ5KfurzY3ni3SP4Jcm4ocn6i52NbaQYAuMJdHWE14uJaxCCifkOOR5zf5YRqAAeKNHqyfhTlkTki0uhZ+Hq1CV7Yo7B6UQECO1A3zOx4TqoGcIBIo+fi4T6eqZKFw/Q/UGhKiu1IMXBroc9VwlCOOXIoW9FQqJRSSimltkrP804ijWlavHOWDS//JYo3wHeuhzVAcUPiAECMCTeFwPJzm2RNMhFEABGkDkw3dHmgS0zx91V2/ILrclUb2tj5vyeKnPNQ1p20QYbyDJbaOtYYA0iE7BT1Ewotsg6OlcTATXDbVy5wSAMPsZExxqDfhrZteTzSDlMbQjqMSP+hkISHiAGkXUOhUkoppZTaRoFwfiAyMyU5FbjhR8X1H3+LM8s8U3gRE4AemyqxW5vRskApAinVyEEYFNa2JVHFDWPo77ojjX/9GHDaqSLSMZoHM9n5lFvMDgCzJuDRqugEAQzgfHbN+e1/PAKTbcuV9WL034e3T0YvYKWUUkoptWWBcJ4VmZkWCjzQuzn3wn3qP+CXCVNrRCTY+hBYXhixVsK4G2T6/DgbXjTDu+8uYCsnZAOgNGh9VykNhUoppZRSamQC4SzH4l0Hh+El9/riV8YX1nckgEE2hWA5o+EbkOIIpOSrFlduVZUkjIE4b1hcvTI27po6jLn5TpK7AdMCDYZKaShUSimllFLDGggbDLDBkJzq7fy/oPN7u6YdntZKKOLL6EYnIC3pfZyroc2NRZAblw9y48cEufHV2ddjYOl9TBpfbpVVxIsJbFRseTEGPv/mtPWcg0VmxWhaqtOwKTUAfaZQKaWUUkoNmcj5Sdy24s4w//VJxYJ3NhBLltM6KPCOPgydseMOiorrVz0kbFkvwVvEhIfQuw0Cv4I+/Ud1btJhb0PbvSgW4cQYW053VNIB1oTphudSBsmt5PITgD0fziYkF+qZU0pDoVJKKaWU2gpkQyDSmBbX/df7Tfj1CWmHS8QgLCcQkkKSyE/ez6Ttb10G7PWt3Piv/EBEYmAhsqXHOJBXXuLCv8zOjfnttOKaxwkAYrM5KgaJneK8MFezoSZu/cK1ubH/dzRZHwGI9QwqpaFQKaWUUkptZSBk8uhMmC/8PGlz3qXGGDN4C573lsY6H9YcReDo9wU11zwkIi+SVwmJEKhDtgDZ3HfNXmTGdSRvAXY9PBxz6+8kvjcXFxzFlNNFFUG8viOOxj40LSn86gyR997aM1KqnkmlNBQqpZRSSqktsaARJKt899vPgJ0vPhVvDO3gYdIwyLk0qH6fKSYnvi8v59wKfBXk7BCYm4pIUgqCm71vbigiqwHclbR/5FSTr/2x8et29YlYEQ4YDAUU74yBf2GscU3vIflnYEYXSe1GqtRmdKAZpZRSSik1KBKCGfTourTWVKy6MGmBN0bCQd8oBka8Cyr+M0Ry42n5/Dm3kg1BFs5uSAYKaCLnJySFvDgX1vzfn5F+4ZGwttYATMuZFs5aExTWdaWmcp+zALxeZGGK0Tw/nlIaCpVSSiml1CgmIuKTdMVN6FjqYAHSD/IGA5/6JJywX+CKR58l+arbsta/xrTc1rrsddfFZIMxFZf8d9w61edCBCzjIUbSZc8gpr9w3S9VrC6tUc+kUhoKlVJKKaXUUPTM8xfHf3kL5I91zhsBB0tXAu/EhVXjQ+8veN5WX/4A2RABs90WpFECjRSRFUF4VhOsAVBOqCQAESTLbVR78XsA2/NNpZSGQqWUUkopVbanHw5F4NH97U+ENVKbxj4VGTgUkvBBJQEzcUXScejxIrIMWOpExG/ZTjQICTHY51JUv0fgyVLIGzRSMhZA9voGEEJEQ6FSGgqVUkoppVTZSFoceGdMFt4VVuHE4tr1iYgNy3mnDQLrk5kP5mtPeDrrNtrktnxP5mT/VJ48Bjh8nQTZFBdl7AcghE/uXwM4PaFK9UFHH1VKKaWUUgOYbkSaHTs+HKNq2VgQMWTwKSGshS22B/FLHf86m6QRka2aCkJEPIlQRJZ2r8Hn8xPxveK6tEgiGjTWEgJsMNpzVCkNhUoppZRSaghICiApybGIP//5pO0nhLHB4C1uBqCHqbgg3Gfi1yMRKZAQGaYxXsQEVQBMGDBvBmuzpAA5wnUFVXpGldJQqJRSSimlhhrABCRRi6jjKNcCGDv48J2kT4NxNnDtze8D0E7CigxH3835BGYiqP71aqDwJKMVicMgXVkFtDBicntuAO7cziG7wQC7201zMvbMy1gHYDaA11FkZrr126EBbthsO3UbF5Hzk9H9YQQEWBS8cv9feQzDVVZKQ6FSSimllBokUQHAsgWyasrhk5yxsGW2EhLmTbDRES+LCMl6AE3DEFCzEBDk3nUTgJt2hBIsdZ312f43egB9DLTTDOD8PgLkHJY7dQfZYErrR2l7/tXbaO4jfDVIz/tGQRg0AJgNBjQ96bucmvsJ2+WXldJQqJRSSimlytYgQCP3OurP10t8vE0TcLBRR7MRQT2AI4CKayLgqwDmYTjnB+wJM0MPlUMNPwIgLHevACSb7We9FREHRACIJLl3RhAs+++k49cp4gcCciWAEBK81Ye1x5u08MZnw4p3fpqkZMGuEaWvOUh5WJHG0nYcku4HZgb5xy9JOv6YIn4oIFdCguNggymAPc6b/FlnieS6RWICjSTnWZFZ220UHnKeBWaJCFLAgkzHA/ff6AoP06ePC5JHwPRfkGgGYA9iWH2s+HivZTZ3zCdIN6SyUhoKlVJKKaXUlnBPnSQmBJBwsHQnksbhBERxy83fi8Z+914uRiQi8XDuTtaS1Dhilf9spNTzExbvPA/R6q+47mUxafoZ0MZAJIltxaER3Ju+IMHec0mGQJMXmeVIHuKT2y4FFp6YtB5fFUwYUxlWtgOV3aX3pwD+BmApAgji9RVnpx2Xx+RNpwFnLRWRzt6tja/cTxrgfCvyvwmLvz0kTR+6zIR/OiFpO64qyNdUhpUdQGWhVGgPImtluwvxuo8sc8mnYYK6z6C7fr6ILO9vGyNvjRGZFQMA2086NMXu/8+nU99jpHOczRVgc0WApbKSRwD8A8AfYLxDvOGgD7riT1Py+6dj7ceXiEh77xZTpaFQKaWUUkoNS0CiuPbTWhD4Pct5vfeEmBoYTGkXkZicGgFLd7CjzrooJvFvqsPozklp5wvIDTDGabEI2IqjAH91NphN85xQpjd2pd0LLwQ++11T/A7gC7AGKK7pSF8ZqwmgC2AXIDC5SCal8TUApj/i0baA5CmAFPoKOz3dROOW2Rcj+p/rguIfgBSl7XRutp2u0tKCKMJkdnwVGPv6n6Bi1WoWeZyILO4Jw9vu2mowIjMLccwjwnDGiUiWXBnEf4TvBIoJ+nhesHQMbAEAk8u9NCnt/DCQe9ODmNh9H8n/BNBNLrVbN/2JhkKllFJKKaVKGiHSyMKaSrFhOXVsA8ADfg+ayk8BOBtAPYDGHfLojbEOCAlIXIwl6ntKCwPAx0AQAeLJ+YHIzK60+zsX2/yc6+J182MSASACEGIk6HM9kv2nGJMiRgqrFqX5yU/PcN3xn2wljwNmOJSeEyx1twTAQ4FLv+Jafnhysr7FeS+SDbeK/rcDQRyTEAOseTK1+U9MDqoe/3Oh8NBxIkcu3TYtbQSAnEijj1vnvtWa9/8BeHxcsWVDAhELUET6239kRQn0Kqu/p/lJ/zom7bjpnuDpjx8t05uS0mi32pW03Gtdi0AppZRSSr2q2s4sXJDcy4So9GmZFWyCMJMEOGJs9o23yA5eEpKFlP6XntcAzorMTFn4n0/Y3C+vi9fPj8koFBGTvRYy8FyJRPYaDxOaoLi2NbaV3zrKdTf9QmRhysXzSu2Vc6wIXLJh/xOBG05O05aYtFaERgSDbCfbhsCLsSZ0hdSj+4e7Bv4H95Gchqal0nPuRy4RBgDwIrvm7hVGc+dL1y3jims2xMZK2HMMg5VT77KyoQmK67qSoObxI9KDvrhgzRNvrcmu3QbNOhoKlVJKKaXUllsSisD79LnGsPbgfeMupCLGDBIkaSMErrBqlYn2/302IMzJr5FpAwzAoJXpc2ci97NvFtb8lfA2EokHCTj9FaYHjAlcxwsxzEfrii9PPkQOnhUvWoRQZGkcr9n9wrB25dXFNa2JiETYghk/SA8xYgpdSGzFL8enHZ+fK7OaHDAnHMGCCnzcBQ+ckia3PEB5LIqL4sRIRBKAAQlPwpFwWVyRco4jLK71cZBvfev4A7puX726viobREeDYVknRYtAKaWUUkq9Wuk5QPdkB4I2Zj32Bgs3ZFABG7c+tSyoCO/MRsWUstIKSQs0WSwBMG2kjmmSH7G57ejg7N7iOz742bDqASdGBOK2qsVN4E3SHQQ5ifeWCef9ifzmicCDT6ft37nAVt/97WRDIYaREFvVS5IQMUG8oTsJam48KGm7+jSRy3/DRbNDmX7DMD9fSBgDm3a1IIquOV24EHErIBYWEBDi4X2aq0YEm41iW2j1TgQUYwPQDbxuK1FxXcHlJj19zNjKY+4BOBNYEAPbojuss1xcHwELIi6uH75Vr3wp4OJ645COaIu7hkKllFJKKdU/v8pgKBVSD4jNRWTBDmUailJ43CEHBxFBlLR1w+Yfud4nDyNuNXa4Zkaw1pu4K41zVffu2vaivDhmj4en2OrWb8fr1hVJG8lWBs9s/73QCYzdMMHLHe8keU9z8/Tu7PwN52N5Plub+xuKax9KARixYgDAO++iCNZMODZK1i95jGZiJ/gc8xPedBT8oyisK6YmGOA5w+yDBUggtrimM85N/t0RrnDSz4KKU04f4QF0COQA2BY5uCkGmuJhXn8MAGn3aXHPs5QaCpVSSiml1DaSTTbv3Z9h0Fp+vpMACP6DIuJI2EFr1KQVEZckq08JgrXTXfF5D4TD3OVPvM3VGBe3PRnk3nHL8E6/QEAA+rVA/KWckSJKc7Bvvg+9FvZaBisfDzEmSDubfeWEH34h7fj1GDF3gV4CMX0Fws23U95hGmPC7tXFtGIX81EUL7t2+vTmJ0Zu0BmH3gPJ0AP5yQfZtPOU5QaX/Dgcv9dV2TQmBkx/cwlk7sn5XRacVFyzIBVjgwE/OyABa4K0fXki4XfeRPJoYNaDPdfZsOdBIPDdT4P4/ulxx+xdhGIpHLbtiHhDRp7pgn1cWuw5wRoKlVJKKaXUtjTUfCYQ2aX0df3GcNm/OwMAznDp+4EbP2hzSwFYYNgHjgzgurrvBXALMN2WnZbKCwaAX4Z0YxvR5qu2IF0CkHjFTI8SiLCcAjauS5Cb1PzfwGMoriHEGPvKMhIQTEF6gOi1HSti7GCHSzpIYKxrW+gld+5ckjNGdt5CbtznoCqI4fafHVRd+4CILGMDDHlsgCVrjAS7XUdyLnDAdBM+80fDFRXOD/ygoQAm7WaSr3l5b9f9jaODyqb7n3rqkhyGvSXaw1jYtPPviMY8d7ytqDkeGHQqzy0oJwO2vYw4jiEyMmPCaChUSimllFKvtiQLc654M4Jq/8oANKj2IWyoI1tpum4Dwr/ExTUvJhAM90AnaW4cAqRYk/1v8wgV2qu7W5JC0LncpDEhMBXAeAAdAJ4BW1cijgFjswaugcKHWKC49gcJCBGLANyU10QE3tHnahEgOgDAFAB5AGuB4t9QbPPeWDEceCNZ+6IXQ//SESN/gQm8Y5yfPCVKOt96ZRD88ueAgJwXiZwZo3FhafqNRaGIFAE84Ip3PGCi2Scmq1d4G4j0fzweYsW64uNe/E1TSNYA0k1SZLj69W48vwBEUGxrcUDLSHZ/DrPRVkeGhkKllFJKKTWAodZzDcQeAuAOlNdS2PO20AK1EfCSiGzt4CmvqrgbCAIIA4zo1HWvXLf38PkKGlSfGqQd1ddK7qPrbHiUuOQJ4wvXOLpHPmarlu+VdnoaM0gLEAERhNl0h723Y+Gdi3OTJkdJy5Tfm+SEB5E/21q7B1zxL84Vfva23KRHTy6uftaJHaTFkIQI4ePfdmDppcPYmtrXpsSHVca64pRnwqpbbiefCYFFzLqN9oqOMj0haYBpAXDyO1089ddhzcunph3eiaHtP3KaIG5xrmKX112QdP3px1EVmtl3v95hOe8iYoHBu0sP5/WloVAppZRSSo1SBmJet4Xv9aVluAc42fZI4/KTxthkw76/DXHxV8Kady4Cbn7lazq/87PEX//vKHjWJo4sryWoV7mIgU9dnJ/8hgi44rfh2LNmiUgCXN1rP/gt777y62DMVcelnd0QiB1kDkP4+GGR6ZKMXOkIAO9txVim8fkPicjfs8FgpM+RYUXEk7MpImmx5Ys3RbXLT0q7niAGPBYHYwEfN3kU/1W56TnLHS+wbZvfWqWUUkoppYZV8TV99KQwl/OStO7722j8P08TOWHR/PlxwMXzIi5eHJGLQrI+kqpPrIC57C4TUYChdWsUMfCp9/nJB0U++fIfRP7rNBFJyIbS+heFWVdMKdqg8RQXvy3MBbQcpA9p6kCJoojxP99cCpUy/OUDRoEEacebwiB/9rnZwD8Djw4qckNCTo2i2sbfxOueuyM3TiKSg0wvYox0w5j8Ob8hvRGB199NDYVKKaWUUmqbkK1431CXUXbkEoCOHjXvMWHt3y8AUpCzw5kzkcrBs2I5+OBYZHoCTE1Jb1L5w8dRUZfNpzCEqrn3TIPqsYB/760296FTyaItjRYai0xPsmVWnE3e7mCCw7+ECBgofIqIpClcOGbXam8qvp19t3kkehZScgTMvleJ2Lj8QHw0RSSV3DkBTG05mwEAuPjPVsRqINRQqJRSSimlRnUV0zsHdMUAY9LHJMtZktF13AKXuiS/yz4W8ZFfB9BK1oUifU8CLwJv7c8nwrx5SOVGWoqxDCrfaWC+9HP6LgEW9TN9RCMAj7j76h9lD44N3FIoAsCnALh+5D4wIBHt4tL0xh+WHlssM93PBgCE+fPXw1f7bNo+GTAUZvMizge5tnYkzzsQjvAyso8r6jOFSimllFJqmHUP4bXVWa0+qBkHHBblJpkoq6IO1nhkAHSjuHb5SM7pPSSkoc0B3r1ppYkuu1NEusj5ATCzj1fPAdCIKKpKgcm9wkUZkds4byoj77rfcLmtwO+B+TZrfRyg0m9rJ4FtKOvZNxGAI5NCBBYuTQF7ps2PbdgDmLCs3Gkceo5RwsPPLqyRk6MIE+O4/2cxRUSShGluwsSxcKt+AeCUbDTT6cP8YQLhXVLexJNbWm4CEaOjjyqllFJKqR2Cg097pnwoZ+TRkxMAMOGkucCM+13XZA9UmoFGPfXOG2NznunivcLK5ZcnXfAjNX/bUOIO4NKwdrfQF2b9TQKZnz3TNzMe/L01ZccJUhhFsHHXwa25CZ+7BvjcIO9oyMJncFoK+xCAf5UC9fbpTenh03AMrCs8/RubH//k/PkIMOQhbg1McBiARzHwoETceE3CPVX6n+ZhPucEZFfkJ1wssBUyMvMU5uC7FiLtahqxHtMaCpVSSiml1KtNmwpgKcQeBuAZAJ3lV2LZWn61ujRBushh9wG4byi72L0M++b3xOXo2v5DP5JkLkSQtGB1OPbMi8kzDYCk7DIbShChh638r9Xkx4P+Rux8legQwDw1Ci4s74LKICisvvPuoELW3nEHcmUfw0YWEh4JuEfLLN4Yzj09AsdiQO+SaMJbQpgrvg7gRmR9PYezJTIAkMJM+GVYffthcUeXExn+VlwNhUoppZRSqq9UCGApTHAIgJWlUFjuVBGVWxCq5lng7jJb+14wwF4+WffjSWA6SspLAKFIdPl4EbN8ZHoSZlM5oHJfY7v/cLpUXJCSKHNUzQRAuv3LiBRgd9iq42vJH8mSJbNY9lyWvcIYZMoQXl8E3N9LXzcP90FRjIVzWBkE8uRIlVza+f0uE45cY7iGQqWUUkop1Yep2T/2DRhSAx496J+QLOTNKj8uyCyHMrsR9gSh4mqMkkQo2W6FkYiJriC9AAKR4U6GAeATIDhdUHNttCmky1D2czuXEwFMgAmOdiJCLm7YgvUYiN0nzc5+GR9U0MG7F0cqFAIgrEVE0mDZsgj77BMP37qbAqA+dd0/NCPZHq6jjyqllFJKqT5MyyqL5hAH5Fl2hVQcGD+WlELea4QBQEruP5z1j90iIgQahn9+P6RJNEFs2vb7LwF4gkTQ0/12x1IDmINfcZ0NOVzKuAnlh6RuML1vBENhdnpExKOz04vIsC3AEr8tzrGGQqWUUkop1YfSqKD2wHFArbCsmQNEXAxvK/eYTMZ1yB612+nrmwKT9WI1p1hUfH/X7Ltzhn0rICl2N5D7vCwiMVAnO1pJZUGuCjY8YMuSFyFACuHLTeVMsbGJTlOooVAppZRSSg3RyQkJMcFB30k7nnsxrIAlB5vjTiQtILFVb9gHvvu/smfdng539pLycGk4FiYtLLwJwNPMpnMY5s5+Wf7zfgpN/sLSI2Czd9ASywEYm305beoWFESMwppzLpPcUEKh0lColFJKKaWGVvPOuqyJiCxy3S0bbARTVgVcIMAq+vTeluwb/9j5K+303uZDSdtvv09EWgCYrAvpMIdCDxqzp9jc2yt37FC49UUTVE+cDI2DGgqVUkoppdQ2qL5znrWVZwYoqxdoTy19vfj4jtKw+Ut29vhc+ndv2IpPjSEpIxHWCHqbh3XxyuVAzd/I7TjZ4KjQqv1BNRQqpZRSSqmR1wCRWU7C4wRlTY1GiADAavjkl1lCXNL0GikrB6DdDX8LYQ/vgxoErvXBZhG5B4AVEfdavTKZJF36+6mhUCmllFJKjbhGAkBavOd0HycQKafuGIbxuiQJas+6iOQxOHhpQtLuvGXU01JYDWNeP/K505iKnbs8y4swtuqDBw2tnVT011lDoVJKKaWU2lK5jufXGPu6Uu/QwSrXXugBY56qRHprLhtvcidvLSQAjIcNjyp9o24E86f3O34L4ZYHtGzwohwk+MDNLAKAMUM4SUpDoVJKKaWU2oK0A+x2X4jwjNLYo4NVH11p2r6/IG29oPS9Wa+Rskr0kikrmHXAueezL5cs3cJ1uY7yk2QOYg8f2cCuoVAppZRSSu2MRIQkAgAvx8VfnZObYD3hBk0+AhumLTFQ+d/zuIFjReCy+eXUzicLWcYeC2DS4K3JAgBFwL+8VeGS7vkh5JgQJjhAQ6GGQqWUUkoptWXmQ0S8zV8bwxxnfAqKDPZImwcg8N0/q5Vx0kJSRCPhTh0KER6OjXMPDqoN8I+Vvt6S0Wk9wBc3BsTBBYDsq6OVaihUSimllFJbZobjIoQ2etdfkvaVC/ITgsh7nw78HsI5+iD/LxQ7vnh91uJYr/XOnZovI6CVfs718OkjlqQswdC7j5LFAP6fZbwye6IVpgYSnlqdfW+2nioNhUoppZRSaihEhKibDRFZBfPO2ynVBTHE4IOFCCGBGP/bd5Lr9waeM9kcfmrnkrUU2ly9h9+TGPC5UwICQtYCnTe2iAhfeOFR2YJrMnXdt/us9XngICoG4uOu1ES7/T37TruOOKOhUCmllFJKDb0SfkNC1tuo+ppr05bqF6McDEE/8Htgk84kDmpa90nbvnquSHOC5Z/Ma2nunKEQ9i2VMHtIdlUMlPNskHR004496z0kdzv55GfScj8sIGlICtOFZ9rKmuo0hR9oWyQZhbBJOzeIHPDp7Lqcmeo501ColFJKKaW2SBPJBmNrvpmiMm/AwaqRBCBR0vp8aip+enbcecV02etb3WSD1j93rlCYZoMRhb9M2xbcH9YiJJ3rP3wYm3bAm2jPEwDsJwKHsueomBOICF3xkfOCqspK5+BEOOCoNvQGJldfSzLQc6WhUCmllFJKbR0CjbTRLsejsO9SCTxIM2BXPBGKT0xgkjV7izy3kOQRAAxJrYPuJESEQJ2IyEvO7bnS5ioFIPu/iFJIAMD/zGGDrCiFvcEvPlKABZ7knvT/F/jCGg/I4NeR9TD2wL8CcHq2NBQqpZRSSqmtqvyDWFIfihy7PI5nXBmN3deQPh6sOiniUexKkyD/q0rXecl3RRpTEfHkPLs1zxiSDQbUiv7oMBckJai6eiKktpQIpd9YKBBBYYVNo8bPAGGZ25gTiixMXXL7KUH1xGOTNp/IgMPgGpD0UrMfkvZvn1eaXkWzj4ZCpZRSSim1VabNS7i4PopqvzbfdR12XzTOWhLlPKMVJC1A2nn9fuSFD5N8s8gsl1XU54ZD2QVyUQjsHYk0eoejavSkjAZ1qYjQRm/9WNoxOY0CsSQHakUWXxQY3Hnhv+f/KS/S6AfqVpz97CWSnCjmvsuK6+93MEGUjXjaH5slUJzYacctr+0JpKqfX1AtAqWUUkopVY4sxC2iSM3qNF35O2M7jzHy5zibl54DvA9C52AjOwHuxglJ57/vIe86EzjhYRFZT9aFwH6lGn59H2to2vivyPQEQMLirQc7/P4PafsDzLoRaoV/+14XEJH8067zs38ywWMnixMAfbcEi1ASJy60j6R7vXXefJInA9JGzg+AmW5TgOt5+0tW5Iak2Dr5pGjMz/dF6rxYGeRZwqSYn7RHLu1YdXVUY5oXL66PRCTWs9U3bSlUSimllFJDCADTE7LeBsHu3yi2n/i5cMJ+ET3doAPPCOFTx+KGgnPFO6qBr92B7nffmXR+rVHk8USkyWXLrD6Wnp/BMXnsSna/4xtxx6ULrP9JbZqCAw82oraNBiEpsUkuRvWbjXf0A/XuFBEbtyEwcteRwLV3rl7NSpGZqQiYLcJNX9+QpO1XvT8as/CmdP2KVOzAHwKQ8LZCwrSL/w6qL/0d59EuXVqvXY0HoC2FSimllFJqiMGwyZEX50Q+fVXacQZykzq/Eq9fVaQ3kYjvP6AJRAArYlBYfU+SH4MjgvxjR8Trqt8l4YkiQR1g9oTYgwAUsqoqW8B0CZg+BMZ3AvbswxAsh+1ej2K7gbXeUBsJR8E10ejJBUFb27w1QfLX7+Ym2IviDS4WQdT3OzxsILaw4TmfH/OlIydOePAfrvibO03xvkbU1FvgSN/evoA1ubbdETzx0+KGaw9x6Vp6L9YIB9sZBnnxSfeHHxE5spmcHc6SWYmeJQ2FSimllFJqWEPA9UWyPhJpuipu2cNH48dcnaxrSwgJB+/K6WGsDYsddOh4nrlqeSPwKwC/yXocut6tjgTEA6EDQofiusdSEjRGrJhyA6EAJMEBH0JTW20Odtlll46k+6+3CxrOt9FfjIvpRXyfzcgkYQJjCu1tLl/1m/3BOy5K/f4Xof0JiD0AFXgaadciBBXtEBTBRGjMYK3ChoF4QXxC+GLNVR8hrzIiooFQQ6FSSimllBqZYNgUkw1GpPGawtojTW7CC18prFnpAIExtAO/20EEFhAUO+iBFChjzBoRE4gQ5T1DKCCFgE9gEcDUVgGteuJG7HqYmZL1VuStf+xe9+F3Bbn8bcZ0luYx7OexNXoYI7bYRQ8URGSJAEte8ZJiOzwgIoMGQgt65+yk6YGPP/e1fYC4nOkulD5TqJRSSimltkojyZNy+YkPX4XkHVfkJx1q82OMpUdazjRyACECU+6SjTg5eCAUCUDPROAlN3G3irTj7csivvHc0o9TPW8j9kGBI+fZigm/+CPwzRfD8btGJGTg2Uc2XgOSDS5jkI0ealDqc2wGe26UCAhxhdykQwPvP3C1zR17GTDDAI3auVhDoVJKKaWUGtkQAIr8sbh48XsjiX56NZIvXoZwlwW5cRL41DtSso6bGOmxYLJWQTLrKOrS1OUmjQ8RTC8An2sKqu95m0xcuIKkiOhQpSNrCTn/iiComv124DNNYsbENiJJuMGvAyIL/g7lfQBQag32qYvGvyGfFt5/tbWfvIJsCEQWpnquy6PdR5VSSiml1FY7+OCmmIQRee/XAH6dvOzX+cn3vce3PAjvAeeZAGJEjC23tW9wBiQ84D1AGoMwjLKggOpzLVBzlam+5G6RfecDFyGbNkE41G1sar1iPz/vPX3CkBGge+V2BgtNW1p2Msg2pPexbPFonSKNPkt0jc8BmFVoPf7kIHr2jsA+Z4vd9NkzodZuxSYAWJDeA3RhiNDUHhX4rg9+Nay64IqsC2vjVrYGSxnnY+M10ZNkR5hBeW16MuTrUUOhUkoppZQaFiLw5NxQjCQA64HbDvDh/F9Lesv+ufE2QmEFiu0uRtZNUERssCkgDt4i1FNJJ+kB50DPXA4RaiID2R2uNUkSHPPvMHz63cD1iUjts8C3QM6LRM6MRYY6Tmnigc4YYEz2F2A8AMRAN+DdlgSDEMhbeN9NEwf9FoQgLQ2Us4VhxxHsjgE6MrUDZM4UUgSAcVt7PZAUYE5OpPHOpPOn7wryf/xuzs/fCxWrUFjvYrEQQRBuylQc5Pyb0vlPHehcGCIyYw8xcftb7o5wyMds1X8/S9ZboGkrA9rGsvJk2n8Koxc6xAAiAFUj+svl0xSmMwa8IzHQ87oehIEkQxpcR0OhUkoppZQaxmB4flJqkUsB/AuQqeTKU4Hf1sfd1+yWm3TwO4D7gLQNhfUpxWxsnnplNNmUBHp9i0Lvma+CQVVogLcgaWl/AS3r7wnHfSNnq46fF4S1v8vCQwVIGCxoMCKzhjhpeV1p63tWA3VRbuKTERCi35ZCFiLgjUBQXf2K9w+amRoMgLXerVua2/WQqVkw6i/PMAIsYONJwNOlbTQP4ZjGhTCHRbmJXej/WABAImAMCP+70rH4Lb8WhAAKJKzI2bcB5ra08IvPW1x/fH5y5duAe1Bck3LzM73Zzsmmbzmhd8yPhUV0ok07xqxA+pl7opo3nyciSdZS3bT18xHKhBDBYVF+UudgZQVAQpeYog3RTDYYLFgzzC2GMwA0Amb8LsjVRblcKwZuLSQAC3RP3F1DoVJKKaWU2o7BEMxaibK8J7LbbQBuIxkCj74/Xv+BxNg3Hp6f/PbPsPN+CJ4U+OVZJVsAGCOl2JT1DAUAuy88D4CpOkJc59p73PqbfxSNvzgXjp31oIg8BZzR8xbJuiU2SNaNsXELKukrHQBYc9hvgJrlccde3iLqpyZu4NDmo+ojDOyEUkqrc4OXkZBsEBFZ3rnm8OMrJ75rpuvucnD9jNpqjbcVkTFBcSXwLQDvdOWFwtJAK9Eb/g34s1xHJYF8330LrdBGIml7sRCOe/2tpf10w3A9OBLS1HSGCfLv+/JT5NcPxPz3xi3PVOTGzf4h/N+A5G+AXw4YAcTIxiDmANADwetAvAFS+Q5J2//2zSCa/feg+qh/iMgSEqY0Cu5WBrKesjr4BaBwluuo6L+sAMDS24oK4ztefD4YL/eTDUZmzhzmQYxmZNdiOOUi4PiJrqOdWSH1t09CGwViw/3a+wjYSimllFJKbR8kDdmw2STmlSA5hZ237sl1J0zp3rDLPl3rMCXtmvshlz76tEsXPe2Kt32vax2mcMNe+7Lr3VPYeceeJKeQzPde0+LFUyNybkgONg3GqCwbGZ37NT8Y+fWa7BrgI1PYfda+XeswxRV//y2XPva0SxYudemDT8edH53etQ5TutbP3ot8bE+SU4CaXuubF42S82h35N9R0duUUkoppZTadgFogW1u/rTU1TVv1ciQ2dx3DQDmeBHxI7O/DQZ4yQJPEs2v77/eXPckgdcLMNdtyb5s2s5uRPNLfW6nGUBdHQBs8FvSRTIr+/OD5uZm1PXTvbUZpY6vdU9SZGE6stfBDQEWnE+ZOfRnJAkIODcAZruROPfllNVwnJOhh+mbpbl54M7Jm/bp/RSZqVOvKKWUUkqp0R8SswUbl4aGrCtgtsD0/tmm11MbNnbea6DX+W/o8/xrqSmllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJKKaWUUkoppZRSSimllFJ9+P/Fu99AQS+AUQAAAABJRU5ErkJggg==" alt="Lutz Spring GmbH">
+      <div class="brand-sub">Sanitär · Heizung · Klimatechnik</div>
+    </div>
+    <div class="tool-title">
+      <strong>Auslegungstool Wärmepumpe</strong>
+      Wärmepumpen-Ersteinschätzung
+    </div>
+  </header>
+
+  <div class="hinweis">
+    &#9888; Überschlägige Ersteinschätzung für die Angebotserstellung. Die verbindliche Auslegung erfolgt erst nach raumweiser Heizlastberechnung nach DIN EN 12831 und Abgleich mit den Leistungskurven aus dem Weishaupt-Planungshandbuch.
+  </div>
+
+  <!-- BLOCK 0: Kundenliste -->
+  <div class="block">
+    <div class="block-title"><span class="num">&#128193;</span> Kundenfälle</div>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+      <select id="kunde-select" style="flex:1; min-width:180px;">
+        <option value="">— neuer, ungespeicherter Fall —</option>
+      </select>
+      <button class="mini-btn" id="kunde-neu" title="Neuen leeren Fall beginnen">+ Neu</button>
+      <button class="mini-btn" id="kunde-dupl" title="Aktuellen Fall als Kopie speichern (z. B. für Dämmvariante)">Duplizieren</button>
+      <button class="mini-btn" id="kunde-del" title="Ausgewählten Fall löschen">Löschen</button>
+    </div>
+    <label class="fld">Kunde / Bauvorhaben <span style="color:var(--text-3); font-weight:400;">— erscheint im PDF-Dateinamen</span></label>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <input type="text" id="kunde-name" placeholder="z. B. Müller, Musterstraße 12 – Oranienburg" style="flex:1; min-width:200px; height:38px; padding:0 11px; font-size:14px; font-family:var(--font); color:var(--text); background:var(--card); border:1px solid var(--border-strong); border-radius:var(--radius); outline:none;">
+      <button class="mini-btn accent" id="kunde-save">Speichern</button>
+      <span id="save-status" style="font-size:12px; color:var(--text-3);"></span>
+    </div>
+    <div class="uwert-hint" style="margin-top:10px;">Der Name ist für den Ausdruck alleine nicht zwingend zu speichern — er wandert beim „Als PDF speichern" automatisch in den Dateinamen (z. B. „Wärmepumpenauslegungstool - Müller - Weishaupt Evoblock WEB 9-14 - 24.07.2026"). Speichern und Duplizieren sind nur für Dämmvarianten nötig.</div>
+  </div>
+
+  <!-- BLOCK 1: Bestandsanlage / Heizart -->
+  <div class="block">
+    <div class="block-title"><span class="num">1</span> Bestehende Heizung</div>
+    <div class="heizart-grid">
+      <div class="heizart-card" data-heizart="oel">
+        <div class="heizart-icon">&#128738;</div>
+        <div class="heizart-lbl">Öl</div>
+        <div class="heizart-sub">Liter/Jahr</div>
+      </div>
+      <div class="heizart-card" data-heizart="gas">
+        <div class="heizart-icon">&#128293;</div>
+        <div class="heizart-lbl">Gas</div>
+        <div class="heizart-sub">m³ oder kWh/Jahr</div>
+      </div>
+      <div class="heizart-card" data-heizart="wp">
+        <div class="heizart-icon">&#9889;</div>
+        <div class="heizart-lbl">Wärmepumpe</div>
+        <div class="heizart-sub">Strom kWh/Jahr</div>
+      </div>
+    </div>
+
+    <!-- Öl -->
+    <div class="subpanel" id="panel-oel">
+      <div class="grid-in">
+        <div>
+          <label class="fld">Ölverbrauch pro Jahr</label>
+          <div class="row"><input type="number" id="oel-verbrauch" value="3000" min="0" max="12000" step="100" style="flex:1;"><span class="unit">l/a</span></div>
+        </div>
+        <div>
+          <label class="fld">Kesselwirkungsgrad</label>
+          <select id="oel-eta">
+            <option value="0.80">Alter Standardkessel (80 %)</option>
+            <option value="0.85" selected>Niedertemperatur (85 %)</option>
+            <option value="0.90">Brennwert (90 %)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gas -->
+    <div class="subpanel" id="panel-gas">
+      <div class="grid-in">
+        <div>
+          <label class="fld">Gasverbrauch pro Jahr</label>
+          <div class="row"><input type="number" id="gas-verbrauch" value="3000" min="0" max="60000" step="100" style="flex:1;"><span class="unit" id="gas-unit">m³/a</span></div>
+        </div>
+        <div>
+          <label class="fld">Abrechnungseinheit</label>
+          <div class="segment" id="gas-einheit">
+            <button type="button" data-einheit="m3" class="active">m³</button>
+            <button type="button" data-einheit="kwh">kWh</button>
+          </div>
+          <div class="uwert-hint" id="gas-brennwert-hint">Brennwert ~10 kWh/m³ (Erdgas H). Bei m³-Abrechnung automatisch umgerechnet.</div>
+        </div>
+        <div>
+          <label class="fld">Kesselwirkungsgrad</label>
+          <select id="gas-eta">
+            <option value="0.85">Alter Heizwertkessel (85 %)</option>
+            <option value="0.90" selected>Niedertemperatur (90 %)</option>
+            <option value="0.96">Brennwert (96 %)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- WP -->
+    <div class="subpanel" id="panel-wp">
+      <div class="grid-in">
+        <div>
+          <label class="fld">Stromverbrauch Wärmepumpe/Jahr</label>
+          <div class="row"><input type="number" id="wp-strom" value="4500" min="0" max="20000" step="100" style="flex:1;"><span class="unit">kWh/a</span></div>
+          <div class="uwert-hint">Nur WP-Strom, ohne Haushaltsstrom. Falls Zwischenzähler vorhanden.</div>
+        </div>
+        <div>
+          <label class="fld">Jahresarbeitszahl (JAZ)</label>
+          <div class="row"><input type="number" id="wp-jaz" value="3.5" min="1.5" max="6" step="0.1" style="flex:1;"><span class="unit">–</span></div>
+          <div class="uwert-hint">Aus Zählerablesung ermittelt oder geschätzt (Luft/Wasser typ. 3,0–4,0).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bisherige Vorlauftemperatur -->
+    <div style="border-top:1px solid var(--border); margin-top:16px; padding-top:16px;">
+      <label class="fld">Bisherige Vorlauftemperatur bekannt?</label>
+      <div class="segment" id="alt-vl-bekannt" style="margin-bottom:4px;">
+        <button type="button" data-altvl="nein" class="active">Nicht bekannt</button>
+        <button type="button" data-altvl="ja">Ja, bekannt</button>
+      </div>
+
+      <div class="mode-panel" id="alt-vl-panel">
+        <div class="grid-in" style="margin-top:14px;">
+          <div>
+            <label class="fld">Vorlauf der Altanlage am kältesten Tag</label>
+            <div class="row">
+              <input type="number" id="alt-vl-wert" value="60" min="30" max="90" step="1" style="flex:1;">
+              <span class="unit">°C</span>
+            </div>
+          </div>
+          <div>
+            <label class="fld">Wurde es damit ausreichend warm?</label>
+            <select id="alt-vl-komfort">
+              <option value="ja" selected>Ja, Räume wurden warm</option>
+              <option value="knapp">Knapp / einzelne Räume kühl</option>
+              <option value="nein">Nein, es war zu kalt</option>
+            </select>
+          </div>
+        </div>
+        <div id="alt-vl-bewertung" style="margin-top:12px;"></div>
+      </div>
+
+      <div class="uwert-hint" id="alt-vl-hint" style="margin-top:8px;">Die am Kessel eingestellte Heizkurve bzw. der Vorlauf an sehr kalten Tagen. Ist der Kunde bereits mit niedrigem Vorlauf ausgekommen, taugen die vorhandenen Heizflächen meist auch für die Wärmepumpe.</div>
+    </div>
+
+    <!-- Bauliche Gegebenheiten -->
+    <div style="border-top:1px solid var(--border); margin-top:16px; padding-top:16px;">
+      <div class="grid-in">
+        <div>
+          <label class="fld">Abwasseranschluss am Aufstellort vorhanden?</label>
+          <div class="segment" id="abwasser">
+            <button type="button" data-abw="ja" class="active">Ja</button>
+            <button type="button" data-abw="nein">Nein</button>
+          </div>
+          <div class="uwert-hint">Für den Ablauf der Sicherheitsgruppe am Trinkwasserspeicher (freier Auslauf nach DIN EN 1717). Ohne Anschluss mit Gefälle wird eine Hebeanlage nötig. Das Kondensat des Außengeräts geht separat in den Sickerkasten.</div>
+        </div>
+        <div>
+          <label class="fld">Zirkulationsleitung vorhanden?</label>
+          <div class="segment" id="zirkulation">
+            <button type="button" data-zirk="nein" class="active">Nein</button>
+            <button type="button" data-zirk="ja">Ja</button>
+          </div>
+          <div class="uwert-hint">Warmwasser-Zirkulation für sofort warmes Wasser an der Zapfstelle. Nur relevant, wenn die Wärmepumpe das Warmwasser bereitet.</div>
+        </div>
+      </div>
+
+      <div class="grid-in" style="margin-top:16px;">
+        <div>
+          <label class="fld">Solarthermie-Anlage vorhanden?</label>
+          <div class="segment" id="solar">
+            <button type="button" data-solar="nein" class="active">Nein</button>
+            <button type="button" data-solar="ja">Ja</button>
+          </div>
+          <div class="uwert-hint">Solarthermie und Wärmepumpe arbeiten oft gegeneinander und erhöhen die Taktzahl der WP. In der Regel wird die Solaranlage daher stillgelegt.</div>
+        </div>
+        <div id="solar-demontage-wrap" style="display:none;">
+          <label class="fld">Solarthermie demontieren?</label>
+          <div class="segment" id="solar-demontage">
+            <button type="button" data-solardem="ja" class="active">Ja, demontieren</button>
+            <button type="button" data-solardem="nein">Nein, bleibt</button>
+          </div>
+          <div class="uwert-hint">Bei Demontage wird die Solarflüssigkeit in einem Kanister aufgefangen (verbleibt beim Kunden).</div>
+        </div>
+      </div>
+
+      <div class="grid-in" style="margin-top:16px;">
+        <div>
+          <label class="fld">Photovoltaik-Anlage vorhanden?</label>
+          <div class="segment" id="pv">
+            <button type="button" data-pv="nein" class="active">Nein</button>
+            <button type="button" data-pv="ja">Ja</button>
+            <button type="button" data-pv="geplant">Nein, geplant</button>
+          </div>
+          <div class="uwert-hint" id="pv-hint">Die Wärmepumpe ist SG-Ready und kann PV-Überschuss nutzen (Eigenstromanteil erhöhen). Bei geplanter PV die SG-Ready-Anbindung und ggf. Modbus/WEM-Portal vorsehen.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bes-wrap">
+      <label class="fld">Besonderheiten / offene Punkte zur Bestandsanlage</label>
+      <textarea id="bes-bestand" placeholder="z. B. Kessel im Keller ohne Außenwand, Öltank muss vor Rückbau entleert werden, Schornstein wird noch für Kaminofen genutzt, Zählerschrank veraltet …"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOCK 2: Heizflächen -->
+  <div class="block">
+    <div class="block-title"><span class="num">2</span> Heizflächen</div>
+    <div class="heizart-grid">
+      <div class="heizflaeche-card" data-hf="hk">
+        <div class="heizart-icon">&#9482;</div>
+        <div class="heizart-lbl">Heizkörper</div>
+        <div class="heizart-sub">höhere Vorlauftemp.</div>
+      </div>
+      <div class="heizflaeche-card" data-hf="fbh">
+        <div class="heizart-icon">&#9636;</div>
+        <div class="heizart-lbl">Fußbodenheizung</div>
+        <div class="heizart-sub">niedrige Vorlauftemp.</div>
+      </div>
+      <div class="heizflaeche-card" data-hf="beides">
+        <div class="heizart-icon">&#9707;</div>
+        <div class="heizart-lbl">Beides</div>
+        <div class="heizart-sub">gemischtes System</div>
+      </div>
+    </div>
+
+    <!-- Heizkörper-Anzahl -->
+    <div class="subpanel" id="panel-hk">
+      <div class="grid-in">
+        <div>
+          <label class="fld">Anzahl Heizkörper</label>
+          <div class="row"><input type="number" id="hf-hk-anzahl" value="8" min="0" max="60" step="1" style="flex:1;"><span class="unit">Stück</span></div>
+        </div>
+        <div>
+          <label class="fld">Rohrsystem</label>
+          <div class="segment" id="hk-system">
+            <button type="button" data-hksys="zweirohr" class="active">Zweirohr</button>
+            <button type="button" data-hksys="einrohr">Einrohr</button>
+          </div>
+        </div>
+      </div>
+      <div class="uwert-hint" id="hk-system-hint" style="margin-top:8px;"></div>
+
+      <div style="border-top:1px solid var(--border); margin-top:14px; padding-top:14px;">
+        <div class="grid-in">
+          <div>
+            <label class="fld">RTL-Boxen vorhanden? <span style="color:var(--text-3); font-weight:400;">(Rücklauftemperaturbegrenzer)</span></label>
+            <div class="segment" id="rtl">
+              <button type="button" data-rtl="nein" class="active">Nein</button>
+              <button type="button" data-rtl="ja">Ja</button>
+            </div>
+          </div>
+          <div id="rtl-anzahl-wrap" style="display:none;">
+            <label class="fld">Anzahl RTL-Boxen</label>
+            <div class="row"><input type="number" id="rtl-anzahl" value="1" min="1" max="40" step="1" style="flex:1;"><span class="unit">Stück</span></div>
+          </div>
+          <div id="rtl-hersteller-wrap" style="display:none;">
+            <label class="fld">Hersteller / Typ</label>
+            <input type="text" id="rtl-hersteller" placeholder="z. B. Möhlenhoff, Oventrop …" style="width:100%; height:38px; padding:0 11px; font-size:14px; font-family:var(--font); color:var(--text); background:var(--card); border:1px solid var(--border-strong); border-radius:var(--radius); outline:none;">
+          </div>
+        </div>
+        <div class="uwert-hint" id="rtl-hint" style="margin-top:8px; display:none;">RTL-Boxen begrenzen den Rücklauf einzelner Flächen (oft Bad-FBH im Heizkörpernetz). Im Wärmepumpenbetrieb können sie zu hohen Rücklauftemperaturen bzw. Taktung führen — vor Ort prüfen, ob sie entfallen oder umgebaut werden müssen.</div>
+      </div>
+    </div>
+
+    <!-- FBH-Kreise -->
+    <div class="subpanel" id="panel-fbh">
+      <label class="fld">Heizkreisverteiler (je Etage / Bereich ein Verteiler)</label>
+      <div id="fbh-verteiler-liste"></div>
+      <button type="button" class="vt-add" id="fbh-verteiler-add">+ Verteiler hinzufügen</button>
+      <div class="uwert-hint" style="margin-top:10px;">Bei mehreren Etagen hat üblicherweise jede Etage einen eigenen Heizkreisverteiler. Über „+ Verteiler hinzufügen" weitere Verteiler mit ihrer jeweiligen Kreiszahl ergänzen.</div>
+    </div>
+
+    <!-- Beides -->
+    <div class="subpanel" id="panel-beides">
+
+      <div class="pg-box pg1">
+        <div class="pg-head"><span class="pg-num">1</span> Pumpengruppe 1 · Heizkörper <span class="pg-sub">— ungemischter Kreis</span></div>
+        <div class="grid-in">
+          <div>
+            <label class="fld">Anzahl Heizkörper</label>
+            <div class="row"><input type="number" id="hf-beides-hk" value="4" min="0" max="60" step="1" style="flex:1;"><span class="unit">Stück</span></div>
+          </div>
+          <div>
+            <label class="fld">Vorlauftemperatur</label>
+            <select id="hf-beides-vlhk">
+              <option value="45">45 °C</option>
+              <option value="50" selected>50 °C</option>
+              <option value="55">55 °C</option>
+              <option value="60">60 °C</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="pg-box pg2">
+        <div class="pg-head"><span class="pg-num">2</span> Pumpengruppe 2 · Fußbodenheizung <span class="pg-sub">— gemischter Kreis (3-Wege-Mischer)</span></div>
+        <div class="grid-in" style="margin-bottom:12px;">
+          <div>
+            <label class="fld">Vorlauftemperatur</label>
+            <select id="hf-beides-vlfbh">
+              <option value="30">30 °C</option>
+              <option value="35">35 °C</option>
+              <option value="40" selected>40 °C</option>
+              <option value="45">45 °C</option>
+            </select>
+          </div>
+        </div>
+        <label class="fld">Heizkreisverteiler (je Etage / Bereich ein Verteiler)</label>
+        <div id="beides-verteiler-liste"></div>
+        <button type="button" class="vt-add" id="beides-verteiler-add">+ Verteiler hinzufügen</button>
+      </div>
+
+      <div class="uwert-hint" style="margin-top:12px;">Die Wärmepumpe wird auf den höheren Vorlauf (Pumpengruppe 1, Heizkörper) ausgelegt — dieser Wert wird oben als Ziel-Vorlauftemperatur übernommen. Für maximale Effizienz die Heizkörper möglichst groß für niedrige Vorlauftemperaturen auslegen. Bei mehreren Etagen je Etage einen FBH-Verteiler ergänzen.</div>
+    </div>
+
+    <div id="kuehlen-wrap" style="display:none; border-top:1px solid var(--border); margin-top:16px; padding-top:16px;">
+      <div class="grid-in">
+        <div>
+          <label class="fld">Kühlfunktion gewünscht?</label>
+          <div class="segment" id="kuehlen">
+            <button type="button" data-kuehl="nein" class="active">Nein</button>
+            <button type="button" data-kuehl="ja">Ja, aktive Kühlung</button>
+          </div>
+          <div class="uwert-hint">Die Wärmepumpe ist reversibel und kann über die Flächenheizung kühlen. Erfordert Zusatzkomponenten (Taupunktüberwachung, diffusionsdichte Dämmung).</div>
+        </div>
+        <div id="kuehlen-regler-wrap" style="display:none;">
+          <label class="fld">Anzahl Räume mit Kühlung <span style="color:var(--text-3); font-weight:400;">(Raumregler)</span></label>
+          <div class="row"><input type="number" id="kuehlen-raeume" value="1" min="1" max="40" step="1" style="flex:1;"><span class="unit">Räume</span></div>
+        </div>
+      </div>
+      <div class="uwert-hint" id="kuehlen-hint" style="margin-top:8px; display:none;">Für aktive Kühlung werden Blossom-IC Raumregler eingesetzt (ermöglichen zugleich den automatischen hydraulischen Abgleich). Zusätzlich diffusionsdichte Isolierung der kälteführenden Leitungen und Taupunktfühler zur Kondensatvermeidung erforderlich.</div>
+    </div>
+
+    <div class="bes-wrap">
+      <label class="fld">Besonderheiten / offene Punkte zu den Heizflächen</label>
+      <textarea id="bes-heizflaechen" placeholder="z. B. Bad-Heizkörper zu klein, Wintergarten schlecht beheizbar, FBH-Verteiler nicht zugänglich, einzelne Heizkörper mit Einrohrsystem, Thermostatventile defekt …"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOCK 3: Gebäude -->
+  <div class="block">
+    <div class="block-title"><span class="num">3</span> Gebäude</div>
+    <div class="grid-in" style="margin-bottom:16px;">
+      <div>
+        <label class="fld">Beheizte Wohnfläche</label>
+        <div class="row"><input type="range" id="flaeche" min="60" max="800" value="120" step="5" style="flex:1;"><input type="number" id="flaeche-num" value="120" min="20" step="5" class="val-input"><span class="unit">m²</span></div>
+      </div>
+      <div>
+        <label class="fld">Wohneinheiten</label>
+        <div class="row"><input type="range" id="wohneinheiten" min="1" max="20" value="1" step="1" style="flex:1;"><input type="number" id="wohneinheiten-num" value="1" min="1" step="1" class="val-input"><span class="unit">WE</span></div>
+      </div>
+      <div id="personen-wrap">
+        <label class="fld">Personen (Warmwasser)</label>
+        <div class="row"><input type="range" id="personen" min="1" max="16" value="2" step="1" style="flex:1;"><input type="number" id="personen-num" value="2" min="1" step="1" class="val-input"><span class="unit">Pers.</span></div>
+      </div>
+    </div>
+
+    <label class="fld">Berechnungsmethode Gebäudehülle</label>
+    <div class="segment" id="geb-mode" style="margin-bottom:4px;">
+      <button type="button" data-mode="schnell" class="active">Schnell (Pauschale)</button>
+      <button type="button" data-mode="detail">Detailliert (Bauteile)</button>
+      <button type="button" data-mode="uwert">U-Werte direkt</button>
+    </div>
+
+    <!-- Modus schnell -->
+    <div class="mode-panel show" id="mode-schnell">
+      <div style="margin-top:14px;">
+        <label class="fld">Gebäude- / Dämmstandard</label>
+        <select id="pauschale">
+          <option value="30">Neubau GEG / KfW-Effizienzhaus (30 W/m²)</option>
+          <option value="50">Neubau ~2010+ / Sanierung gut (50 W/m²)</option>
+          <option value="70">Teilsaniert / 90er Jahre (70 W/m²)</option>
+          <option value="90" selected>Altbau teilsaniert (90 W/m²)</option>
+          <option value="110">Altbau ungedämmt (110 W/m²)</option>
+          <option value="140">Altbau unsaniert, einfachverglast (140 W/m²)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Modus detail -->
+    <div class="mode-panel" id="mode-detail">
+      <div class="grid-in" style="margin-top:14px;">
+        <div>
+          <label class="fld">Baujahr / Gebäudealter</label>
+          <select id="d-baujahr">
+            <option value="70">vor 1977 (unsaniert)</option>
+            <option value="55" selected>1977–1994</option>
+            <option value="45">1995–2001</option>
+            <option value="38">2002–2008</option>
+            <option value="28">2009–2015</option>
+            <option value="22">ab 2016 (EnEV/GEG)</option>
+          </select>
+        </div>
+        <div>
+          <label class="fld">Fensterverglasung</label>
+          <select id="d-fenster">
+            <option value="22">Einfachverglasung</option>
+            <option value="12" selected>2-fach, älter (vor ~2000)</option>
+            <option value="5">2-fach, modern (Wärmeschutz)</option>
+            <option value="-2">3-fach-Verglasung</option>
+          </select>
+        </div>
+        <div>
+          <label class="fld">Wandaufbau (Werkstoff)</label>
+          <select id="d-wand-mat">
+            <option value="massiv">Massiv (Ziegel/Kalksandstein/Beton)</option>
+            <option value="leicht" selected>Leichtbaustein (Poroton/Holzstein/Bims)</option>
+            <option value="holz">Holzständer / Fachwerk</option>
+          </select>
+        </div>
+        <div>
+          <label class="fld">Wanddicke</label>
+          <select id="d-wand-dicke">
+            <option value="dünn">bis 24 cm</option>
+            <option value="mittel" selected>24–36 cm</option>
+            <option value="dick">über 36 cm</option>
+          </select>
+        </div>
+        <div>
+          <label class="fld">Wanddämmung</label>
+          <select id="d-wand-daemm">
+            <option value="ohne" selected>keine Dämmung</option>
+            <option value="teil">Teildämmung / Kerndämmung</option>
+            <option value="wdvs">WDVS / Volldämmung</option>
+          </select>
+        </div>
+        <div>
+          <label class="fld">Dachdämmung / oberste Geschossdecke</label>
+          <select id="d-dach">
+            <option value="16">ungedämmt</option>
+            <option value="6" selected>teilgedämmt / vor 2000</option>
+            <option value="-3">gut gedämmt (aktueller Standard)</option>
+          </select>
+        </div>
+      </div>
+      <div class="uwert-hint" id="detail-ergebnis" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- Modus uwert -->
+    <div class="mode-panel" id="mode-uwert">
+      <div class="uwert-hint" style="margin-top:14px; margin-bottom:12px;">Aus Energieausweis oder Bauteilberechnung. Flächen der Bauteile eintragen, U-Werte in W/(m²·K). Norm-Innentemperatur 20 °C.</div>
+      <div class="grid-in">
+        <div>
+          <label class="fld">Außenwand · Fläche</label>
+          <div class="row"><input type="number" id="u-wand-a" value="140" min="0" step="5" style="flex:1;"><span class="unit">m²</span></div>
+        </div>
+        <div>
+          <label class="fld">Außenwand · U-Wert</label>
+          <div class="row"><input type="number" id="u-wand-u" value="0.8" min="0.1" max="2.5" step="0.05" style="flex:1;"><span class="unit">W/m²K</span></div>
+        </div>
+        <div>
+          <label class="fld">Dach/Decke · Fläche</label>
+          <div class="row"><input type="number" id="u-dach-a" value="90" min="0" step="5" style="flex:1;"><span class="unit">m²</span></div>
+        </div>
+        <div>
+          <label class="fld">Dach/Decke · U-Wert</label>
+          <div class="row"><input type="number" id="u-dach-u" value="0.4" min="0.1" max="2.5" step="0.05" style="flex:1;"><span class="unit">W/m²K</span></div>
+        </div>
+        <div>
+          <label class="fld">Fenster · Fläche</label>
+          <div class="row"><input type="number" id="u-fen-a" value="25" min="0" step="1" style="flex:1;"><span class="unit">m²</span></div>
+        </div>
+        <div>
+          <label class="fld">Fenster · U-Wert</label>
+          <div class="row"><input type="number" id="u-fen-u" value="1.3" min="0.6" max="5" step="0.1" style="flex:1;"><span class="unit">W/m²K</span></div>
+        </div>
+        <div>
+          <label class="fld">Boden/Keller · Fläche</label>
+          <div class="row"><input type="number" id="u-bod-a" value="90" min="0" step="5" style="flex:1;"><span class="unit">m²</span></div>
+        </div>
+        <div>
+          <label class="fld">Boden/Keller · U-Wert</label>
+          <div class="row"><input type="number" id="u-bod-u" value="0.6" min="0.1" max="2.5" step="0.05" style="flex:1;"><span class="unit">W/m²K</span></div>
+        </div>
+      </div>
+      <div class="uwert-hint" id="uwert-ergebnis" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="bes-wrap">
+      <label class="fld">Besonderheiten / offene Punkte zum Gebäude</label>
+      <textarea id="bes-gebaeude" placeholder="z. B. Dachdämmung für nächstes Jahr geplant, Anbau ungedämmt, Keller teilbeheizt, Denkmalschutz an der Fassade, Fenster werden noch getauscht …"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOCK 4: Auslegungsrandbedingungen -->
+  <div class="block">
+    <div class="block-title"><span class="num">4</span> Auslegung</div>
+
+    <label class="fld">Wärmequelle</label>
+    <div class="segment" id="waermequelle" style="margin-bottom:6px;">
+      <button type="button" data-wq="luft" class="active">Luft / Wasser</button>
+      <button type="button" data-wq="sole">Sole / Wasser (Erdwärme)</button>
+    </div>
+    <div class="uwert-hint" id="sole-hint" style="margin-bottom:18px;">Standard ist Luft/Wasser (Evoblock/Aeroblock/Monoblock). Nur umschalten, wenn eine Erdwärme-Anlage mit Sole/Wasser-Wärmepumpe (Geoblock) geplant ist — erfordert Erdsonden-Bohrung.</div>
+
+    <label class="fld">Aufgabe der Wärmepumpe</label>
+    <div class="segment" id="wp-aufgabe" style="margin-bottom:18px;">
+      <button type="button" data-aufgabe="heizung_ww" class="active">Heizung + Warmwasser</button>
+      <button type="button" data-aufgabe="nur_heizung">Nur Heizung</button>
+    </div>
+    <div class="uwert-hint" id="ww-extern-hint" style="margin-top:-12px; margin-bottom:16px; display:none;">Warmwasserbereitung erfolgt extern (z. B. Durchlauferhitzer, Frischwasserstation am Gaskessel, separater WW-Wärmeerzeuger). Die Wärmepumpe wird ausschließlich auf die Raumheizung ausgelegt — kein Warmwasser-Zuschlag in der Heizlast.</div>
+
+    <label class="fld">Speicherkonzept — Platzverhältnisse im Technikraum</label>
+    <div class="segment" id="speicher-konzept" style="margin-bottom:6px;">
+      <button type="button" data-sp="getrennt" class="active">Platz für WAS + WES</button>
+      <button type="button" data-sp="wms">Nur Platz für WMS</button>
+    </div>
+
+    <div id="speicher-detail" style="margin-bottom:18px;">
+      <div class="grid-in" id="sp-getrennt-felder" style="margin-top:12px;">
+        <div id="sp-was-wrap">
+          <label class="fld">WAS · Trinkwasserspeicher</label>
+          <select id="sp-was">
+            <option value="200">200 Liter</option>
+            <option value="300" selected>300 Liter</option>
+            <option value="400">400 Liter</option>
+            <option value="500">500 Liter</option>
+            <option value="600">600 Liter</option>
+          </select>
+        </div>
+        <div>
+          <label class="fld">WES · Energiespeicher (Puffer)</label>
+          <select id="sp-wes">
+            <option value="70">70 Liter</option>
+            <option value="200" selected>200 Liter</option>
+            <option value="500">500 Liter</option>
+            <option value="660">660 Liter</option>
+            <option value="910">910 Liter</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-in" id="sp-wms-felder" style="margin-top:12px; display:none;">
+        <div>
+          <label class="fld">WMS · Modularspeicher</label>
+          <select id="sp-wms">
+            <option value="300_120" selected>300 l Trinkwasser / 120 l Puffer</option>
+            <option value="200_80">200 l Trinkwasser / 80 l Puffer</option>
+          </select>
+        </div>
+      </div>
+      <div class="uwert-hint" id="sp-hint" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="grid-in">
+      <div>
+        <label class="fld">Norm-Außentemperatur (Heizlast, DIN EN 12831)</label>
+        <select id="norm-at">
+          <option value="-10">−10 °C</option>
+          <option value="-11">−11 °C</option>
+          <option value="-12">−12 °C</option>
+          <option value="-13">−13 °C</option>
+          <option value="-14" selected>−14 °C (Brandenburg, typ. −13,5)</option>
+          <option value="-15">−15 °C</option>
+          <option value="-16">−16 °C</option>
+          <option value="-18">−18 °C</option>
+        </select>
+        <div class="uwert-hint">Standortbezogener Auslegungswert für die Heizlastermittlung.</div>
+      </div>
+      <div>
+        <label class="fld">Bivalenzpunkt (Auslegung Wärmepumpe)</label>
+        <select id="ap">
+          <option value="-12">−12 °C</option>
+          <option value="-10">−10 °C</option>
+          <option value="-9">−9 °C</option>
+          <option value="-8">−8 °C</option>
+          <option value="-7" selected>−7 °C (Betriebsstandard)</option>
+          <option value="-6">−6 °C</option>
+          <option value="-5">−5 °C (Weishaupt-Werksauslegung)</option>
+          <option value="-3">−3 °C</option>
+        </select>
+        <div class="uwert-hint">Bis hierher arbeitet die WP ohne nennenswerte Heizstabunterstützung.</div>
+      </div>
+      <div>
+        <label class="fld">Ziel-Vorlauftemperatur <span id="vl-auto-hint" style="color:var(--text-3); font-weight:400;"></span></label>
+        <select id="vl">
+          <option value="35">35 °C (Fußbodenheizung)</option>
+          <option value="40">40 °C (FBH / sehr große HK)</option>
+          <option value="45" selected>45 °C (FBH / große HK)</option>
+          <option value="50">50 °C (Bestands-Heizkörper)</option>
+          <option value="55">55 °C (Bestands-Heizkörper knapp)</option>
+          <option value="65">65 °C (kleine Altbau-HK)</option>
+          <option value="75">75 °C (nur mit R290 möglich)</option>
+        </select>
+      </div>
+    </div>
+    <div id="bivalenz-info" style="margin-top:14px;"></div>
+    <div class="toggle-row">
+      <input type="checkbox" id="streng">
+      <label for="streng">Strenge Auslegung erzwingen — Wärmepumpe deckt den Auslegungspunkt zu 100 % ohne Zusatzheizung. Standard (deaktiviert): monoenergetisch, kleiner Heizstab-Anteil an den kältesten Tagen erlaubt.</label>
+    </div>
+
+    <div class="bes-wrap">
+      <label class="fld">Besonderheiten / offene Punkte zur Auslegung &amp; Aufstellung</label>
+      <textarea id="bes-auslegung" placeholder="z. B. Aufstellort Grenzabstand zum Nachbarn prüfen, Schallgutachten nötig, PV-Anlage geplant (SG-Ready), Netzbetreiber-Anmeldung offen, Zugang für Krananlieferung eng …"></textarea>
+    </div>
+  </div>
+
+  <!-- Ergebnis Heizlast -->
+  <div class="block">
+    <div class="section-label">Heizlast-Abschätzung</div>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-lbl" id="lbl-verbrauch">Verbrauchsansatz</div>
+        <div class="stat-val" id="hl-verbrauch">—</div>
+        <div class="stat-sub" id="sub-verbrauch">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-lbl">Gebäudeansatz</div>
+        <div class="stat-val" id="hl-gebaeude">10,8 kW</div>
+        <div class="stat-sub" id="sub-gebaeude">Hülle</div>
+      </div>
+      <div class="stat">
+        <div class="stat-lbl">Ansatz Auslegung</div>
+        <div class="stat-val" id="hl-final">11,0 kW</div>
+        <div class="stat-sub">inkl. WW-Zuschlag</div>
+      </div>
+    </div>
+    <div class="plausi" id="plausi"></div>
+  </div>
+
+  <!-- Ergebnis Empfehlung -->
+  <div class="block">
+    <div class="section-label">Empfohlene Evoblock-Baugröße</div>
+    <div id="empfehlung"></div>
+  </div>
+
+  <!-- Zusätzlich benötigte Komponenten -->
+  <div class="block">
+    <div class="section-label">Objektabhängige Zusatzpositionen <span style="color:var(--text-3); font-weight:400;">— nicht im Standardumfang enthalten</span></div>
+    <div id="komponenten"></div>
+  </div>
+
+  <!-- Druck-Zusammenfassung: nur beim Drucken sichtbar -->
+  <div id="print-summary">
+    <div class="ps-title">Zusammenfassung Wärmepumpen-Ersteinschätzung</div>
+    <div class="ps-meta" id="ps-meta"></div>
+    <div class="ps-cols">
+      <div class="ps-col">
+        <div class="ps-h">Objekt / Gebäude</div>
+        <table class="ps-table" id="ps-gebaeude"></table>
+      </div>
+      <div class="ps-col">
+        <div class="ps-h">Bestandsheizung</div>
+        <table class="ps-table" id="ps-bestand"></table>
+      </div>
+    </div>
+    <div class="ps-h" style="margin-top:14px;">Heizlast-Abschätzung</div>
+    <table class="ps-table" id="ps-heizlast"></table>
+    <div class="ps-result" id="ps-result"></div>
+    <div class="ps-note" id="ps-note"></div>
+    <div id="ps-komponenten"></div>
+    <div id="ps-besonderheiten"></div>
+    <div class="ps-disclaimer">Überschlägige Ersteinschätzung für die Angebotserstellung. Keine verbindliche Auslegung — diese erfolgt nach raumweiser Heizlastberechnung gemäß DIN EN 12831 und Abgleich mit dem Weishaupt-Planungshandbuch (Fachinformation 83603801).</div>
+  </div>
+
+  <div style="margin-top:22px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+    <button class="print-btn" style="margin-top:0;" onclick="if(window.aktualisiereDruck)window.aktualisiereDruck();window.print()">Als PDF drucken / speichern</button>
+    <button class="print-btn" style="margin-top:0;" id="reset-btn" title="Alle Eingaben auf Standard zurücksetzen">Zurücksetzen für nächstes Bauvorhaben</button>
+  </div>
+
+  <footer>
+    Verbrauchsansatz: Öl l&#215;10 kWh, Gas m³&#215;10 kWh bzw. kWh direkt, jeweils &#215;Wirkungsgrad &#247;1.800 Volllaststunden; vorhandene WP: Strom&#215;JAZ &#247;1.800 h. Gebäudeansatz: Pauschale, bauteilbasierter Konfigurator oder direkte U-Wert-Eingabe (Transmission &#215;&#916;T bei Norm-Innentemperatur 20 °C, zzgl. Lüftungsanteil). Auslegungswert = Mittel aus Verbrauchs- und Gebäudeansatz (bei großer Abweichung Gebäude stärker gewichtet), zzgl. 0,2 kW/Person Warmwasser. AP-Leistung interpoliert aus den Heizleistungskurven der Weishaupt-Fachinformation (Druck-Nr. 83603801, April 2026), Stützpunkte −15/−7/+2/+7 °C, W35–W75.<br>
+    Nennwärmeleistung A−7/W35 (EN 14511): Evoblock WEB 7/10 = 7,09 · WEB 9/14 = 9,49 · WEB 10/15 = 10,07 · WEB 13/20 = 13,15 kW. Aeroblock WAB 8 / 11 / 14 (R290, bis 70 °C Vorlauf). Monoblock-Großgeräte WWP LA 20/30-A R (6,8–30,6 kW) und LA 43/60-A R (17,1–60,0 kW) für Mehrfamilienhäuser, Kaskaden bis 840 kW. Werte der Aeroblock- und Großgeräte teils aus den Leistungsdiagrammen der jeweiligen Fachinformation abgelesen — für die verbindliche Auslegung stets das aktuelle Weishaupt-Planungshandbuch bzw. die Auslegungssoftware heranziehen. R290, Werksauslegung Bivalenztemperatur −5 °C.<br><br>
+    © Lutz Spring GmbH · Internes Werkzeug zur Angebotserstellung
+  </footer>
+
+  <div style="display:flex; justify-content:center; margin-top:26px;">
+    <a class="zurueck" href="index.html" title="Zur Startseite" aria-label="Zur Startseite"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3.5l9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9.75 20v-5.5h4.5V20"/></svg></a>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var VBh = 1800, WWpP = 0.2;
+
+  var geraete = [
+    {name:"WEB 7/10", serie:"Evoblock", typ:"evoblock", min:1.7, max:10.0, phase:"230 V", biv:7.09, db:43, kg:144,
+     kurve:{"-15":{35:6.0,45:5.9,55:5.8,65:5.4,75:5.6},"-7":{35:7.09,45:7.0,55:7.0,65:6.7,75:5.6},"2":{35:7.0,45:7.0,55:6.9,65:6.9,75:6.3},"7":{35:8.5,45:8.4,55:8.3,65:8.0,75:7.3}}},
+    {name:"WAB 8", serie:"Aeroblock", typ:"aeroblock", min:1.6, max:8.0, phase:"230 V", biv:6.2, db:49, kg:200,
+     kurve:{"-15":{35:5.6,45:5.5,55:5.4,65:5.1,75:4.8},"-7":{35:6.2,45:6.1,55:6.0,65:5.7,75:5.3},"2":{35:6.2,45:6.1,55:6.0,65:5.8,75:5.5},"7":{35:7.4,45:7.3,55:7.1,65:6.8,75:6.4}}},
+    {name:"WEB 9/14", serie:"Evoblock", typ:"evoblock", min:1.7, max:14.0, phase:"230 V", biv:9.49, db:46, kg:150,
+     kurve:{"-15":{35:8.7,45:8.6,55:8.5,65:8.2,75:7.5},"-7":{35:9.49,45:9.4,55:9.3,65:8.5,75:7.0},"2":{35:9.3,45:9.3,55:9.2,65:8.5,75:8.2},"7":{35:9.5,45:9.8,55:10.0,65:9.3,75:9.0}}},
+    {name:"WAB 11", serie:"Aeroblock", typ:"aeroblock", min:1.6, max:11.0, phase:"230 V", biv:6.9, db:49, kg:207,
+     kurve:{"-15":{35:6.2,45:6.1,55:6.0,65:5.7,75:5.3},"-7":{35:6.9,45:6.8,55:6.7,65:6.4,75:5.9},"2":{35:6.9,45:6.8,55:6.7,65:6.5,75:6.1},"7":{35:8.3,45:8.2,55:8.0,65:7.6,75:7.1}}},
+    {name:"WEB 10/15", serie:"Evoblock", typ:"evoblock", min:2.7, max:15.0, phase:"400 V", biv:10.07, db:46, kg:166,
+     kurve:{"-15":{35:8.7,45:8.6,55:8.5,65:8.3,75:8.0},"-7":{35:10.07,45:10.0,55:9.9,65:9.5,75:9.0},"2":{35:9.8,45:9.8,55:9.7,65:9.6,75:9.6},"7":{35:11.0,45:10.9,55:10.8,65:10.5,75:10.2}}},
+    {name:"WAB 14", serie:"Aeroblock", typ:"aeroblock", min:4.1, max:14.0, phase:"400 V", biv:11.2, db:41, kg:260,
+     kurve:{"-15":{35:10.0,45:9.9,55:9.7,65:9.3,75:8.7},"-7":{35:11.2,45:11.0,55:10.8,65:10.3,75:9.6},"2":{35:11.2,45:11.0,55:10.8,65:10.5,75:9.9},"7":{35:13.0,45:12.8,55:12.5,65:11.9,75:11.2}}},
+    {name:"WEB 13/20", serie:"Evoblock", typ:"evoblock", min:3.2, max:20.0, phase:"400 V", biv:13.15, db:45, kg:205,
+     kurve:{"-15":{35:12.5,45:12.4,55:12.3,65:12.0,75:11.5},"-7":{35:13.15,45:13.0,55:12.9,65:12.5,75:12.3},"2":{35:13.5,45:13.5,55:13.4,65:13.0,75:13.2},"7":{35:15.0,45:14.9,55:14.8,65:14.5,75:14.0}}},
+    {name:"WWP LA 20/30-A R", serie:"", typ:"gross", min:6.8, max:30.6, phase:"400 V", biv:20.0, db:54, kg:340,
+     kurve:{"-15":{35:17.5,45:17.0,55:16.5,65:16.0,75:15.5},"-7":{35:20.5,45:20.0,55:19.5,65:19.0,75:18.0},"2":{35:17.5,45:17.0,55:16.5,65:16.5,75:16.0},"7":{35:20.0,45:19.5,55:19.0,65:18.5,75:17.5}}},
+    {name:"WWP LA 43/60-A R", serie:"", typ:"gross", min:17.1, max:60.0, phase:"400 V", biv:39.0, db:58, kg:490,
+     kurve:{"-15":{35:33.0,45:33.0,55:34.0,65:37.0,75:36.0},"-7":{35:39.0,45:38.0,55:40.0,65:42.0,75:40.0},"2":{35:36.0,45:35.0,55:35.0,65:35.0,75:34.0},"7":{35:40.0,45:37.0,55:37.0,65:36.0,75:35.0}}},
+    {name:"WGB 8", serie:"Geoblock", typ:"sole", min:1.7, max:8.6, phase:"400 V", biv:8.6, db:39, kg:190,
+     kurve:{"-15":{35:8.6,45:8.4,55:8.1,65:7.6,75:7.6},"-7":{35:8.6,45:8.4,55:8.1,65:7.6,75:7.6},"2":{35:8.6,45:8.4,55:8.1,65:7.6,75:7.6},"7":{35:8.8,45:8.6,55:8.3,65:7.8,75:7.8}}},
+    {name:"WGB 14", serie:"Geoblock", typ:"sole", min:2.0, max:13.5, phase:"400 V", biv:13.5, db:39, kg:195,
+     kurve:{"-15":{35:13.5,45:13.2,55:12.7,65:12.0,75:12.0},"-7":{35:13.5,45:13.2,55:12.7,65:12.0,75:12.0},"2":{35:13.5,45:13.2,55:12.7,65:12.0,75:12.0},"7":{35:13.8,45:13.5,55:13.0,65:12.3,75:12.3}}}
+  ];
+  var stuetzTemp = [-15, -7, 2, 7];
+
+  var stuetzVL = [35, 45, 55, 65, 75];
+
+  function leistungBeiVL(kurveTemp, vl){
+    // interpoliert die Heizleistung zwischen den VL-Stützpunkten (35/45/55/65/75)
+    var v = vl;
+    if(v <= stuetzVL[0]) return kurveTemp[35];
+    if(v >= stuetzVL[stuetzVL.length-1]) return kurveTemp[75];
+    var vLow = stuetzVL[0], vHigh = stuetzVL[stuetzVL.length-1];
+    for(var i=0;i<stuetzVL.length-1;i++){ if(v >= stuetzVL[i] && v <= stuetzVL[i+1]){ vLow = stuetzVL[i]; vHigh = stuetzVL[i+1]; break; } }
+    var pLow = kurveTemp[vLow], pHigh = kurveTemp[vHigh];
+    if(vHigh === vLow) return pLow;
+    return pLow + (v - vLow)/(vHigh - vLow) * (pHigh - pLow);
+  }
+
+  function apLeistungKurve(g, apTemp, vl){
+    var t = apTemp;
+    if(t <= stuetzTemp[0]) t = stuetzTemp[0];
+    if(t >= stuetzTemp[stuetzTemp.length-1]) t = stuetzTemp[stuetzTemp.length-1];
+    var tLow = stuetzTemp[0], tHigh = stuetzTemp[stuetzTemp.length-1];
+    for(var i=0;i<stuetzTemp.length-1;i++){ if(t >= stuetzTemp[i] && t <= stuetzTemp[i+1]){ tLow = stuetzTemp[i]; tHigh = stuetzTemp[i+1]; break; } }
+    var pLow = leistungBeiVL(g.kurve[String(tLow)], vl), pHigh = leistungBeiVL(g.kurve[String(tHigh)], vl);
+    if(tHigh === tLow) return pLow;
+    return pLow + (t - tLow)/(tHigh - tLow) * (pHigh - pLow);
+  }
+
+  function el(id){ return document.getElementById(id); }
+  function geraeteBez(g){ return g.serie ? "Weishaupt "+g.serie+" "+g.name : "Weishaupt "+g.name; }
+  function r1(x){ return (Math.round(x*10)/10).toString().replace(".",","); }
+  function r0(x){ return Math.round(x).toString(); }
+
+  var heizart = "oel";
+  var gebMode = "schnell";
+  var gasEinheit = "m3";
+  var altVlBekannt = "nein";      // nein | ja
+  var abwasser = "ja";            // ja | nein
+  var zirkulation = "nein";       // ja | nein
+  var solar = "nein";             // ja | nein — Solarthermie vorhanden
+  var solarDemontage = "ja";      // ja | nein — nur relevant wenn solar==ja
+  var pv = "nein";                // ja | nein | geplant — Photovoltaik
+  var speicherKonzept = "getrennt"; // getrennt (WAS+WES) | wms
+  var wpAufgabe = "heizung_ww";   // heizung_ww | nur_heizung
+  var waermequelle = "luft";      // luft | sole
+  var aeroblockAktiv = false;     // true, wenn Nutzer die Aeroblock-Alternative bewusst gewählt hat
+  var heizflaeche = null;   // null = noch keine Auswahl
+  var hkSystem = "zweirohr";      // zweirohr | einrohr
+  var rtl = "nein";               // ja | nein — RTL-Boxen vorhanden
+  var kuehlen = "nein";           // ja | nein — aktive Kühlung über Flächenheizung
+  var vlManuell = false;    // true, sobald der Nutzer die VL selbst ändert
+
+  // Heizkreisverteiler-Listen (je Etage/Bereich ein Verteiler)
+  var fbhVerteiler = [{name:"Erdgeschoss", kreise:6}];
+  var beidesVerteiler = [{name:"Erdgeschoss", kreise:4}];
+
+  function verteilerRendern(listeId, daten, onChange){
+    var container = el(listeId);
+    if(!container) return;
+    container.innerHTML = "";
+    daten.forEach(function(v, idx){
+      var row = document.createElement("div");
+      row.className = "verteiler-row";
+      var nameInput = document.createElement("input");
+      nameInput.type = "text"; nameInput.className = "vt-name";
+      nameInput.placeholder = "Etage / Bereich"; nameInput.value = v.name || "";
+      nameInput.addEventListener("input", function(){ daten[idx].name = nameInput.value; onChange(); });
+      var kreiseInput = document.createElement("input");
+      kreiseInput.type = "number"; kreiseInput.className = "vt-kreise";
+      kreiseInput.min = "0"; kreiseInput.max = "40"; kreiseInput.step = "1";
+      kreiseInput.value = v.kreise; kreiseInput.title = "Anzahl Heizkreise";
+      kreiseInput.addEventListener("input", function(){ daten[idx].kreise = parseInt(kreiseInput.value)||0; onChange(); });
+      var kreiseWrap = document.createElement("div");
+      kreiseWrap.style.cssText = "flex:0.8; display:flex; align-items:center; gap:6px;";
+      kreiseWrap.appendChild(kreiseInput);
+      var kreiseUnit = document.createElement("span");
+      kreiseUnit.className = "unit"; kreiseUnit.textContent = "Kreise";
+      kreiseWrap.appendChild(kreiseUnit);
+      row.appendChild(nameInput);
+      row.appendChild(kreiseWrap);
+      var delBtn = document.createElement("button");
+      delBtn.type = "button"; delBtn.className = "vt-del"; delBtn.textContent = "×";
+      delBtn.title = "Verteiler entfernen";
+      delBtn.disabled = daten.length <= 1;
+      delBtn.style.opacity = daten.length <= 1 ? "0.3" : "1";
+      delBtn.addEventListener("click", function(){
+        if(daten.length <= 1) return;
+        daten.splice(idx, 1);
+        verteilerRendern(listeId, daten, onChange);
+        onChange();
+      });
+      row.appendChild(delBtn);
+      container.appendChild(row);
+    });
+  }
+
+  function verteilerKreiseGesamt(daten){
+    return daten.reduce(function(s, v){ return s + (parseInt(v.kreise)||0); }, 0);
+  }
+
+  // Heizart-Auswahl
+  var heizartCards = document.querySelectorAll(".heizart-card");
+  heizartCards.forEach(function(c){
+    c.addEventListener("click", function(){
+      heizart = c.getAttribute("data-heizart");
+      heizartCards.forEach(function(x){ x.classList.remove("active"); });
+      c.classList.add("active");
+      ["oel","gas","wp"].forEach(function(h){ el("panel-"+h).classList.toggle("show", h===heizart); });
+      calc();
+      arbeitsstandSichern();
+    });
+  });
+
+  // Gas-Einheit
+  document.querySelectorAll("#gas-einheit button").forEach(function(b){
+    b.addEventListener("click", function(){
+      gasEinheit = b.getAttribute("data-einheit");
+      document.querySelectorAll("#gas-einheit button").forEach(function(x){ x.classList.remove("active"); });
+      b.classList.add("active");
+      el("gas-unit").textContent = gasEinheit === "m3" ? "m³/a" : "kWh/a";
+      el("gas-brennwert-hint").style.display = gasEinheit === "m3" ? "block" : "none";
+      calc();
+      arbeitsstandSichern();
+    });
+  });
+
+  // Bisherige Vorlauftemperatur bekannt?
+  function altVlAnwenden(){
+    el("alt-vl-panel").classList.toggle("show", altVlBekannt === "ja");
+    el("alt-vl-hint").style.display = altVlBekannt === "ja" ? "none" : "block";
+    document.querySelectorAll("#alt-vl-bekannt button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-altvl")===altVlBekannt); });
+  }
+  document.querySelectorAll("#alt-vl-bekannt button").forEach(function(b){
+    b.addEventListener("click", function(){
+      altVlBekannt = b.getAttribute("data-altvl");
+      altVlAnwenden();
+      calc();
+      arbeitsstandSichern();
+    });
+  });
+
+  // Fachliche Bewertung: bisherige VL im Vergleich zur geplanten Ziel-VL
+  function altVlBewerten(zielVl){
+    if(altVlBekannt !== "ja"){ el("alt-vl-bewertung").innerHTML = ""; return null; }
+    var altVl = parseFloat(el("alt-vl-wert").value)||0;
+    var komfort = el("alt-vl-komfort").value;
+    if(!altVl){ el("alt-vl-bewertung").innerHTML = ""; return null; }
+
+    var cls, txt, kurz;
+    if(komfort === "nein"){
+      cls = "b-danger";
+      kurz = "Heizflächen bereits im Bestand zu klein";
+      txt = "Die Altanlage lief mit "+altVl+" °C und es wurde trotzdem nicht warm — die Heizflächen sind schon für den Bestand unterdimensioniert. Vor einem Wärmepumpen-Angebot Heizflächen prüfen und einzelne Räume nachrüsten. Raumweise Heizlastberechnung hier zwingend.";
+    } else if(altVl <= zielVl){
+      cls = "b-success";
+      kurz = "Sehr gute Voraussetzung";
+      txt = "Die Altanlage kam bereits mit "+altVl+" °C aus" + (komfort === "knapp" ? " (mit Einschränkungen in einzelnen Räumen)" : "") + " — das liegt auf oder unter der geplanten Ziel-Vorlauftemperatur von "+zielVl+" °C. Die vorhandenen Heizflächen sind damit für den Wärmepumpenbetrieb gut geeignet." + (komfort === "knapp" ? " Die kritischen Räume gezielt nachrechnen." : "");
+    } else if(altVl - zielVl <= 10){
+      cls = komfort === "knapp" ? "b-warn" : "b-success";
+      kurz = "Gute Voraussetzung";
+      txt = "Die Altanlage lief mit "+altVl+" °C, geplant sind "+zielVl+" °C — eine Absenkung um "+Math.round(altVl-zielVl)+" K. Das ist meist erreichbar, weil Bestandsanlagen typischerweise mit Reserve gefahren werden." + (komfort === "knapp" ? " Da es bereits knapp war, sollten die kritischen Räume vor dem Angebot nachgerechnet werden." : " Als Nachweis empfiehlt sich ein Absenkversuch: Heizkurve für einige kalte Tage auf "+zielVl+" °C stellen und prüfen, ob alle Räume warm werden.");
+    } else if(altVl - zielVl <= 20){
+      cls = "b-warn";
+      kurz = "Absenkung prüfen";
+      txt = "Von "+altVl+" °C auf "+zielVl+" °C sind "+Math.round(altVl-zielVl)+" K Absenkung — das ist deutlich. Vor dem Angebot unbedingt einen Absenkversuch durchführen oder die Heizflächen raumweise nachrechnen. Ggf. einzelne Heizkörper vergrößern.";
+    } else {
+      cls = "b-danger";
+      kurz = "Heizflächenanpassung wahrscheinlich nötig";
+      txt = "Von "+altVl+" °C auf "+zielVl+" °C wären "+Math.round(altVl-zielVl)+" K Absenkung — das schaffen die vorhandenen Heizflächen erfahrungsgemäß nicht. Entweder Heizflächen vergrößern oder mit höherer Vorlauftemperatur auslegen (R290 erlaubt bis 75 °C, kostet aber Effizienz).";
+    }
+    el("alt-vl-bewertung").innerHTML = '<div class="badge '+cls+'" style="margin-bottom:0;">'+txt+'</div>';
+    return { altVl: altVl, komfort: komfort, kurz: kurz };
+  }
+
+  // Bauliche Gegebenheiten: Abwasser / Zirkulation
+  document.querySelectorAll("#abwasser button").forEach(function(b){
+    b.addEventListener("click", function(){
+      abwasser = b.getAttribute("data-abw");
+      document.querySelectorAll("#abwasser button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-abw")===abwasser); });
+      calc(); arbeitsstandSichern();
+    });
+  });
+  document.querySelectorAll("#zirkulation button").forEach(function(b){
+    b.addEventListener("click", function(){
+      zirkulation = b.getAttribute("data-zirk");
+      document.querySelectorAll("#zirkulation button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-zirk")===zirkulation); });
+      calc(); arbeitsstandSichern();
+    });
+  });
+
+  // Solarthermie vorhanden -> ggf. Demontage-Frage einblenden
+  function solarAnwenden(){
+    document.querySelectorAll("#solar button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-solar")===solar); });
+    el("solar-demontage-wrap").style.display = solar === "ja" ? "block" : "none";
+    document.querySelectorAll("#solar-demontage button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-solardem")===solarDemontage); });
+  }
+  document.querySelectorAll("#solar button").forEach(function(b){
+    b.addEventListener("click", function(){
+      solar = b.getAttribute("data-solar");
+      solarAnwenden();
+      calc(); arbeitsstandSichern();
+    });
+  });
+  document.querySelectorAll("#solar-demontage button").forEach(function(b){
+    b.addEventListener("click", function(){
+      solarDemontage = b.getAttribute("data-solardem");
+      solarAnwenden();
+      calc(); arbeitsstandSichern();
+    });
+  });
+
+  // Photovoltaik vorhanden / geplant / nein
+  function pvAnwenden(){
+    document.querySelectorAll("#pv button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-pv")===pv); });
+    var txt;
+    if(pv === "ja"){
+      txt = "PV vorhanden — die Wärmepumpe ist SG-Ready und kann den PV-Überschuss nutzen (Eigenstromanteil erhöhen). SG-Ready-Anbindung bzw. Modbus/WEM-Portal einplanen.";
+    } else if(pv === "geplant"){
+      txt = "PV für die Zukunft geplant — SG-Ready-Vorbereitung vorsehen, damit die Anbindung später ohne Umbau möglich ist. Auf Leerrohr/Steuerleitung zum künftigen Wechselrichter achten.";
+    } else {
+      txt = "Die Wärmepumpe ist SG-Ready und kann PV-Überschuss nutzen (Eigenstromanteil erhöhen). Bei geplanter PV die SG-Ready-Anbindung und ggf. Modbus/WEM-Portal vorsehen.";
+    }
+    el("pv-hint").textContent = txt;
+  }
+  document.querySelectorAll("#pv button").forEach(function(b){
+    b.addEventListener("click", function(){
+      pv = b.getAttribute("data-pv");
+      pvAnwenden();
+      calc(); arbeitsstandSichern();
+    });
+  });
+
+  // ---- Zusätzlich benötigte Komponenten ----
+  function komponentenErmitteln(gewaehlt, hlFinal){
+    // Nur objektabhängige Zusatzpositionen, die NICHT im Standardangebot enthalten sind.
+    var k = [];
+
+    // --- Solarthermie-Demontage ---
+    if(solar === "ja" && solarDemontage === "ja"){
+      k.push({art:"pflicht", name:"Leerer Kanister für Solarflüssigkeit",
+        desc:"Zum Auffangen der Solarflüssigkeit beim Rückbau der Solarthermie-Anlage. Der Kanister verbleibt beim Kunden (Entsorgung bzw. Weiterverwendung durch den Kunden)."});
+    }
+
+    // --- Öltankentsorgung (nur bei Öl-Bestand) ---
+    if(heizart === "oel"){
+      k.push({art:"pflicht", name:"Öltankentsorgung inkl. Restölentsorgung",
+        desc:"Demontage und fachgerechte Entsorgung des Öltanks samt Restöl und Ölschlamm. Bei erdverlegten oder Kellertanks ggf. Fachbetrieb erforderlich. Entsorgungsnachweis dokumentieren."});
+    }
+
+    // --- Erdwärmequelle (nur bei Sole/Wasser) ---
+    if(waermequelle === "sole"){
+      k.push({art:"pflicht", name:"Erdwärmesonde inkl. Bohrung",
+        desc:"Sole/Wasser erfordert die Erschließung der Erdwärmequelle. Sondendimensionierung nach VDI 4640 (Entzugsleistung je nach Bodenverhältnissen ca. 35–50 W/m). Behördliche Genehmigung erforderlich. Komplettservice über Weishaupt-Partner BauGrund Süd möglich (Bohrung, Genehmigung, 10 Jahre Garantie auf Material und Entzugsleistung)."});
+      k.push({art:"pflicht", name:"Soleverteiler + Solekreis-Zubehör",
+        desc:"Soleverteiler, Solekreis-Befüllung (Wasser-Glykol-Gemisch), Membranausdehnungsgefäß Solekreis, Solekreis-Sicherheitsgruppe."});
+    }
+
+    // --- Speicher (Ausführung objektabhängig nach Platzverhältnissen) ---
+    if(wpAufgabe === "nur_heizung"){
+      k.push({art:"pflicht", name:"WES " + el("sp-wes").value + " l · Energiespeicher",
+        desc:"Reiner Pufferspeicher — Warmwasserbereitung erfolgt extern, kein Trinkwasserspeicher erforderlich."});
+    } else if(speicherKonzept === "getrennt"){
+      k.push({art:"pflicht", name:"WAS " + el("sp-was").value + " l · Trinkwasserspeicher",
+        desc:"Getrennte Aufstellung — Stellfläche für zwei Speicher erforderlich."});
+      k.push({art:"pflicht", name:"WES " + el("sp-wes").value + " l · Energiespeicher",
+        desc:"Pufferspeicher für Anlagenvolumen und Abtaubetrieb."});
+    } else {
+      var wmsWahl = el("sp-wms").value === "200_80"
+        ? {name:"WMS 200/80 · Modularspeicher", desc:"200 l Trinkwasser / 80 l Puffer in einer Einheit — platzsparend bei beengtem Technikraum. Nur 80 l Puffervolumen: bei geringem Estrich-/Rohrnetzvolumen oder überwiegend Heizkörpern zusätzliches Anlagenvolumen prüfen."}
+        : {name:"WMS 300/120 · Modularspeicher", desc:"300 l Trinkwasser / 120 l Puffer in einer Einheit — platzsparend bei beengtem Technikraum."};
+      k.push({art:"pflicht", name:wmsWahl.name, desc:wmsWahl.desc});
+    }
+
+    // --- Trinkwasserseite: nur wenn die WP das Warmwasser bereitet ---
+    if(wpAufgabe !== "nur_heizung"){
+      if(abwasser === "nein"){
+        k.push({art:"pflicht", name:"Hebeanlage für Ablauf Sicherheitsgruppe",
+          desc:"Kein Abwasseranschluss mit Gefälle am Aufstellort — Ablauf der Sicherheitsgruppe muss gehoben werden, freier Auslauf nach DIN EN 1717 bleibt erhalten."});
+      }
+      if(zirkulation === "ja"){
+        k.push({art:"pflicht", name:"Zirkulationspumpe mit Zeit-/Temperatursteuerung",
+          desc:"Zirkulationsleitung vorhanden. Bedarfsgeführte Steuerung — Dauerzirkulation senkt die Jahresarbeitszahl deutlich."});
+      }
+    }
+
+    // --- Anlagenvolumen bei Taktungsrisiko ---
+    if(hlFinal < gewaehlt.min * 1.3){
+      k.push({art:"pflicht", name:"Zusätzliches Anlagenvolumen (Reihenpuffer)",
+        desc:"Heizlast "+r1(hlFinal)+" kW liegt nahe der unteren Modulationsgrenze der "+gewaehlt.name+" ("+r1(gewaehlt.min)+" kW) — Taktungsgefahr im Teillastbetrieb."});
+    }
+
+    // --- Zweiter Heizkreis / zusätzliche Verteiler ---
+    if(heizflaeche === "beides"){
+      k.push({art:"pflicht", name:"Erweiterungsmodul 2. Heizkreis + gemischte Pumpengruppe",
+        desc:"Gemischter Kreis (3-Wege-Mischer) für die Fußbodenheizung zusätzlich zum ungemischten Heizkörperkreis."});
+    }
+    var vertListe = heizflaeche === "beides" ? beidesVerteiler : (heizflaeche === "fbh" ? fbhVerteiler : null);
+    if(vertListe && vertListe.length > 1){
+      k.push({art:"pflicht", name:"Zusätzliche Heizkreisverteiler ("+(vertListe.length-1)+" über Standard)",
+        desc:"Insgesamt "+vertListe.length+" Verteiler mit "+verteilerKreiseGesamt(vertListe)+" Kreisen — Anbindeleitungen je Etage einkalkulieren."});
+    }
+
+    // --- Heizflächen aus VL-Bewertung ---
+    if(altVlBekannt === "ja"){
+      var aVl = parseFloat(el("alt-vl-wert").value)||0;
+      var aK = el("alt-vl-komfort").value;
+      var zielVl = parseFloat(el("vl").value)||45;
+      if(aK === "nein"){
+        k.push({art:"bedingt", name:"Heizflächenerweiterung erforderlich",
+          desc:"Altanlage wurde mit "+aVl+" °C nicht warm — Heizflächen bereits im Bestand unterdimensioniert. Raumweise Nachrechnung und Austausch einzelner Heizkörper einplanen."});
+      } else if(aVl - zielVl > 20){
+        k.push({art:"bedingt", name:"Heizflächenanpassung wahrscheinlich",
+          desc:"Absenkung von "+aVl+" °C auf "+zielVl+" °C ("+Math.round(aVl-zielVl)+" K) — einzelne Heizkörper vergrößern oder mit höherer Vorlauftemperatur auslegen."});
+      } else if(aVl - zielVl > 10){
+        k.push({art:"bedingt", name:"Absenkversuch vor Angebotslegung",
+          desc:"Absenkung um "+Math.round(aVl-zielVl)+" K geplant — Heizkurve testweise auf "+zielVl+" °C stellen und kritische Räume prüfen."});
+      }
+    }
+
+    // --- Kühlung ---
+    if((heizflaeche === "fbh" || heizflaeche === "beides") && kuehlen === "ja"){
+      var kuehlRaeume = parseInt(el("kuehlen-raeume").value)||1;
+      k.push({art:"pflicht", name:"Taupunktfühler / Kondensatüberwachung",
+        desc:"Verhindert Kondensatbildung im Kühlbetrieb — schaltet die Kühlung ab, bevor der Taupunkt unterschritten wird. Pflicht bei aktiver Flächenkühlung."});
+      k.push({art:"pflicht", name:"Diffusionsdichte Dämmung der kälteführenden Leitungen",
+        desc:"Alle Vor- und Rücklaufleitungen im Kühlbetrieb müssen diffusionsdicht gedämmt werden, um Tauwasser und Bauschäden zu vermeiden."});
+      k.push({art:"pflicht", name:"Blossom-IC Raumregler ("+kuehlRaeume+" "+(kuehlRaeume===1?"Raum":"Räume")+")",
+        desc:"Raumregler für den Kühlbetrieb — übernehmen zugleich den automatischen hydraulischen Abgleich der Flächenheizkreise. Je gekühltem Raum ein Regler."});
+      k.push({art:"pflicht", name:"Umschaltung Heizen/Kühlen + Kühlstation",
+        desc:"Umschaltventile und Regelungserweiterung für den reversiblen Betrieb. Bei Sole/Wasser passive Kühlung über Wärmetauscher möglich."});
+    } else if(heizflaeche === "fbh" || heizflaeche === "beides"){
+      k.push({art:"option", name:"Kühlfunktion über Flächenheizung (optional)",
+        desc:"Die Wärmepumpe ist reversibel. Bei späterem Wunsch nach Kühlung sind Taupunktfühler, diffusionsdichte Dämmung und geeignete Raumregler nachzurüsten."});
+    }
+
+    // --- Objektabhängige Prüfpunkte ---
+    k.push({art:"option", name:"Schallgutachten / Schallschutzmaßnahmen",
+      desc:"Bei enger Bebauung: "+ (gewaehlt.db||46) +" dB(A) Schallleistung, Abstand zu schutzbedürftigen Räumen mit dem Weishaupt-Schallrechner prüfen."});
+
+    return k;
+  }
+
+  function komponentenRendern(k){
+    if(!k.length){
+      el("komponenten").innerHTML = '<div class="komp-desc" style="padding:4px 0;">Keine objektabhängigen Zusatzpositionen erkannt — Standardumfang ausreichend.</div>';
+      return;
+    }
+    var html = "";
+    k.forEach(function(item){
+      var zeichen = item.art === "pflicht" ? "✓" : item.art === "bedingt" ? "!" : "+";
+      html += '<div class="komp-item">';
+      html += '<span class="komp-icon '+item.art+'">'+zeichen+'</span>';
+      html += '<div class="komp-txt"><div class="komp-name">'+item.name+'</div><div class="komp-desc">'+item.desc+'</div></div>';
+      html += '</div>';
+    });
+    html += '<div class="komp-legende">';
+    html += '<span><i style="background:var(--accent)"></i> erforderlich</span>';
+    html += '<span><i style="background:var(--gold)"></i> objektabhängig</span>';
+    html += '<span><i style="background:var(--text-3)"></i> optional</span>';
+    html += '</div>';
+    el("komponenten").innerHTML = html;
+  }
+
+  // Speicherkonzept: getrennt (WAS+WES) oder kombiniert (WMS)
+  function speicherAnwenden(){
+    var nurHeizung = (wpAufgabe === "nur_heizung");
+    document.querySelectorAll("#speicher-konzept button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-sp")===speicherKonzept); });
+    el("sp-getrennt-felder").style.display = speicherKonzept === "getrennt" ? "" : "none";
+    el("sp-wms-felder").style.display = speicherKonzept === "wms" ? "" : "none";
+    // Bei nur Heizung entfällt der Trinkwasserspeicher
+    el("sp-was-wrap").style.display = nurHeizung ? "none" : "";
+    var hint = "";
+    if(nurHeizung){
+      hint = speicherKonzept === "getrennt"
+        ? "Nur Heizung: Trinkwasserspeicher entfällt, es wird ausschließlich der WES als Pufferspeicher benötigt."
+        : "Nur Heizung: Ein WMS ist hier nicht sinnvoll — der integrierte Trinkwasserteil bleibt ungenutzt. Reiner Pufferspeicher (WES) empfohlen.";
+    } else {
+      hint = speicherKonzept === "getrennt"
+        ? "Getrennte Aufstellung: mehr Puffervolumen und größere Trinkwasserreserve, benötigt aber Stellfläche für zwei Speicher."
+        : "Kombispeicher WMS: platzsparend, Trinkwasser und Puffer in einer Einheit. Geringeres Puffervolumen — bei Taktungsgefahr zusätzliches Anlagenvolumen prüfen.";
+    }
+    el("sp-hint").textContent = hint;
+  }
+  document.querySelectorAll("#speicher-konzept button").forEach(function(b){
+    b.addEventListener("click", function(){
+      speicherKonzept = b.getAttribute("data-sp");
+      speicherAnwenden();
+      calc(); arbeitsstandSichern();
+    });
+  });
+
+  // WP-Aufgabe: Heizung+WW oder nur Heizung
+  function wpAufgabeAnwenden(){
+    var nurHeizung = (wpAufgabe === "nur_heizung");
+    el("ww-extern-hint").style.display = nurHeizung ? "block" : "none";
+    var pw = el("personen-wrap");
+    if(pw){
+      pw.style.opacity = nurHeizung ? "0.4" : "1";
+      pw.style.pointerEvents = nurHeizung ? "none" : "auto";
+      var lbl = pw.querySelector("label.fld");
+      if(lbl) lbl.textContent = nurHeizung ? "Personen (Warmwasser extern)" : "Personen (Warmwasser)";
+    }
+    document.querySelectorAll("#wp-aufgabe button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-aufgabe")===wpAufgabe); });
+    speicherAnwenden();
+  }
+  document.querySelectorAll("#wp-aufgabe button").forEach(function(b){
+    b.addEventListener("click", function(){
+      wpAufgabe = b.getAttribute("data-aufgabe");
+      wpAufgabeAnwenden();
+      calc();
+      arbeitsstandSichern();
+    });
+  });
+
+  // Wärmequelle: Luft (Standard) oder Sole (Erdwärme)
+  function waermequelleAnwenden(){
+    document.querySelectorAll("#waermequelle button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-wq")===waermequelle); });
+    el("sole-hint").style.display = waermequelle === "sole" ? "block" : "none";
+    // Bei Sole ist die Aeroblock-Ausweichoption gegenstandslos
+    if(waermequelle === "sole") aeroblockAktiv = false;
+  }
+  document.querySelectorAll("#waermequelle button").forEach(function(b){
+    b.addEventListener("click", function(){
+      waermequelle = b.getAttribute("data-wq");
+      waermequelleAnwenden();
+      calc();
+      arbeitsstandSichern();
+    });
+  });
+
+  // Gebäude-Modus
+  document.querySelectorAll("#geb-mode button").forEach(function(b){
+    b.addEventListener("click", function(){
+      gebMode = b.getAttribute("data-mode");
+      document.querySelectorAll("#geb-mode button").forEach(function(x){ x.classList.remove("active"); });
+      b.classList.add("active");
+      ["schnell","detail","uwert"].forEach(function(m){ el("mode-"+m).classList.toggle("show", m===gebMode); });
+      calc();
+      arbeitsstandSichern();
+    });
+  });
+
+  // Heizflächen-Auswahl (schlägt Vorlauftemperatur vor)
+  var vlVorschlagEinzel = { hk:"50", fbh:"35" };
+  var heizflaecheCards = document.querySelectorAll(".heizflaeche-card");
+
+  function vlVorschlagAnwenden(){
+    if(vlManuell) return;
+    var vorschlag = null;
+    if(heizflaeche === "beides"){
+      // Bei zwei Pumpengruppen ist der Heizkörper-Kreis (höherer Vorlauf) führend
+      vorschlag = el("hf-beides-vlhk").value;
+    } else if(heizflaeche && vlVorschlagEinzel[heizflaeche]){
+      vorschlag = vlVorschlagEinzel[heizflaeche];
+    }
+    if(vorschlag){
+      el("vl").value = vorschlag;
+      el("vl-auto-hint").textContent = heizflaeche === "beides" ? "· aus Heizkörper-Kreis" : "· automatisch vorgeschlagen";
+    }
+  }
+
+  heizflaecheCards.forEach(function(c){
+    c.addEventListener("click", function(){
+      heizflaeche = c.getAttribute("data-hf");
+      heizflaecheCards.forEach(function(x){ x.classList.remove("active"); });
+      c.classList.add("active");
+      ["hk","fbh","beides"].forEach(function(h){ el("panel-"+h).classList.toggle("show", h===heizflaeche); });
+      vlVorschlagAnwenden();
+      kuehlenSichtbarkeit();
+      kuehlenAnwenden();
+      calc();
+      arbeitsstandSichern();
+    });
+  });
+
+  // Bei Beides: Änderung des Heizkörper-Vorlaufs führt die Haupt-Vorlauftemperatur nach
+  el("hf-beides-vlhk").addEventListener("change", function(){
+    if(heizflaeche === "beides"){ vlVorschlagAnwenden(); calc(); arbeitsstandSichern(); }
+  });
+
+  // Rohrsystem Ein-/Zweirohr
+  function hkSystemAnwenden(){
+    document.querySelectorAll("#hk-system button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-hksys")===hkSystem); });
+    el("hk-system-hint").textContent = hkSystem === "einrohr"
+      ? "Einrohrsystem: Die Vorlauftemperatur fällt über den Strang ab — die hinteren Heizkörper bekommen weniger. Für Wärmepumpen kritisch; Umbau auf Zweirohr oder Strangoptimierung vor Ort prüfen."
+      : "Zweirohrsystem: Jeder Heizkörper wird mit gleicher Vorlauftemperatur versorgt — gut für den Wärmepumpenbetrieb geeignet.";
+  }
+  document.querySelectorAll("#hk-system button").forEach(function(b){
+    b.addEventListener("click", function(){
+      hkSystem = b.getAttribute("data-hksys");
+      hkSystemAnwenden();
+      calc(); arbeitsstandSichern();
+    });
+  });
+
+  // RTL-Boxen
+  function rtlAnwenden(){
+    document.querySelectorAll("#rtl button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-rtl")===rtl); });
+    var an = rtl === "ja";
+    el("rtl-anzahl-wrap").style.display = an ? "block" : "none";
+    el("rtl-hersteller-wrap").style.display = an ? "block" : "none";
+    el("rtl-hint").style.display = an ? "block" : "none";
+  }
+  document.querySelectorAll("#rtl button").forEach(function(b){
+    b.addEventListener("click", function(){
+      rtl = b.getAttribute("data-rtl");
+      rtlAnwenden();
+      calc(); arbeitsstandSichern();
+    });
+  });
+
+  // Kühlfunktion (nur bei Flächenheizung: fbh oder beides)
+  function kuehlenSichtbarkeit(){
+    var moeglich = (heizflaeche === "fbh" || heizflaeche === "beides");
+    el("kuehlen-wrap").style.display = moeglich ? "block" : "none";
+    if(!moeglich) kuehlen = "nein";
+  }
+  function kuehlenAnwenden(){
+    document.querySelectorAll("#kuehlen button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-kuehl")===kuehlen); });
+    var an = (kuehlen === "ja");
+    el("kuehlen-regler-wrap").style.display = an ? "block" : "none";
+    el("kuehlen-hint").style.display = an ? "block" : "none";
+  }
+  document.querySelectorAll("#kuehlen button").forEach(function(b){
+    b.addEventListener("click", function(){
+      kuehlen = b.getAttribute("data-kuehl");
+      kuehlenAnwenden();
+      calc(); arbeitsstandSichern();
+    });
+  });
+
+  // Merken, wenn der Nutzer die Vorlauftemperatur selbst ändert
+  el("vl").addEventListener("change", function(){
+    vlManuell = true;
+    el("vl-auto-hint").textContent = "";
+  });
+
+  // Verteiler-Hinzufügen
+  el("fbh-verteiler-add").addEventListener("click", function(){
+    var etagen = ["Erdgeschoss","1. Obergeschoss","2. Obergeschoss","3. Obergeschoss","Dachgeschoss","Keller"];
+    var name = etagen[fbhVerteiler.length] || ("Verteiler "+(fbhVerteiler.length+1));
+    fbhVerteiler.push({name:name, kreise:4});
+    verteilerRendern("fbh-verteiler-liste", fbhVerteiler, function(){ calc(); arbeitsstandSichern(); });
+    calc(); arbeitsstandSichern();
+  });
+  el("beides-verteiler-add").addEventListener("click", function(){
+    var etagen = ["Erdgeschoss","1. Obergeschoss","2. Obergeschoss","3. Obergeschoss","Dachgeschoss","Keller"];
+    var name = etagen[beidesVerteiler.length] || ("Verteiler "+(beidesVerteiler.length+1));
+    beidesVerteiler.push({name:name, kreise:4});
+    verteilerRendern("beides-verteiler-liste", beidesVerteiler, function(){ calc(); arbeitsstandSichern(); });
+    calc(); arbeitsstandSichern();
+  });
+
+  // Verteiler initial rendern
+  verteilerRendern("fbh-verteiler-liste", fbhVerteiler, function(){ calc(); arbeitsstandSichern(); });
+  verteilerRendern("beides-verteiler-liste", beidesVerteiler, function(){ calc(); arbeitsstandSichern(); });
+
+  function verbrauchHeizlast(){
+    if(heizart === "oel"){
+      var l = parseFloat(el("oel-verbrauch").value)||0;
+      var eta = parseFloat(el("oel-eta").value);
+      return l>0 ? (l*10*eta/VBh) : 0;
+    } else if(heizart === "gas"){
+      var g = parseFloat(el("gas-verbrauch").value)||0;
+      var eta2 = parseFloat(el("gas-eta").value);
+      var kwh = gasEinheit === "m3" ? g*10 : g;
+      return kwh>0 ? (kwh*eta2/VBh) : 0;
+    } else {
+      var strom = parseFloat(el("wp-strom").value)||0;
+      var jaz = parseFloat(el("wp-jaz").value)||3.5;
+      return strom>0 ? (strom*jaz/VBh) : 0;
+    }
+  }
+
+  function wandFaktor(){
+    var mat = el("d-wand-mat").value;
+    var dicke = el("d-wand-dicke").value;
+    var daemm = el("d-wand-daemm").value;
+    var base = {massiv:14, leicht:10, holz:8}[mat];
+    var dickeAdj = {"dünn":4, "mittel":0, "dick":-3}[dicke];
+    var daemmAdj = {ohne:4, teil:-6, wdvs:-16}[daemm];
+    return base + dickeAdj + daemmAdj;
+  }
+
+  function gebaeudeHeizlast(flaeche){
+    if(gebMode === "schnell"){
+      var w = parseFloat(el("pauschale").value);
+      return {hl: flaeche*w/1000, spez:w, txt:"Pauschale "+w+" W/m²"};
+    } else if(gebMode === "detail"){
+      var basis = parseFloat(el("d-baujahr").value);
+      var fen = parseFloat(el("d-fenster").value);
+      var wand = wandFaktor();
+      var dach = parseFloat(el("d-dach").value);
+      var spez = Math.max(15, basis + fen + wand + dach);
+      el("detail-ergebnis").textContent = "Ergebnis Bauteilansatz: ≈ "+r0(spez)+" W/m² (Basis "+r0(basis)+" + Fenster "+r0(fen)+" + Wand "+r0(wand)+" + Dach "+r0(dach)+")";
+      return {hl: flaeche*spez/1000, spez:spez, txt:"Bauteile ≈ "+r0(spez)+" W/m²"};
+    } else {
+      var normAT = parseFloat(el("norm-at").value);
+      var dT = 20 - normAT;
+      var HT = 0;
+      HT += (parseFloat(el("u-wand-a").value)||0)*(parseFloat(el("u-wand-u").value)||0);
+      HT += (parseFloat(el("u-dach-a").value)||0)*(parseFloat(el("u-dach-u").value)||0);
+      HT += (parseFloat(el("u-fen-a").value)||0)*(parseFloat(el("u-fen-u").value)||0);
+      HT += (parseFloat(el("u-bod-a").value)||0)*(parseFloat(el("u-bod-u").value)||0);
+      var transmission = HT*dT/1000;
+      var lueftung = 0.5 * flaeche*2.5 * 0.34 * dT / 1000;
+      var hl = transmission + lueftung;
+      el("uwert-ergebnis").textContent = "Transmission ≈ "+r1(transmission)+" kW + Lüftung ≈ "+r1(lueftung)+" kW bei ΔT="+r0(dT)+" K (Norm-Innentemp. 20 °C).";
+      return {hl: hl, spez: flaeche>0 ? hl*1000/flaeche : 0, txt:"U-Werte, ΔT="+r0(dT)+" K"};
+    }
+  }
+
+  function calc(){
+    var flaeche = parseFloat(el("flaeche-num").value) || 0;
+    var wohneinheiten = parseFloat(el("wohneinheiten-num").value) || 1;
+    var personen = parseFloat(el("personen-num").value) || 1;
+    var apTemp = parseFloat(el("ap").value);
+    var normAT = parseFloat(el("norm-at").value);
+    var vl = parseFloat(el("vl").value);
+    var altVlInfo = altVlBewerten(vl);
+
+    var hlVerbrauch = verbrauchHeizlast();
+    var geb = gebaeudeHeizlast(flaeche);
+    var hlGebaeude = geb.hl;
+    var wwZuschlag = (wpAufgabe === "nur_heizung") ? 0 : personen * WWpP;
+
+    // Verbrauchs-Kachel-Beschriftung
+    var vLabel = {oel:"Ölverbrauchsansatz", gas:"Gasverbrauchsansatz", wp:"WP-Verbrauchsansatz"}[heizart];
+    var vSub = {oel:"l × 10 kWh ÷ VBh ÷ η", gas:"kWh × η ÷ VBh", wp:"Strom × JAZ ÷ VBh"}[heizart];
+    el("lbl-verbrauch").textContent = vLabel;
+    el("hl-verbrauch").textContent = hlVerbrauch>0 ? r1(hlVerbrauch)+" kW" : "—";
+    el("sub-verbrauch").textContent = vSub;
+    el("hl-gebaeude").textContent = r1(hlGebaeude)+" kW";
+    el("sub-gebaeude").textContent = geb.txt;
+
+    // Auslegungswert
+    var wwText = (wpAufgabe === "nur_heizung")
+      ? "ohne Warmwasser-Zuschlag (WW extern)"
+      : "plus "+r1(wwZuschlag)+" kW Warmwasser für "+personen+" Personen";
+    var gebaeudeAnteil;
+    if(hlVerbrauch > 0){
+      var abw = Math.abs(hlGebaeude - hlVerbrauch) / ((hlGebaeude + hlVerbrauch)/2) * 100;
+      // Bei großer Abweichung Gebäude stärker gewichten (60/40), sonst 50/50
+      var wG = abw > 35 ? 0.6 : 0.5;
+      gebaeudeAnteil = wG*hlGebaeude + (1-wG)*hlVerbrauch;
+      var plausiTxt = abw > 35
+        ? "Große Abweichung zwischen Verbrauch und Gebäudehülle ("+r0(abw)+" %). Altanlage evtl. über-/unterdimensioniert oder untypisches Nutzerverhalten — Gebäudeansatz wird mit 60 % stärker gewichtet. Vor Angebot prüfen."
+        : "Verbrauch und Gebäudehülle plausibel ("+r0(abw)+" % Abweichung). Auslegungswert = Mittel beider Wege, "+wwText+".";
+      el("plausi").textContent = plausiTxt;
+    } else {
+      gebaeudeAnteil = hlGebaeude;
+      el("plausi").textContent = "Nur Gebäudeansatz genutzt (kein Verbrauch angegeben), "+wwText+".";
+    }
+    var hlFinal = gebaeudeAnteil + wwZuschlag;
+    el("hl-final").textContent = r1(hlFinal)+" kW";
+
+    // Baugrößenauswahl
+    // Die Heizlast hlFinal gilt bei Norm-Außentemperatur. Am (wärmeren) Bivalenzpunkt
+    // ist die Gebäudelast geringer — lineare Lastlinie zwischen Heizgrenze (15 °C) und Norm-AT.
+    var heizgrenze = 15;
+    var lastAnteilBiv = (heizgrenze - apTemp) / (heizgrenze - normAT);
+    if(lastAnteilBiv > 1) lastAnteilBiv = 1;
+    if(lastAnteilBiv < 0) lastAnteilBiv = 0;
+    var lastAmBivalenzpunkt = hlFinal * lastAnteilBiv;
+
+    var monoTol = el("streng").checked ? 1.0 : 1.15;
+
+    var evoWahl = null, aeroWahl = null, gewaehlt = null;
+
+    if(waermequelle === "sole"){
+      // Sole/Wasser: nur Geoblock-Geräte
+      for(var s=0;s<geraete.length;s++){
+        if(geraete[s].typ !== "sole") continue;
+        if(apLeistungKurve(geraete[s], apTemp, vl)*monoTol >= lastAmBivalenzpunkt){ gewaehlt = geraete[s]; break; }
+      }
+      if(!gewaehlt){
+        // größtes Sole-Gerät als Rückfall
+        for(var s2=geraete.length-1;s2>=0;s2--){ if(geraete[s2].typ==="sole"){ gewaehlt = geraete[s2]; break; } }
+      }
+      evoWahl = gewaehlt;
+      aeroblockAktiv = false;
+    } else {
+      // Luft/Wasser: Evoblock und große Monoblock, Aeroblock übersprungen (teurer Vorgänger)
+      for(var i=0;i<geraete.length;i++){
+        if(geraete[i].typ === "aeroblock" || geraete[i].typ === "sole") continue;
+        if(apLeistungKurve(geraete[i], apTemp, vl)*monoTol >= lastAmBivalenzpunkt){ evoWahl = geraete[i]; break; }
+      }
+      if(!evoWahl){
+        for(var i2=geraete.length-1;i2>=0;i2--){ if(geraete[i2].typ!=="sole"){ evoWahl = geraete[i2]; break; } }
+      }
+
+      // Passende Aeroblock als Alternative (kleinste, die die Last deckt)
+      for(var j=0;j<geraete.length;j++){
+        if(geraete[j].typ !== "aeroblock") continue;
+        if(apLeistungKurve(geraete[j], apTemp, vl)*monoTol >= lastAmBivalenzpunkt){ aeroWahl = geraete[j]; break; }
+      }
+      if(!aeroWahl){ aeroblockAktiv = false; }
+
+      // Das tatsächlich ausgelegte Gerät: Aeroblock nur wenn bewusst aktiviert
+      gewaehlt = (aeroblockAktiv && aeroWahl) ? aeroWahl : evoWahl;
+    }
+
+    var apLeistung = apLeistungKurve(gewaehlt, apTemp, vl);
+    var deckung = Math.min(100, apLeistung/lastAmBivalenzpunkt*100);
+    var heizstabAnteil = Math.max(0, lastAmBivalenzpunkt - apLeistung);
+    // Heizstabbedarf bei Norm-Außentemperatur (dort ist die Lücke am größten)
+    var leistungBeiNormAT = apLeistungKurve(gewaehlt, normAT, vl);
+    var heizstabBeiNormAT = Math.max(0, hlFinal - leistungBeiNormAT);
+    var taktRisiko = lastAmBivalenzpunkt < gewaehlt.min*1.3;
+
+    var statusCls, statusTxt;
+    if(heizstabAnteil <= 0.05){
+      statusCls="b-success"; statusTxt="✓ Die Wärmepumpe deckt den Bivalenzpunkt "+apTemp+" °C vollständig ohne Heizstab.";
+    } else if(heizstabAnteil <= gewaehlt.max*0.15){
+      statusCls="b-warn"; statusTxt="◐ Am Bivalenzpunkt "+apTemp+" °C bereits geringe Heizstab-Unterstützung nötig.";
+    } else {
+      statusCls="b-danger"; statusTxt="⚠ Deutlicher Heizstab-Anteil schon am Bivalenzpunkt — nächstgrößere Baugröße prüfen.";
+    }
+
+    var html = '<div class="rec-card">';
+    html += '<div class="rec-head"><div class="rec-name">'+geraeteBez(gewaehlt)+'</div>';
+    html += '<div class="rec-meta">R290 · Modulation '+r1(gewaehlt.min)+'–'+r1(gewaehlt.max)+' kW · '+gewaehlt.phase+'</div></div>';
+    html += '<div class="rec-stats">';
+    html += '<div class="rec-stat"><div class="rec-stat-lbl">Gebäudelast bei '+apTemp+' °C</div><div class="rec-stat-val">'+r1(lastAmBivalenzpunkt)+' kW</div></div>';
+    html += '<div class="rec-stat"><div class="rec-stat-lbl">WP-Leistung A'+apTemp+'/W'+vl+'</div><div class="rec-stat-val">≈ '+r1(apLeistung)+' kW</div></div>';
+    html += '<div class="rec-stat"><div class="rec-stat-lbl">Deckung am Bivalenzpunkt</div><div class="rec-stat-val">'+r0(deckung)+' %</div></div>';
+    html += '<div class="rec-stat"><div class="rec-stat-lbl">Nennwärmeleistung A−7/W35</div><div class="rec-stat-val">'+r1(gewaehlt.biv)+' kW</div></div>';
+    html += '</div>';
+    html += '<div class="badge '+statusCls+'">'+statusTxt+'</div>';
+
+    // Zweiter Betriebspunkt: Norm-Außentemperatur (nur bei Luft/Wasser relevant)
+    if(waermequelle === "sole"){
+      html += '<div style="border-top:1px solid var(--border); margin-top:14px; padding-top:14px;">';
+      if(heizstabAnteil > 0.05){
+        html += '<div class="badge b-warn" style="margin-bottom:0;">Die Heizlast liegt über der Dauerleistung der '+gewaehlt.name+' ('+r1(gewaehlt.max)+' kW). Für reinen Sole-Betrieb ohne nennenswerten Heizstab-Einsatz größere Sonde bzw. Kaskade prüfen — oder die integrierten Backup-Heizstäbe (2 × 3,5 kW) an den kältesten Tagen zuschalten. Sole liefert ganzjährig konstante Quellentemperatur.</div>';
+      } else {
+        html += '<div class="badge b-success" style="margin-bottom:0;">Monovalenter Betrieb — die Sole/Wasser-Wärmepumpe deckt die volle Heizlast von '+r1(hlFinal)+' kW auch an den kältesten Tagen, da die Erdreichtemperatur ganzjährig nahezu konstant bleibt. Die integrierten Elektroheizstäbe (2 × 3,5 kW) dienen nur als Backup.</div>';
+      }
+      html += '</div>';
+    } else {
+    html += '<div style="border-top:1px solid var(--border); margin-top:14px; padding-top:14px;">';
+    html += '<div style="font-size:13px; color:var(--text-2); margin-bottom:10px;">Bei Norm-Außentemperatur '+normAT+' °C (kälteste Auslegungstage)</div>';
+    html += '<div class="rec-stats" style="margin-bottom:10px;">';
+    html += '<div class="rec-stat"><div class="rec-stat-lbl">Gebäudeheizlast</div><div class="rec-stat-val">'+r1(hlFinal)+' kW</div></div>';
+    html += '<div class="rec-stat"><div class="rec-stat-lbl">WP-Leistung A'+normAT+'/W'+vl+'</div><div class="rec-stat-val">≈ '+r1(leistungBeiNormAT)+' kW</div></div>';
+    html += '<div class="rec-stat"><div class="rec-stat-lbl">Heizstab-Anteil</div><div class="rec-stat-val">'+(heizstabBeiNormAT<=0.05?"0 kW":"≈ "+r1(heizstabBeiNormAT)+" kW")+'</div></div>';
+    html += '</div>';
+    var hsStufen = Math.ceil(heizstabBeiNormAT / 3);
+    if(heizstabBeiNormAT > 0.05){
+      var stufenTxt = hsStufen <= 3
+        ? "Die integrierte dreistufige Zusatzheizung (3/6/9 kW) deckt das ab — rechnerisch Stufe "+hsStufen+"."
+        : "Benötigte Zusatzleistung übersteigt die integrierte Zusatzheizung — Auslegung prüfen.";
+      html += '<div class="badge '+(hsStufen<=3?"b-warn":"b-danger")+'" style="margin-bottom:0;">Zwischen '+apTemp+' °C und '+normAT+' °C unterstützt der Heizstab mit bis zu '+r1(heizstabBeiNormAT)+' kW. '+stufenTxt+' Jahresanteil an der Heizarbeit typisch unter 5 %, da diese Temperaturen nur an wenigen Tagen auftreten.</div>';
+    } else {
+      html += '<div class="badge b-success" style="margin-bottom:0;">Monovalent — die Wärmepumpe deckt auch die Norm-Außentemperatur '+normAT+' °C vollständig ohne Heizstab.</div>';
+    }
+    html += '</div>';
+    }
+
+    if(taktRisiko){
+      html += '<div class="badge b-warn" style="margin-top:11px;">↻ Taktungsrisiko im Teillastbetrieb: Last am Bivalenzpunkt ('+r1(lastAmBivalenzpunkt)+' kW) nahe der unteren Modulationsgrenze ('+r1(gewaehlt.min)+' kW). Ausreichendes Anlagenvolumen bzw. Pufferspeicher vorsehen.</div>';
+    }
+    var bivTxt = (waermequelle === "sole")
+      ? "Sole/Wasser-Auslegung (Geoblock). Die Erdwärmequelle liefert nahezu konstante Leistung über das ganze Jahr — monovalenter Betrieb ohne nennenswerte Elektro-Zusatzheizung. Vorlauf bis 65 °C, R290. Voraussetzung: fachgerecht dimensionierte Erdsonden-Bohrung (Entzugsleistung nach VDI 4640, Genehmigung erforderlich)."
+      : "Auslegung monoenergetisch mit Bivalenzpunkt "+apTemp+" °C bei einer Norm-Außentemperatur von "+normAT+" °C. Bei 0 Sperrstunden (§14a EnWG, Neuanlage) unkritisch. Weishaupt-Werksauslegung: Bivalenztemperatur −5 °C. Vorlauf bis 75 °C über R290 möglich.";
+    html += '<div class="note" style="margin-top:11px;">ℹ '+bivTxt+'</div></div>';
+
+    // Aeroblock-Alternative (Vorgänger, teurer) — nur anzeigen, wenn passend und nicht ohnehin gewählt
+    if(aeroWahl){
+      var aeroLeistung = apLeistungKurve(aeroWahl, apTemp, vl);
+      var aeroDeckung = Math.min(100, aeroLeistung/lastAmBivalenzpunkt*100);
+      if(aeroblockAktiv){
+        // Aeroblock ist aktiv -> Hinweis mit Möglichkeit, zur Evoblock zurückzuwechseln
+        html += '<div class="alt-card aktiv">';
+        html += '<div class="alt-head"><span class="alt-badge">Ausweichlösung aktiv</span> '+geraeteBez(aeroWahl)+'</div>';
+        html += '<div class="alt-desc">Die Aeroblock (Vorgängermodell, höherer Preis) ist als Auslegung aktiviert — nur wählen, wenn Baubedingungen die Evoblock ausschließen. Standardempfehlung wäre '+geraeteBez(evoWahl)+'.</div>';
+        html += '<button type="button" class="alt-btn" id="aero-toggle">Zurück zur Evoblock ('+evoWahl.name+')</button>';
+        html += '</div>';
+      } else {
+        // Aeroblock als graue, aktivierbare Alternative
+        html += '<div class="alt-card">';
+        html += '<div class="alt-head">Alternative: '+geraeteBez(aeroWahl)+' <span class="alt-sub">Vorgängermodell</span></div>';
+        html += '<div class="alt-desc">Würde die Anforderung ebenfalls erfüllen (Leistung ≈ '+r1(aeroLeistung)+' kW, '+r0(aeroDeckung)+' % Deckung am Bivalenzpunkt), ist aber teurer. Nur aktivieren, wenn die Evoblock aus baulichen Gründen vor Ort nicht möglich ist.</div>';
+        html += '<button type="button" class="alt-btn" id="aero-toggle">Aeroblock stattdessen auslegen</button>';
+        html += '</div>';
+      }
+    }
+
+    el("empfehlung").innerHTML = html;
+
+    // Umschalt-Button verbinden
+    var aeroBtn = el("aero-toggle");
+    if(aeroBtn){
+      aeroBtn.addEventListener("click", function(){
+        aeroblockAktiv = !aeroblockAktiv;
+        calc(); arbeitsstandSichern();
+      });
+    }
+
+    // Zusätzlich benötigte Komponenten
+    var komponenten = komponentenErmitteln(gewaehlt, hlFinal);
+    komponentenRendern(komponenten);
+
+    // ---- Druck-Zusammenfassung befüllen ----
+    befuelleDruck({
+      flaeche:flaeche, wohneinheiten:wohneinheiten, personen:personen, apTemp:apTemp, vl:vl,
+      hlVerbrauch:hlVerbrauch, hlGebaeude:hlGebaeude, geb:geb, hlFinal:hlFinal, wwZuschlag:wwZuschlag,
+      gewaehlt:gewaehlt, apLeistung:apLeistung, deckung:deckung, heizstabAnteil:heizstabAnteil,
+      statusTxt:statusTxt, bivTxt:bivTxt, taktRisiko:taktRisiko, altVlInfo:altVlInfo, komponenten:komponenten, normAT:normAT, lastAmBivalenzpunkt:lastAmBivalenzpunkt, leistungBeiNormAT:leistungBeiNormAT, heizstabBeiNormAT:heizstabBeiNormAT
+    });
+  }
+
+  function optText(id){
+    var e = el(id);
+    if(!e || e.tagName !== "SELECT") return "";
+    return e.options[e.selectedIndex] ? e.options[e.selectedIndex].text : "";
+  }
+
+  function befuelleDruck(d){
+    function r1(x){ return (Math.round(x*10)/10).toString().replace(".",","); }
+    function r0(x){ return Math.round(x).toString(); }
+    function zeile(a,b){ return "<tr><td>"+a+"</td><td>"+b+"</td></tr>"; }
+
+    // Kopf: Kundenname + Datum
+    var name = (el("kunde-name").value||"").trim();
+    var datum = new Date().toLocaleDateString("de-DE", {day:"2-digit",month:"2-digit",year:"numeric"});
+    el("ps-meta").innerHTML = (name ? "<strong>"+name+"</strong> · " : "") + "Erstellt am " + datum;
+
+    // Gebäude
+    var g = "";
+    g += zeile("Beheizte Wohnfläche", r0(d.flaeche)+" m²");
+    g += zeile("Wohneinheiten", r0(d.wohneinheiten));
+    if(wpAufgabe !== "nur_heizung") g += zeile("Personen (Warmwasser)", r0(d.personen));
+    if(gebMode === "schnell"){
+      g += zeile("Methode Gebäudehülle", "Pauschale");
+      g += zeile("Dämmstandard", optText("pauschale"));
+    } else if(gebMode === "detail"){
+      g += zeile("Methode Gebäudehülle", "Bauteil-Konfigurator");
+      g += zeile("Baujahr", optText("d-baujahr"));
+      g += zeile("Fenster", optText("d-fenster"));
+      g += zeile("Wand", optText("d-wand-mat")+", "+optText("d-wand-dicke")+", "+optText("d-wand-daemm"));
+      g += zeile("Dach / oberste Decke", optText("d-dach"));
+      g += zeile("Spezifische Heizlast", r0(d.geb.spez)+" W/m²");
+    } else {
+      g += zeile("Methode Gebäudehülle", "U-Werte direkt");
+      g += zeile("Wand", (el("u-wand-a").value||"–")+" m² · U="+(el("u-wand-u").value||"–"));
+      g += zeile("Dach / Decke", (el("u-dach-a").value||"–")+" m² · U="+(el("u-dach-u").value||"–"));
+      g += zeile("Fenster", (el("u-fen-a").value||"–")+" m² · U="+(el("u-fen-u").value||"–"));
+      g += zeile("Boden / Keller", (el("u-bod-a").value||"–")+" m² · U="+(el("u-bod-u").value||"–"));
+    }
+    el("ps-gebaeude").innerHTML = g;
+
+    // Bestandsheizung
+    var b = "";
+    var heizartName = {oel:"Öl", gas:"Gas", wp:"Vorhandene Wärmepumpe"}[heizart];
+    b += zeile("Wärmeerzeuger", heizartName);
+    if(heizart === "oel"){
+      b += zeile("Ölverbrauch", (el("oel-verbrauch").value||"–")+" l/a");
+      b += zeile("Kesselwirkungsgrad", optText("oel-eta"));
+    } else if(heizart === "gas"){
+      b += zeile("Gasverbrauch", (el("gas-verbrauch").value||"–")+" "+(gasEinheit==="m3"?"m³/a":"kWh/a"));
+      b += zeile("Kesselwirkungsgrad", optText("gas-eta"));
+    } else {
+      b += zeile("Stromverbrauch WP", (el("wp-strom").value||"–")+" kWh/a");
+      b += zeile("Jahresarbeitszahl (JAZ)", (el("wp-jaz").value||"–"));
+    }
+    b += zeile("Norm-Außentemperatur", d.normAT+" °C");
+    b += zeile("Bivalenzpunkt (WP-Auslegung)", d.apTemp+" °C");
+    var hfName = {hk:"Heizkörper", fbh:"Fußbodenheizung", beides:"Heizkörper + Fußbodenheizung"}[heizflaeche];
+    if(hfName){
+      b += zeile("Heizflächen", hfName);
+      if(heizflaeche === "hk"){
+        b += zeile("Anzahl Heizkörper", (el("hf-hk-anzahl").value||"–")+" Stück");
+        b += zeile("Rohrsystem", hkSystem === "einrohr" ? "Einrohrsystem" : "Zweirohrsystem");
+      } else if(heizflaeche === "fbh"){
+        var gesamtF = verteilerKreiseGesamt(fbhVerteiler);
+        b += zeile("Heizkreisverteiler", fbhVerteiler.length + " (gesamt " + gesamtF + " Kreise)");
+        fbhVerteiler.forEach(function(v){ b += zeile("&nbsp;&nbsp;· "+(v.name||"Verteiler"), (v.kreise||0)+" Kreise"); });
+      } else {
+        var gesamtB = verteilerKreiseGesamt(beidesVerteiler);
+        b += zeile("Heizkörper (Pumpengruppe 1)", (el("hf-beides-hk").value||"–")+" Stück");
+        b += zeile("Rohrsystem Heizkörper", hkSystem === "einrohr" ? "Einrohrsystem" : "Zweirohrsystem");
+        b += zeile("FBH-Verteiler (Pumpengruppe 2)", beidesVerteiler.length + " (gesamt " + gesamtB + " Kreise)");
+        beidesVerteiler.forEach(function(v){ b += zeile("&nbsp;&nbsp;· "+(v.name||"Verteiler"), (v.kreise||0)+" Kreise"); });
+        b += zeile("Vorlauf HK / FBH", (el("hf-beides-vlhk").value||"–")+" °C / "+(el("hf-beides-vlfbh").value||"–")+" °C");
+      }
+    }
+    if(rtl === "ja" && (heizflaeche === "hk" || heizflaeche === "beides")){
+      var rtlAnz = el("rtl-anzahl").value||"–";
+      var rtlHst = (el("rtl-hersteller").value||"").trim();
+      b += zeile("RTL-Boxen", rtlAnz + " Stück" + (rtlHst ? " ("+rtlHst+")" : ""));
+    }
+    if((heizflaeche === "fbh" || heizflaeche === "beides") && kuehlen === "ja"){
+      b += zeile("Kühlfunktion", "aktive Kühlung — " + (el("kuehlen-raeume").value||"–") + " Räume (Blossom-IC)");
+    }
+    b += zeile("Ziel-Vorlauftemperatur", d.vl+" °C");
+    if(altVlBekannt === "ja"){
+      var aVl = el("alt-vl-wert").value||"–";
+      var aK = {ja:"Räume wurden warm", knapp:"knapp / einzelne Räume kühl", nein:"zu kalt"}[el("alt-vl-komfort").value];
+      b += zeile("Bisheriger Vorlauf (Altanlage)", aVl+" °C — "+aK);
+    }
+    b += zeile("Aufgabe der Wärmepumpe", wpAufgabe === "nur_heizung" ? "Nur Heizung (WW extern)" : "Heizung + Warmwasser");
+    var spTxt;
+    if(wpAufgabe === "nur_heizung"){
+      spTxt = "WES " + el("sp-wes").value + " l (nur Puffer)";
+    } else if(speicherKonzept === "getrennt"){
+      spTxt = "WAS " + el("sp-was").value + " l + WES " + el("sp-wes").value + " l (getrennt)";
+    } else {
+      spTxt = el("sp-wms").value === "200_80" ? "WMS 200 l TW / 80 l Puffer" : "WMS 300 l TW / 120 l Puffer";
+    }
+    b += zeile("Speicherkonzept", spTxt);
+    b += zeile("Abwasseranschluss", abwasser === "ja" ? "vorhanden" : "nicht vorhanden");
+    b += zeile("Zirkulationsleitung", zirkulation === "ja" ? "vorhanden" : "nicht vorhanden");
+    if(solar === "ja"){
+      b += zeile("Solarthermie-Anlage", solarDemontage === "ja" ? "vorhanden — wird demontiert" : "vorhanden — bleibt bestehen");
+    }
+    b += zeile("Photovoltaik-Anlage", pv === "ja" ? "vorhanden (SG-Ready-Anbindung)" : pv === "geplant" ? "für die Zukunft geplant" : "nicht vorhanden");
+    el("ps-bestand").innerHTML = b;
+
+    // Heizlast
+    var h = "";
+    var vLabel = {oel:"Ölverbrauchsansatz", gas:"Gasverbrauchsansatz", wp:"WP-Verbrauchsansatz"}[heizart];
+    if(d.hlVerbrauch > 0) h += zeile(vLabel, r1(d.hlVerbrauch)+" kW");
+    h += zeile("Gebäudeansatz ("+d.geb.txt+")", r1(d.hlGebaeude)+" kW");
+    h += zeile("Warmwasser-Zuschlag", wpAufgabe === "nur_heizung" ? "entfällt (WW extern)" : r1(d.wwZuschlag)+" kW");
+    h += zeile("<strong>Auslegungswert Heizlast</strong>", "<strong>"+r1(d.hlFinal)+" kW</strong>");
+    el("ps-heizlast").innerHTML = h;
+
+    // Ergebnis
+    var res = '<div class="ps-r-name">'+geraeteBez(d.gewaehlt)+'</div>';
+    res += '<div class="ps-r-sub">R290 · Modulation '+r1(d.gewaehlt.min)+'–'+r1(d.gewaehlt.max)+' kW · '+d.gewaehlt.phase+' · Vorlauf bis 75 °C</div>';
+    res += '<table>';
+    res += zeile("<strong>Am Bivalenzpunkt "+d.apTemp+" °C</strong>", "");
+    res += zeile("&nbsp;&nbsp;Gebäudelast", r1(d.lastAmBivalenzpunkt)+" kW");
+    res += zeile("&nbsp;&nbsp;WP-Leistung A"+d.apTemp+"/W"+d.vl, "≈ "+r1(d.apLeistung)+" kW");
+    res += zeile("&nbsp;&nbsp;Deckung", r0(d.deckung)+" %");
+    res += zeile("<strong>Bei Norm-Außentemperatur "+d.normAT+" °C</strong>", "");
+    res += zeile("&nbsp;&nbsp;Gebäudeheizlast", r1(d.hlFinal)+" kW");
+    res += zeile("&nbsp;&nbsp;WP-Leistung A"+d.normAT+"/W"+d.vl, "≈ "+r1(d.leistungBeiNormAT)+" kW");
+    res += zeile("&nbsp;&nbsp;Heizstab-Anteil", d.heizstabBeiNormAT<=0.05?"0 kW":"≈ "+r1(d.heizstabBeiNormAT)+" kW");
+    res += zeile("Nennwärmeleistung A−7/W35", r1(d.gewaehlt.biv)+" kW");
+    res += '</table>';
+    el("ps-result").innerHTML = res;
+
+    // Bewertung
+    var note = d.statusTxt.replace(/^[✓◐⚠]\s*/, "") + " " + d.bivTxt;
+    if(d.taktRisiko) note += " Hinweis: Heizlast nahe der unteren Modulationsgrenze — ausreichendes Anlagenvolumen bzw. Pufferspeicher vorsehen.";
+    if(d.altVlInfo) note += " Heizflächen-Einschätzung: " + d.altVlInfo.kurz + " (Altanlage lief mit " + d.altVlInfo.altVl + " °C).";
+    el("ps-note").textContent = note;
+
+    // Komponentenliste im Druck
+    if(d.komponenten && d.komponenten.length){
+      var kh = '<div class="ps-h" style="margin-top:16px;">Objektabhängige Zusatzpositionen</div>';
+      d.komponenten.forEach(function(item){
+        var mark = item.art === "pflicht" ? "■" : item.art === "bedingt" ? "▲" : "□";
+        kh += '<div class="psk-item"><span class="psk-mark">'+mark+'</span><span><span class="psk-name">'+item.name+'</span> — <span class="psk-desc">'+item.desc+'</span></span></div>';
+      });
+      kh += '<div class="psk-legende">■ erforderlich &nbsp; ▲ objektabhängig &nbsp; □ zu prüfen</div>';
+      el("ps-komponenten").innerHTML = kh;
+    } else {
+      el("ps-komponenten").innerHTML = "";
+    }
+
+    // Besonderheiten (nur ausgeben, wenn etwas eingetragen wurde)
+    var besFelder = [
+      {id:"bes-bestand",      label:"Bestandsanlage"},
+      {id:"bes-heizflaechen", label:"Heizflächen"},
+      {id:"bes-gebaeude",     label:"Gebäude"},
+      {id:"bes-auslegung",    label:"Auslegung & Aufstellung"}
+    ];
+    var bh = "", hatBes = false;
+    besFelder.forEach(function(f){
+      var e = el(f.id);
+      var txt = e ? (e.value||"").trim() : "";
+      if(txt){
+        hatBes = true;
+        var sicher = txt.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        bh += '<div class="psb-item"><span class="psb-label">'+f.label+':</span> <span class="psb-text">'+sicher+'</span></div>';
+      }
+    });
+    el("ps-besonderheiten").innerHTML = hatBes
+      ? '<div class="ps-h" style="margin-top:16px;">Besonderheiten &amp; offene Punkte</div>' + bh
+      : "";
+
+    // Seitentitel = Dateiname beim Speichern als PDF
+    // Schrägstriche (z. B. "WEB 13/20") würden im Dateinamen stören -> ersetzen
+    var jetzt = new Date();
+    var datum = ("0"+jetzt.getDate()).slice(-2) + "." + ("0"+(jetzt.getMonth()+1)).slice(-2) + "." + jetzt.getFullYear();
+    var titel = "Wärmepumpenauslegungstool";
+    if(name) titel += " - " + name;
+    titel += " - " + geraeteBez(d.gewaehlt).replace(/\//g,"-");
+    titel += " - " + datum;
+    document.title = titel;
+  }
+
+  // ---- Kundenliste (lokal gespeichert, überlebt Schließen/Neuöffnen) ----
+  var STORAGE_KEY = "lutzspring_evoblock_kunden_v2";
+  var WORK_KEY = "lutzspring_evoblock_work_v2";
+  var alleInputs = ["flaeche","flaeche-num","wohneinheiten","wohneinheiten-num","personen","personen-num","ap","norm-at","vl","streng","pauschale","oel-verbrauch","oel-eta","gas-verbrauch","gas-eta","wp-strom","wp-jaz","d-baujahr","d-fenster","d-wand-mat","d-wand-dicke","d-wand-daemm","d-dach","u-wand-a","u-wand-u","u-dach-a","u-dach-u","u-fen-a","u-fen-u","u-bod-a","u-bod-u","hf-hk-anzahl","rtl-anzahl","rtl-hersteller","kuehlen-raeume","hf-beides-hk","hf-beides-vlhk","hf-beides-vlfbh","alt-vl-wert","alt-vl-komfort","bes-bestand","bes-heizflaechen","bes-gebaeude","bes-auslegung","sp-was","sp-wes","sp-wms"];
+
+  var kunden = [];        // [{id, name, stand}]
+  var aktuelleId = null;  // id des geladenen Kunden, null = ungespeicherter Arbeitsstand
+
+  function standErfassen(){
+    var stand = { heizart: heizart, gebMode: gebMode, gasEinheit: gasEinheit, altVlBekannt: altVlBekannt, abwasser: abwasser, zirkulation: zirkulation, solar: solar, solarDemontage: solarDemontage, pv: pv, speicherKonzept: speicherKonzept, wpAufgabe: wpAufgabe, waermequelle: waermequelle, aeroblockAktiv: aeroblockAktiv, heizflaeche: heizflaeche, hkSystem: hkSystem, rtl: rtl, kuehlen: kuehlen, vlManuell: vlManuell, fbhVerteiler: fbhVerteiler, beidesVerteiler: beidesVerteiler, felder: {} };
+    alleInputs.forEach(function(id){
+      var e = el(id);
+      if(!e) return;
+      stand.felder[id] = e.type === "checkbox" ? e.checked : e.value;
+    });
+    return stand;
+  }
+
+  function standAnwenden(stand){
+    if(!stand) return;
+    if(stand.heizart){
+      heizart = stand.heizart;
+      heizartCards.forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-heizart")===heizart); });
+      ["oel","gas","wp"].forEach(function(h){ el("panel-"+h).classList.toggle("show", h===heizart); });
+    }
+    if(stand.gebMode){
+      gebMode = stand.gebMode;
+      document.querySelectorAll("#geb-mode button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-mode")===gebMode); });
+      ["schnell","detail","uwert"].forEach(function(m){ el("mode-"+m).classList.toggle("show", m===gebMode); });
+    }
+    if(stand.gasEinheit){
+      gasEinheit = stand.gasEinheit;
+      document.querySelectorAll("#gas-einheit button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-einheit")===gasEinheit); });
+      el("gas-unit").textContent = gasEinheit === "m3" ? "m³/a" : "kWh/a";
+      el("gas-brennwert-hint").style.display = gasEinheit === "m3" ? "block" : "none";
+    }
+    vlManuell = !!stand.vlManuell;
+    hkSystem = stand.hkSystem || "zweirohr";
+    hkSystemAnwenden();
+    rtl = stand.rtl || "nein";
+    rtlAnwenden();
+    kuehlen = stand.kuehlen || "nein";
+    kuehlenSichtbarkeit();
+    kuehlenAnwenden();
+    wpAufgabe = stand.wpAufgabe || "heizung_ww";
+    wpAufgabeAnwenden();
+    waermequelle = stand.waermequelle || "luft";
+    waermequelleAnwenden();
+    aeroblockAktiv = !!stand.aeroblockAktiv;
+    altVlBekannt = stand.altVlBekannt || "nein";
+    altVlAnwenden();
+    abwasser = stand.abwasser || "ja";
+    document.querySelectorAll("#abwasser button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-abw")===abwasser); });
+    zirkulation = stand.zirkulation || "nein";
+    document.querySelectorAll("#zirkulation button").forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-zirk")===zirkulation); });
+    solar = stand.solar || "nein";
+    solarDemontage = stand.solarDemontage || "ja";
+    solarAnwenden();
+    pv = stand.pv || "nein";
+    pvAnwenden();
+    speicherKonzept = stand.speicherKonzept || "getrennt";
+    speicherAnwenden();
+    if(stand.fbhVerteiler && stand.fbhVerteiler.length){
+      fbhVerteiler = stand.fbhVerteiler;
+      verteilerRendern("fbh-verteiler-liste", fbhVerteiler, function(){ calc(); arbeitsstandSichern(); });
+    }
+    if(stand.beidesVerteiler && stand.beidesVerteiler.length){
+      beidesVerteiler = stand.beidesVerteiler;
+      verteilerRendern("beides-verteiler-liste", beidesVerteiler, function(){ calc(); arbeitsstandSichern(); });
+    }
+    if(stand.heizflaeche){
+      heizflaeche = stand.heizflaeche;
+      heizflaecheCards.forEach(function(x){ x.classList.toggle("active", x.getAttribute("data-hf")===heizflaeche); });
+      ["hk","fbh","beides"].forEach(function(h){ el("panel-"+h).classList.toggle("show", h===heizflaeche); });
+    } else {
+      heizflaeche = null;
+      heizflaecheCards.forEach(function(x){ x.classList.remove("active"); });
+      ["hk","fbh","beides"].forEach(function(h){ el("panel-"+h).classList.remove("show"); });
+    }
+    if(stand.felder){
+      alleInputs.forEach(function(id){
+        var e = el(id);
+        if(!e || !(id in stand.felder)) return;
+        if(e.type === "checkbox"){ e.checked = stand.felder[id]; }
+        else { e.value = stand.felder[id]; }
+      });
+      // Regler an wiederhergestellte Zahlenwerte angleichen (begrenzt aufs Regler-Maximum)
+      [["flaeche","flaeche-num"],["wohneinheiten","wohneinheiten-num"],["personen","personen-num"]].forEach(function(pair){
+        var regler = el(pair[0]), zahl = el(pair[1]);
+        if(regler && zahl){
+          var v = parseFloat(zahl.value), max = parseFloat(regler.max), min = parseFloat(regler.min);
+          if(!isNaN(v)) regler.value = v > max ? max : (v < min ? min : v);
+        }
+      });
+    }
+  }
+
+  function kundenLaden(){
+    try{
+      var roh = localStorage.getItem(STORAGE_KEY);
+      kunden = roh ? JSON.parse(roh) : [];
+    }catch(e){ kunden = []; }
+  }
+
+  function kundenSichern(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(kunden)); }catch(e){}
+  }
+
+  function arbeitsstandSichern(){
+    // laufender Arbeitsstand, damit beim Neuöffnen nichts verloren geht
+    try{
+      localStorage.setItem(WORK_KEY, JSON.stringify({ aktuelleId: aktuelleId, stand: standErfassen() }));
+    }catch(e){}
+    statusBlink();
+  }
+
+  function statusBlink(){
+    var s = el("save-status");
+    if(!s) return;
+    s.textContent = "✓ gesichert";
+    clearTimeout(window._saveTimer);
+    window._saveTimer = setTimeout(function(){ s.textContent = ""; }, 1400);
+  }
+
+  function dropdownAufbauen(){
+    var sel = el("kunde-select");
+    sel.innerHTML = '<option value="">— neuer, ungespeicherter Fall —</option>';
+    kunden.forEach(function(k){
+      var o = document.createElement("option");
+      o.value = k.id;
+      o.textContent = k.name;
+      if(k.id === aktuelleId) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+
+  function neueId(){ return "k" + Date.now() + Math.floor(Math.random()*1000); }
+
+  // Speichern-Knopf: aktuellen Fall unter Namen sichern (neu oder überschreiben)
+  el("kunde-save").addEventListener("click", function(){
+    var name = el("kunde-name").value.trim();
+    if(!name){ alert("Bitte einen Namen für den Fall eingeben."); el("kunde-name").focus(); return; }
+    var stand = standErfassen();
+    if(aktuelleId){
+      var vorhanden = kunden.filter(function(k){ return k.id === aktuelleId; })[0];
+      if(vorhanden){ vorhanden.name = name; vorhanden.stand = stand; }
+      else { aktuelleId = neueId(); kunden.push({ id: aktuelleId, name: name, stand: stand }); }
+    } else {
+      aktuelleId = neueId();
+      kunden.push({ id: aktuelleId, name: name, stand: stand });
+    }
+    kundenSichern();
+    arbeitsstandSichern();
+    dropdownAufbauen();
+    statusBlink();
+  });
+
+  // Auswahl im Dropdown: Fall laden
+  el("kunde-select").addEventListener("change", function(){
+    var id = el("kunde-select").value;
+    if(!id){
+      aktuelleId = null;
+      el("kunde-name").value = "";
+      arbeitsstandSichern();
+      return;
+    }
+    var k = kunden.filter(function(x){ return x.id === id; })[0];
+    if(k){
+      aktuelleId = k.id;
+      el("kunde-name").value = k.name;
+      standAnwenden(k.stand);
+      arbeitsstandSichern();
+      calc();
+    }
+  });
+
+  // Neu: leeren Fall beginnen
+  el("kunde-neu").addEventListener("click", function(){
+    if(!confirm("Neuen leeren Fall beginnen? Nicht gespeicherte Änderungen am aktuellen Fall gehen verloren.")) return;
+    aktuelleId = null;
+    el("kunde-name").value = "";
+    // Standardwerte durch Neuladen der Seite ohne Arbeitsstand
+    try{ localStorage.removeItem(WORK_KEY); }catch(e){}
+    location.reload();
+  });
+
+  // Zurücksetzen fürs nächste Bauvorhaben (ohne Akte/Kundenliste)
+  el("reset-btn").addEventListener("click", function(){
+    if(!confirm("Alle Eingaben auf Standard zurücksetzen und mit einem leeren Bauvorhaben starten?")) return;
+    aktuelleId = null;
+    try{ localStorage.removeItem(WORK_KEY); }catch(e){}
+    location.reload();
+  });
+
+  // Duplizieren: aktuellen Stand als neuen Fall (für Dämmvarianten)
+  el("kunde-dupl").addEventListener("click", function(){
+    var basisName = el("kunde-name").value.trim() || "Fall";
+    var neuName = basisName + " (Variante)";
+    aktuelleId = neueId();
+    kunden.push({ id: aktuelleId, name: neuName, stand: standErfassen() });
+    el("kunde-name").value = neuName;
+    kundenSichern();
+    arbeitsstandSichern();
+    dropdownAufbauen();
+    statusBlink();
+  });
+
+  // Löschen
+  el("kunde-del").addEventListener("click", function(){
+    if(!aktuelleId){ alert("Es ist kein gespeicherter Fall ausgewählt."); return; }
+    var k = kunden.filter(function(x){ return x.id === aktuelleId; })[0];
+    if(!k) return;
+    if(!confirm("Fall „" + k.name + "\" wirklich löschen?")) return;
+    kunden = kunden.filter(function(x){ return x.id !== aktuelleId; });
+    aktuelleId = null;
+    el("kunde-name").value = "";
+    kundenSichern();
+    arbeitsstandSichern();
+    dropdownAufbauen();
+  });
+
+  // Alle Inputs: neu berechnen + Arbeitsstand sichern
+  // Regler <-> Zahlenfeld synchron halten (Zahlenfeld kann über Regler-Max hinausgehen)
+  function koppleReglerZahl(reglerId, zahlId){
+    var regler = el(reglerId), zahl = el(zahlId);
+    if(!regler || !zahl) return;
+    regler.addEventListener("input", function(){
+      zahl.value = regler.value;
+      calc(); arbeitsstandSichern();
+    });
+    zahl.addEventListener("input", function(){
+      var v = parseFloat(zahl.value);
+      // Regler folgt nur bis zu seinem Maximum, das Zahlenfeld darf höher
+      if(!isNaN(v)){
+        var max = parseFloat(regler.max), min = parseFloat(regler.min);
+        regler.value = v > max ? max : (v < min ? min : v);
+      }
+      calc(); arbeitsstandSichern();
+    });
+  }
+  koppleReglerZahl("flaeche", "flaeche-num");
+  koppleReglerZahl("personen", "personen-num");
+  koppleReglerZahl("wohneinheiten", "wohneinheiten-num");
+
+  alleInputs.forEach(function(id){
+    var e = el(id);
+    // Regler und ihre Zahlenfelder haben eigene Handler (koppleReglerZahl) - hier überspringen
+    if(id==="flaeche"||id==="personen"||id==="wohneinheiten"||id==="flaeche-num"||id==="personen-num"||id==="wohneinheiten-num"){
+      return;
+    }
+    if(e){
+      e.addEventListener("input", function(){ calc(); arbeitsstandSichern(); });
+      e.addEventListener("change", function(){ calc(); arbeitsstandSichern(); });
+    }
+  });
+  // Letzten Arbeitsstand wiederherstellen
+  var workGeladen = false;
+  try{
+    var work = localStorage.getItem(WORK_KEY);
+    if(work){
+      var w = JSON.parse(work);
+      aktuelleId = w.aktuelleId || null;
+      if(aktuelleId){
+        var k = kunden.filter(function(x){ return x.id === aktuelleId; })[0];
+        if(k) el("kunde-name").value = k.name;
+        else aktuelleId = null;
+      }
+      standAnwenden(w.stand);
+      dropdownAufbauen();
+      workGeladen = true;
+    }
+  }catch(e){}
+
+  if(!workGeladen){
+    document.querySelector('.heizart-card[data-heizart="oel"]').classList.add("active");
+    el("panel-oel").classList.add("show");
+  }
+
+  // Speicheranzeige initial setzen
+  speicherAnwenden();
+  hkSystemAnwenden();
+  rtlAnwenden();
+
+  // Namensfeld aktualisiert die Druck-Zusammenfassung sofort
+  el("kunde-name").addEventListener("input", function(){ calc(); });
+
+  // Vor dem Drucken sicherstellen, dass die Zusammenfassung aktuell ist
+  window.aktualisiereDruck = calc;
+  window.addEventListener("beforeprint", function(){ calc(); });
+
+  calc();
+})();
+</script>
+</body>
+</html>
