@@ -5,11 +5,11 @@ Zweck: Nachweis, dass ein Umbau nichts an der Rechnung ändert (UMBAU-ABLAUF.md 
 
 Die Spalte „erwartet (Formel)“ ist aus dem Rechenteil der Altfassung nachgerechnet (Python, gleiche Formeln und Rundung) und dient nur als Plausibilitätsprüfung; maßgeblich ist die Messung in der Altfassung.
 
-Testfälle je Tool: A1–A4 `auslegung.html` · K1–K4 `kostenvergleich.html` · H1–H6 `heizkoerper.html` · B1–B3 `bestandsaufnahme.html`. Die Fälle der noch nicht begonnenen Tools werden beim jeweiligen Umbau (Schritt 2) angelegt.
+Testfälle je Tool: A1–A4 `auslegung.html` · K1–K6 `kostenvergleich.html` · H1–H6 `heizkoerper.html` · B1–B3 `bestandsaufnahme.html`. Die Fälle der noch nicht begonnenen Tools werden beim jeweiligen Umbau (Schritt 2) angelegt.
 
 ---
 
-## kostenvergleich.html · K1–K4
+## kostenvergleich.html · K1–K6
 
 Altfassung: `alt/kostenvergleich_2026-10-25.html` · Feldliste: `tests/feldliste-kostenvergleich.md`.
 Messung „alt“ am 2026-10-25 in der unveränderten Altfassung (lokaler Server, Chromium; Eingaben per Skript gesetzt, Ergebnisse aus der Anzeige abgelesen). PDFs: `tests/pdf/kostenvergleich_K1_alt.pdf` … `K3_alt.pdf` (Druck aus Chrome, A4, ohne Kopf-/Fußzeile).
@@ -64,6 +64,40 @@ Eingaben wie K2, aber Heizflächen „Heizkörper · W50“: Jahres-Wärmebedarf
 | Günstiger als Öl | % | 24 | – | 24 | = Formel |
 
 PDF: `tests/pdf/kostenvergleich_K4_neu.pdf`.
+
+### K5 · Gas, WWP LA 20/30-A R bei W35 (SCOP 5,20), ohne Heizstab, ohne PV
+Erweiterung 2026-10-25 (Fabian: weitere Baureihen WAB, WGB, WWP LA). SCOP W35/W55 der WWP LA aus Weishaupt Fachinformation 83603701 (07/2026) [BELEGT]. Kein „alt“-Wert, weil die Altfassung nur WEB kannte. Für WAB und WGB ist nur der SCOP W35 belegt; der W55-Wert wird seit dem Nachtrag K6 aus ηs zurückgerechnet.
+Eingaben: Jahres-Wärmebedarf 40 000 kWh · WWP LA 20/30-A R · Flächenheizung W35 · Heizstab-Anteil 0 % · Strompreis 30,0 ct/kWh · Gas 14,0 ct/kWh · Nutzungsgrad 92 % · PV aus.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt | neu (gemessen 2026-10-25) | Status |
+|---|---|---|---|---|---|
+| JAZ (übernommen, W35) | – | 5,20 | – | 5,20 | = Formel |
+| Effektive JAZ | – | 5,20 | – | 5,20 | = Formel |
+| Wärmepumpe ct/kWh Wärme | ct/kWh | 5,77 | – | 5,77 | = Formel |
+| Gas ct/kWh Wärme | ct/kWh | 15,22 | – | 15,22 | = Formel |
+| Jahreskosten Wärmepumpe | €/a | 2 308 | – | 2 308 | = Formel |
+| Jahreskosten Gas | €/a | 6 087 | – | 6 087 | = Formel |
+| Ersparnis pro Jahr | €/a | 3 779 | – | 3 779 | = Formel |
+| Günstiger als Gas | % | 62 | – | 62 | = Formel |
+
+PDF: `tests/pdf/kostenvergleich_K5_neu.pdf`.
+
+### K6 · Gas, WAB 11-A bei W50 (W55 aus ηs zurückgerechnet), ohne Heizstab, ohne PV
+Erweiterung 2026-10-25 (Fabian: für WAB und WGB wird ein sinnvoller SCOP gebraucht, notfalls errechnet). Weishaupt veröffentlicht für WAB/WGB keinen SCOP W55; er wird aus der ηs (W55) der Fachinformation zurückgerechnet: SCOP = (ηs + 3) × 2,5 ÷ 100 (Verordnung (EU) 813/2013, CC = 2,5, F = 3 %; an sechs belegten Weishaupt-Paaren geprüft, Abweichung ≤ 0,4 Prozentpunkte). WAB 11-A: ηs 138 % → W55 ≈ 3,53; W50 = 4,70 + (3,53 − 4,70) × 15 ÷ 20 = 3,82 [BERECHNET, Näherung; 07/21].
+Eingaben: Jahres-Wärmebedarf 18 000 kWh · WAB 11-A · Heizkörper W50 · Heizstab-Anteil 0 % · Strompreis 30,0 ct/kWh · Gas 14,0 ct/kWh · Nutzungsgrad 92 % · PV aus.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt | neu (gemessen 2026-10-25) | Status |
+|---|---|---|---|---|---|
+| JAZ (übernommen, W50) | – | 3,82 | – | 3,82 | = Formel |
+| Effektive JAZ | – | 3,82 | – | 3,82 | = Formel |
+| Wärmepumpe ct/kWh Wärme | ct/kWh | 7,85 | – | 7,85 | = Formel |
+| Gas ct/kWh Wärme | ct/kWh | 15,22 | – | 15,22 | = Formel |
+| Jahreskosten Wärmepumpe | €/a | 1 414 | – | 1 414 | = Formel |
+| Jahreskosten Gas | €/a | 2 739 | – | 2 739 | = Formel |
+| Ersparnis pro Jahr | €/a | 1 326 | – | 1 326 | = Formel |
+| Günstiger als Gas | % | 48 | – | 48 | = Formel |
+
+PDF: `tests/pdf/kostenvergleich_K6_neu.pdf`.
 
 ### K3 · Gas, WEB 7/10 bei W35 (SCOP 5,09), Heizstab 1,5 %, mit PV
 Eingaben: Jahres-Wärmebedarf 12 000 kWh · Baugröße WEB 7/10 · Heizflächen Flächenheizung W35 (JAZ übernimmt SCOP) · Heizstab-Anteil 1,5 % · Strompreis 28,0 ct/kWh · Bestandsanlage Gas · Gaspreis 12,4 ct/kWh · Nutzungsgrad 85 % · PV an: 9,5 kWp · 980 kWh/kWp · Deckungsanteil 30 %.

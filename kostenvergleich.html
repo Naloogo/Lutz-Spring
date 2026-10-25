@@ -817,18 +817,14 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
     </section>
 
     <section class="ls-card" aria-labelledby="h-wp">
-      <div class="ls-card__head"><h2 id="h-wp">Wärmepumpe</h2><span class="ls-card__sub">Weishaupt Evoblock WEB</span></div>
+      <div class="ls-card__head"><h2 id="h-wp">Wärmepumpe</h2><span class="ls-card__sub">Weishaupt WEB · WAB · WGB · WWP LA</span></div>
       <div class="ls-fields">
         <div class="ls-field">
-          <label class="ls-label" for="baugroesse">Baugröße Weishaupt WEB</label>
+          <label class="ls-label" for="baugroesse">Wärmepumpe Weishaupt</label>
           <select class="ls-select" id="baugroesse">
             <option value="none">manuell (JAZ selbst einstellen)</option>
-            <option value="7/10">WEB 7/10 (1,7–10,0 kW)</option>
-            <option value="9/14">WEB 9/14 (1,7–14,0 kW)</option>
-            <option value="10/15">WEB 10/15 (2,7–15,0 kW)</option>
-            <option value="13/20">WEB 13/20 (3,2–20,0 kW)</option>
           </select>
-          <div class="ls-hint">Mit Baugröße wird der SCOP aus dem Datenblatt übernommen.</div>
+          <div class="ls-hint">Mit Baugröße wird der SCOP (EN 14825) aus den Weishaupt-Unterlagen übernommen; Quelle steht am JAZ-Feld.</div>
         </div>
         <div class="ls-field" id="heizflaechenFeld" hidden>
           <span class="ls-label" id="heizflaechenLabel">Heizflächen (SCOP-Punkt)</span>
@@ -846,7 +842,7 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
             <input type="range" id="jazR" min="2.5" max="5.5" step="0.01" value="4" aria-label="JAZ Regler">
             <div class="ls-unit"><input class="ls-input ls-num" id="jaz" type="text" inputmode="decimal" value="4,00"><span>–</span></div>
           </div>
-          <div class="ls-hint" id="jazQuelle">Manuelle Eingabe. Baugröße wählen, um den SCOP (EN 14825) aus der Weishaupt Fachinformation 83603801 zu übernehmen.</div>
+          <div class="ls-hint" id="jazQuelle">Manuelle Eingabe. Wärmepumpe wählen, um den SCOP (EN 14825) aus den Weishaupt-Unterlagen zu übernehmen.</div>
           <div class="ls-error" id="jazErr" hidden></div>
         </div>
         <div class="ls-field">
@@ -994,7 +990,7 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
 
   <!-- 8 · Fuß -->
   <footer class="ls-footer">
-    Grundlage: SCOP nach EN 14825 aus der Weishaupt Fachinformation 83603801 (04/2026), für Heizkörper auf W50 zwischen W35 und W55 interpoliert (≈); Heizwert Heizöl EL ≈ 10 kWh/L. Jahreskosten = Wärmebedarf ÷ Nutzungsgrad bzw. effektive JAZ × Energiepreis. Überschlägige Ersteinschätzung für das Kundengespräch, ersetzt keine Wirtschaftlichkeitsberechnung und ist keine Zusage zu Einsparungen. Angaben ohne Gewähr – maßgeblich sind die Herstellerunterlagen und der Tarif des Kunden. Erstellt mit dem internen Kostenvergleich der Lutz Spring GmbH · kostenvergleich.html · Stand 25.10.2026.
+    Grundlage: SCOP nach EN 14825 aus den Weishaupt-Unterlagen (WEB: Fachinformation 83603801, 04/2026 · WWP LA: 83603701, 07/2026 · WAB: weishaupt.de, 10/2026, und 83601801, 01/2026 · WGB: 83600601, 09/2021); für Heizkörper auf W50 zwischen W35 und W55 interpoliert (≈); SCOP W55 für WAB und WGB aus der veröffentlichten ηs zurückgerechnet (Verordnung (EU) 813/2013, SCOP = (ηs + 3 %) × 2,5), Näherung bis zur Bestätigung durch Weishaupt; Heizwert Heizöl EL ≈ 10 kWh/L. Jahreskosten = Wärmebedarf ÷ Nutzungsgrad bzw. effektive JAZ × Energiepreis. Überschlägige Ersteinschätzung für das Kundengespräch, ersetzt keine Wirtschaftlichkeitsberechnung und ist keine Zusage zu Einsparungen. Angaben ohne Gewähr – maßgeblich sind die Herstellerunterlagen und der Tarif des Kunden. Erstellt mit dem internen Kostenvergleich der Lutz Spring GmbH · kostenvergleich.html · Stand 25.10.2026.
   </footer>
 </div>
 
@@ -1213,13 +1209,40 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
 var PROJEKT_KEY = 'kostenvergleich-projekt';
 function $(id) { return document.getElementById(id); }
 
-/* SCOP-Werte (EN 14825) aus Weishaupt Fachinformation 83603801, April 2026 – unverändert aus der Altfassung [BELEGT] */
-var webData = {
-  '7/10':  { scop35: 5.09, scop55: 4.02, kwA7: 7.09 },
-  '9/14':  { scop35: 4.59, scop55: 3.79, kwA7: 9.49 },
-  '10/15': { scop35: 4.96, scop55: 3.99, kwA7: 10.07 },
-  '13/20': { scop35: 4.89, scop55: 4.01, kwA7: 13.15 }
-};
+/* Wärmepumpen mit SCOP nach EN 14825 (mittleres Klima).
+   WEB:    Weishaupt Fachinformation 83603801 (04/2026), unverändert aus der Altfassung [BELEGT]
+   WWP LA: Fachinformation 83603701 (07/2026) [BELEGT]
+   WAB:    SCOP W35 von weishaupt.de (Produktseite Aeroblock, 10/2026); Leistung und ηs aus Fachinformation 83601801 (01/2026).
+   WGB:    SCOP W35 aus Fachinformation Geoblock 83600601 (09/2021); ηs ebenda.
+   Für WAB und WGB veröffentlicht Weishaupt keinen SCOP W55. Er wird aus der veröffentlichten ηs (W55) zurückgerechnet
+   (Verordnung (EU) 813/2013: ηs = SCOP ÷ CC − F, CC = 2,5, F = 3 %  →  SCOP = (ηs + 3) × 2,5 ÷ 100).
+   Die Formel trifft die sechs belegten Weishaupt-Paare (WWP LA, WAB W35) auf ≤ 0,4 Prozentpunkte [BELEGT, Prüfung 2026-10-25];
+   Werte sind Näherung (≈) bis Weishaupt sie bestätigt [OFFEN 07/21]. */
+var GERAETE = [
+  { gruppe: 'Evoblock WEB (Luft, Innenaufstellung)', key: 'WEB 7/10',  label: 'WEB 7/10 (1,7–10,0 kW)',  scop35: 5.09, scop55: 4.02, leistung: 'Nennwärmeleistung A−7/W35: 7,09 kW',  quelle: 'Weishaupt Fachinformation 83603801 (04/2026)' },
+  { gruppe: 'Evoblock WEB (Luft, Innenaufstellung)', key: 'WEB 9/14',  label: 'WEB 9/14 (1,7–14,0 kW)',  scop35: 4.59, scop55: 3.79, leistung: 'Nennwärmeleistung A−7/W35: 9,49 kW',  quelle: 'Weishaupt Fachinformation 83603801 (04/2026)' },
+  { gruppe: 'Evoblock WEB (Luft, Innenaufstellung)', key: 'WEB 10/15', label: 'WEB 10/15 (2,7–15,0 kW)', scop35: 4.96, scop55: 3.99, leistung: 'Nennwärmeleistung A−7/W35: 10,07 kW', quelle: 'Weishaupt Fachinformation 83603801 (04/2026)' },
+  { gruppe: 'Evoblock WEB (Luft, Innenaufstellung)', key: 'WEB 13/20', label: 'WEB 13/20 (3,2–20,0 kW)', scop35: 4.89, scop55: 4.01, leistung: 'Nennwärmeleistung A−7/W35: 13,15 kW', quelle: 'Weishaupt Fachinformation 83603801 (04/2026)' },
+  { gruppe: 'Aeroblock WAB (Luft, Außenaufstellung)', key: 'WAB 8-A',  label: 'WAB 8-A (1,6–6,2 kW bei A2/W35)',  scop35: 4.78, scop55: 3.58, eta55: 140, leistung: 'A−7/W35: 4,93 kW', quelle: 'SCOP W35 weishaupt.de (10/2026); ηs und Leistung Fachinformation 83601801 (01/2026)' },
+  { gruppe: 'Aeroblock WAB (Luft, Außenaufstellung)', key: 'WAB 11-A', label: 'WAB 11-A (1,6–6,9 kW bei A2/W35)', scop35: 4.70, scop55: 3.53, eta55: 138, leistung: 'A−7/W35: 5,84 kW', quelle: 'SCOP W35 weishaupt.de (10/2026); ηs und Leistung Fachinformation 83601801 (01/2026)' },
+  { gruppe: 'Aeroblock WAB (Luft, Außenaufstellung)', key: 'WAB 14-B', label: 'WAB 14-B (4,1–11,2 kW bei A2/W35)', scop35: 4.86, scop55: 3.83, eta55: 150, leistung: 'A−7/W35: 8,69 kW', quelle: 'SCOP W35 weishaupt.de (10/2026); ηs und Leistung Fachinformation 83601801 (01/2026)' },
+  { gruppe: 'Geoblock WGB (Sole/Wasser)', key: 'WGB 8',  label: 'WGB 8 (1,7–8,6 kW)',   scop35: 5.2, scop55: 3.63, eta55: 142, leistung: 'Modulation 1,7–8,6 kW',  quelle: 'Weishaupt Fachinformation Geoblock 83600601 (09/2021)' },
+  { gruppe: 'Geoblock WGB (Sole/Wasser)', key: 'WGB 14', label: 'WGB 14 (2,0–13,5 kW)', scop35: 5.2, scop55: 3.83, eta55: 150, leistung: 'Modulation 2,0–13,5 kW', quelle: 'Weishaupt Fachinformation Geoblock 83600601 (09/2021)' },
+  { gruppe: 'WWP LA (Luft, Außenaufstellung, MFH)', key: 'WWP LA 20/30-A R', label: 'WWP LA 20/30-A R (6,8–30,6 kW)', scop35: 5.20, scop55: 3.96, leistung: 'Wärmeleistung A−7/W35: 8,8–19,6 kW', quelle: 'Weishaupt Fachinformation 83603701 (07/2026)' },
+  { gruppe: 'WWP LA (Luft, Außenaufstellung, MFH)', key: 'WWP LA 43/60-A R', label: 'WWP LA 43/60-A R (17,1–60,0 kW)', scop35: 4.72, scop55: 3.80, leistung: 'Wärmeleistung A−7/W35: 23,4–42,5 kW', quelle: 'Weishaupt Fachinformation 83603701 (07/2026)' }
+];
+/* SCOP W55 aus ηs: (ηs + 3) × 2,5 ÷ 100, auf 2 Stellen gerundet – muss zum Tabellenwert passen (Selbstprüfung beim Start) */
+function scop55AusEta(eta) { return Math.round((eta + 3) * 2.5) / 100; }
+GERAETE.forEach(function (g) { if (g.eta55 != null && scop55AusEta(g.eta55) !== g.scop55) console.warn('SCOP W55 passt nicht zu ηs:', g.key, g.scop55, scop55AusEta(g.eta55)); });
+function geraet(key) { for (var i = 0; i < GERAETE.length; i++) if (GERAETE[i].key === key) return GERAETE[i]; return null; }
+/* Auswahlliste mit Gruppen aus GERAETE füllen; erste Option „manuell“ bleibt */
+(function () {
+  var sel = $('baugroesse'), og = null, letzte = null;
+  GERAETE.forEach(function (g) {
+    if (g.gruppe !== letzte) { og = document.createElement('optgroup'); og.label = g.gruppe; sel.appendChild(og); letzte = g.gruppe; }
+    var o = document.createElement('option'); o.value = g.key; o.textContent = g.label; og.appendChild(o);
+  });
+})();
 
 /* SCOP für den Auslegungspunkt: W35 aus der Tabelle; W50 linear zwischen W35 und W55 interpoliert und auf 2 Stellen gerundet
    (Wir legen Heizkörper auf 50 °C aus; das Datenblatt nennt nur W35 und W55) [VORSCHLAG der Methode, Fabian 2026-10-25; offener Punkt 07: W50-Wert bei Weishaupt erfragen] */
@@ -1265,22 +1288,37 @@ function systemAnwenden(reset) {
   $('kpiBestandLabel').textContent = s.name; $('kpiCkBestandLabel').textContent = 'Wärme aus ' + s.kurz;
 }
 
-/* Baugröße → SCOP übernehmen (exakt), JAZ-Felder sperren; „manuell“ gibt sie frei */
+/* Baugröße → SCOP übernehmen (exakt), JAZ-Felder sperren; „manuell“ gibt sie frei.
+   Fehlt für Heizkörper (W50) der W55-Wert des Datenblatts, bleibt die JAZ von Hand einzutragen – nichts wird geschätzt. */
 function baugroesseAnwenden() {
-  var model = $('baugroesse').value, jaz = $('jaz'), jazR = $('jazR');
-  if (model === 'none') {
+  var key = $('baugroesse').value, jaz = $('jaz'), jazR = $('jazR'), g = geraet(key);
+  if (!g) {
     $('heizflaechenFeld').hidden = true; jaz.disabled = false; jazR.disabled = false;
-    $('jazQuelle').textContent = 'Manuelle Eingabe. Baugröße wählen, um den SCOP (EN 14825) aus der Weishaupt Fachinformation 83603801 zu übernehmen.';
+    $('jazQuelle').textContent = 'Manuelle Eingabe. Wärmepumpe wählen, um den SCOP (EN 14825) aus den Weishaupt-Unterlagen zu übernehmen.';
     return;
   }
   $('heizflaechenFeld').hidden = false;
-  var d = webData[model], temp = $('heizflaechen50').checked ? '50' : '35', scop = scopFuer(d, temp);
+  var temp = $('heizflaechen50').checked ? '50' : '35';
+  if (temp === '50' && g.scop55 == null) {
+    /* Feld leeren, wenn der Wert zuvor aus der Tabelle kam (W35 gilt nicht für Heizkörper); der Nutzer trägt die JAZ selbst ein */
+    if (jaz.disabled) { jaz.value = ''; jazR.value = jazR.min; }
+    jaz.disabled = false; jazR.disabled = false;
+    $('jazQuelle').textContent = 'Für ' + g.key + ' veröffentlicht Weishaupt nur den SCOP W35 (' + LS.fmt(g.scop35, 2) + '); ein Wert für W50/W55 fehlt. JAZ bitte selbst eintragen (z. B. aus einer Auslegung) – das Tool schätzt hier nichts. ' + g.leistung + '.';
+    return;
+  }
+  var scop = scopFuer(g, temp);
   jaz.value = LS.fmt(scop, 2); jazR.value = scop; jaz.disabled = true; jazR.disabled = true;
   $('jazQuelle').textContent = temp === '35'
-    ? 'SCOP W35 (EN 14825) für WEB ' + model + ' · Nennwärmeleistung A−7/W35: ' + LS.fmt(d.kwA7, 2) + ' kW · Quelle: Weishaupt Fachinformation 83603801.'
-    : 'SCOP W50 ≈ ' + LS.fmt(scop, 2) + ' für WEB ' + model + ', linear interpoliert zwischen W35 (' + LS.fmt(d.scop35, 2) + ') und W55 (' + LS.fmt(d.scop55, 2) + ') aus der Weishaupt Fachinformation 83603801; kein Datenblattwert. Nennwärmeleistung A−7/W35: ' + LS.fmt(d.kwA7, 2) + ' kW.';
+    ? 'SCOP W35 ' + LS.fmt(scop, 2) + ' (EN 14825) für ' + g.key + ' · ' + g.leistung + ' · Quelle: ' + g.quelle + '.'
+    : 'SCOP W50 ≈ ' + LS.fmt(scop, 2) + ' für ' + g.key + ', linear interpoliert zwischen W35 (' + LS.fmt(g.scop35, 2) + ') und W55 (' + w55Text(g) + '); kein Datenblattwert. ' + g.leistung + ' · Quelle: ' + g.quelle + '.';
 }
 
+/* W55-Wert mit Herkunft: Datenblatt oder aus ηs zurückgerechnet */
+function w55Text(g) {
+  return g.eta55 != null
+    ? '≈ ' + LS.fmt(g.scop55, 2) + ', aus ηs ' + g.eta55 + ' % zurückgerechnet: (' + g.eta55 + ' + 3) × 2,5 ÷ 100, kein Weishaupt-Wert'
+    : LS.fmt(g.scop55, 2);
+}
 function pvAnwenden() { $('pvFelder').hidden = !pvAn(); }
 
 /* Zahlenfeld lesen und prüfen; gibt Wert oder null (Fehlertext am Feld) */
@@ -1371,8 +1409,10 @@ function rechne() {
   $('ergebnisSub').textContent = LS.fmt(demand, 0) + ' kWh/a · ' + wpName + ' gegen ' + s.name;
 
   /* ---------- Bericht und Rechenweg ---------- */
-  var model = $('baugroesse').value, temp = $('heizflaechen50').checked ? '50' : '35';
-  var wpText = model === 'none' ? 'JAZ manuell ' + LS.fmt(jazNominal, 2) : 'Weishaupt WEB ' + model + ', ' + (temp === '35' ? 'Flächenheizung W35, SCOP ' + LS.fmt(jazNominal, 2) + ' (EN 14825)' : 'Heizkörper W50, SCOP ≈ ' + LS.fmt(jazNominal, 2) + ' (interpoliert zwischen W35 und W55)');
+  var g = geraet($('baugroesse').value), temp = $('heizflaechen50').checked ? '50' : '35';
+  var wpText = !g ? 'JAZ manuell ' + LS.fmt(jazNominal, 2)
+    : 'Weishaupt ' + g.key + ', ' + (temp === '35' ? 'Flächenheizung W35, SCOP ' + LS.fmt(jazNominal, 2) + ' (EN 14825)'
+      : (g.scop55 == null ? 'Heizkörper W50, JAZ manuell ' + LS.fmt(jazNominal, 2) + ' (kein SCOP W55 veröffentlicht)' : 'Heizkörper W50, SCOP ≈ ' + LS.fmt(jazNominal, 2) + ' (interpoliert zwischen W35 ' + LS.fmt(g.scop35, 2) + ' und W55 ' + LS.fmt(g.scop55, 2) + (g.eta55 != null ? ', W55 aus ηs ' + g.eta55 + ' % zurückgerechnet' : '') + ')'));
   $('berichtWp').textContent = wpText + (pvOn ? ', mit PV ' + LS.fmt(kwp, 1) + ' kWp' : '');
   $('berichtBestand').textContent = s.name + ', Nutzungsgrad ' + LS.fmt(eta, 0) + ' %';
   var rw = [

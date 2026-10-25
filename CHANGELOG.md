@@ -9,6 +9,7 @@ Neueste Einträge oben. Format: Datum · Bereich · Fassung · Änderung · Nach
 - Theme-Schalter als runder Symbolknopf `.ls-theme-toggle` (Mond/Sonne) statt Textbutton „Dunkel / Hell“; Tokens `--ls-icon-moon/--ls-icon-sun`; in Vorlagen, Styleguide, index.html und kostenvergleich.html. Anlass: Backlog (Fabian, „zu klobig“). `_build/patch-toggle.py`.
 
 ## 2026-10-25 · kostenvergleich.html · Nachbesserung nach Durchsicht (Fabian)
+- Weitere Baureihen in der Auswahl (gruppiert): Aeroblock WAB 8-A/11-A/14-B, Geoblock WGB 8/14, WWP LA 20/30-A R / 43/60-A R; Tabelle `GERAETE` im Tool mit SCOP, Leistung und Quelle je Gerät. Belegt: WWP LA W35/W55 (Fachinformation 83603701, 07/2026), WAB W35 (weishaupt.de 10/2026) + ηs/Leistung (83601801, 01/2026), WGB W35 (83600601, 09/2021) + ηs. SCOP W55 für WAB und WGB ist nirgends veröffentlicht (Weishaupt-Website, Fachinformationen, Anleitungen, HSB Schweiz geprüft); auf Wunsch von Fabian („notfalls errechnet“) aus der ηs zurückgerechnet: SCOP = (ηs + 3) × 2,5 ÷ 100 (Verordnung (EU) 813/2013), an sechs belegten Weishaupt-Paaren auf ≤ 0,4 Prozentpunkte geprüft; Werte WAB 8-A ≈ 3,58 · 11-A ≈ 3,53 · 14-B ≈ 3,83 · WGB 8 ≈ 3,63 · WGB 14 ≈ 3,83, im Tool mit Herleitung am Feld, im Bericht und im Fuß; Selbstprüfung beim Start. Referenzfälle K5 (WWP LA 20/30-A R, W35) und K6 (WAB 11-A, W50). Heruntergeladene Unterlagen im Firmengehirn unter `06_datenblaetter/` mit Übersicht (nicht im Repo). Auswahlwerte heißen jetzt „WEB 9/14“ statt „9/14“ (keine Projektdateien betroffen). Werte in 05_fachwissen.md eingetragen.
 - Kopf: nur „Kostenvergleich“ als Titel, rechts über Kunde/Projekt und Datum; der Untertitel entfällt [Fabian 2026-10-25]. Dafür in design.css 2.1.1: Kopf ohne Titelblock, `.ls-header__meta` darf den Titel tragen.
 - Regler in der PV-Karte standen nicht auf einer Höhe: Ursache war `align-content` der Felder (Zeilen wurden gestreckt). Fix in design.css 2.1.1 (`.ls-field { align-content: start }`), gilt für alle Tools.
 - „Erweitert“ (Heizstab-Anteil) steht jetzt in der Karte Wärmepumpe; die Toolbar „Bericht drucken / PDF · Zurücksetzen“ steht am Formularende [BESTÄTIGT, Fabian 2026-10-25, 06].
@@ -70,7 +71,7 @@ Neueste Einträge oben. Format: Datum · Bereich · Fassung · Änderung · Nach
 | Tool | Stand alt (04) | Umbau | Feldliste | Referenzwerte | Freigabe |
 |---|---|---|---|---|---|
 | index.html | 2026-08-07 | umgebaut 2026-10-25 | entfällt | entfällt (Kacheln/Links erhalten) | Fabian, 2026-10-25 |
-| kostenvergleich.html | 2026-07-26 | gebaut 2026-10-25 (Schritt 1–8), Freigabe offen | tests/feldliste-kostenvergleich.md (freigegeben) | K1–K4 alt und neu gemessen (K2/K3 gewollt abweichend: SCOP exakt; K4 neu für W50) | – (Schritt 9) |
+| kostenvergleich.html | 2026-07-26 | gebaut 2026-10-25 (Schritt 1–8), Freigabe offen | tests/feldliste-kostenvergleich.md (freigegeben) | K1–K6 alt und neu gemessen (K2/K3 gewollt abweichend: SCOP exakt; K4 neu für W50, K5 für WWP LA, K6 für WAB) | – (Schritt 9) |
 | foerderung.html | – | offen | – | – | – |
 | auslegung.html | 2026-08-17 | offen | – | A1–A4 | – |
 | heizkoerper.html | 2026-08-14 | offen | – | H1–H6 | – |
