@@ -98,6 +98,17 @@ Jeder Schritt hat ein „Wofür“ (warum er nötig ist) und ein „Wie“ (was 
 2. Altfassung nicht löschen, sondern unter `alt/TOOLNAME_JJJJ-MM-TT.html` ablegen, bis das nächste Tool umgebaut ist (danach kann sie weg; Altlasten laut 04).
 3. Commit mit Nachricht „TOOLNAME: Umbau auf design.css 2.1 (Referenzwerte geprüft)“, Push, Live-Adresse im iPad-Safari neu laden; Homescreen-App bei Adressänderung neu anlegen.
 
+## Schritt 10 · Erweiterungen (erst nach Freigabe des Umbaus)
+
+**Wofür:** Neue Funktionen sind erwünscht, aber getrennt vom Umbau. Nur so bleibt nachweisbar, dass der Umbau nichts an der Rechnung geändert hat; eine Abweichung muss eindeutig einer gewollten Erweiterung zuzuordnen sein.
+
+**Wie:**
+1. Erst Schritt 9 (Freigabe, Commit) abschließen, dann erweitern – in derselben oder einer neuen Sitzung.
+2. Jede Erweiterung vorher in einem Satz festhalten (BACKLOG.md oder Feldliste): was sie tut, welche Eingaben sie braucht, woher die Werte stammen.
+3. Greift sie in die Rechnung ein: Quelle als Kommentar im Code (Norm, Datenblatt, Seite), neue Referenzfälle anlegen (z. B. K4, K5), Ergebnis ist ein Vorschlag bis Fabian bestätigt; neue fachliche Festlegungen in `06_entscheidungen.md`.
+4. Neue Oberfläche nur aus Bausteinen des Designsystems; fehlt ein Baustein, in `design.css` und Styleguide ergänzen, dann `inline.py`.
+5. Eigener Commit „TOOLNAME: Erweiterung … · Referenzfälle …“, Eintrag in `CHANGELOG.md`.
+
 ---
 
 ## Reihenfolge der Tools
