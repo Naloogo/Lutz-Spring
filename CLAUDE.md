@@ -19,7 +19,7 @@ Vor jeder Arbeit an `heizkoerper.html`, `bestandsaufnahme.html`, `bad-angebot.ht
 Das Firmenwissen (Dateien 00–08, Fachwerte, Kommunikation, Entscheidungen) liegt auf dem Mac neben dem Repo unter `../Firmengehirn/`. Bei fachlichen Fragen dort nachlesen (`05_fachwissen.md`, `06_entscheidungen.md`, `07_offene-punkte.md`); nur [BESTÄTIGT] und [BELEGT] gelten als Firmenwissen. Diese Dateien nie ins Repo kopieren oder committen – das Repo ist öffentlich. Sitzung im Ordner `Lutz Spring` starten oder im Repo `/add-dir ../Firmengehirn`.
 
 ## Arbeitsteilung
-- Umbau eines Tools: eine eigene Claude-Code-Sitzung je Tool nach `UMBAU-ABLAUF.md`.
+- Umbau eines Tools: eine eigene Claude-Code-Sitzung je Tool nach `UMBAU-ABLAUF.md`, gestartet mit dem Text aus `START-PROMPT.md` (Tools auflisten, nachfragen, dann Schritt 1–2 bis zur Freigabe).
 - Gestaltung ändern: nie in einem einzelnen Tool. Störendes kommt in `BACKLOG.md` (was stört, wo, Beispiel). Eine eigene Sitzung „Designsystem“ löst den Punkt in `assets/css/design.css` und im Styleguide, dann `python3 _build/inline.py` über alle Tools.
 - Erweiterungen (neue Funktionen) erst nach Freigabe des Umbaus, als eigener Schritt 10 nach `UMBAU-ABLAUF.md`: vorher in einem Satz beschrieben, bei Rechenwirkung mit Quelle und neuen Referenzfällen, eigener Commit.
 - Entscheidungen zu Regeln trifft Fabian; sie werden in `06_entscheidungen.md` des Firmengehirns festgehalten, nicht im Chat.
