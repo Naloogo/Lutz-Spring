@@ -15,7 +15,7 @@
 /* ============================================================
    design.css · Lutz Spring GmbH · Heizung · Sanitär · Wärmepumpen
    Gemeinsames Designsystem für alle internen HTML-Tools.
-   Version 2.1 · Stand 2026-10-25
+   Version 2.1.2 · Stand 2026-10-25
    Einbinden:  Beim Veröffentlichen fügt _build/inline.py diese Datei in jedes
                Tool ein (Marker design.css:start / design.css:end im HTML).
                Ein Tool bleibt so eine einzelne Datei.
@@ -103,6 +103,10 @@
   --ls-control-h: 40px;       /* Höhe Eingaben/Buttons (Maus) */
   --ls-touch-h: 44px;         /* Höhe auf Touch (iPad) */
   --ls-gutter: 16px;
+
+  /* Theme-Schalter: welches Symbol sichtbar ist (hell → Mond anbieten) */
+  --ls-icon-moon: block;
+  --ls-icon-sun: none;
 }
 
 /* Dunkel: folgt dem System, solange kein data-theme gesetzt ist */
@@ -136,11 +140,15 @@
     --ls-chart-wp: #8fb3f0; --ls-chart-alt: #7c7c82; --ls-chart-pv: #e6c800; --ls-chart-2: #4f75b8; --ls-chart-grid: rgba(255,255,255,0.09); --ls-chart-text: #a1a1a6;
     --ls-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
     --ls-shadow-2: 0 6px 20px rgba(0, 0, 0, 0.45);
+    --ls-icon-moon: none;
+    --ls-icon-sun: block;
   }
 }
 /* Dunkel: ausdrücklich gewählt (Schalter im Tool) – gleiche Werte */
 :root[data-theme="dark"] {
   color-scheme: dark;
+  --ls-icon-moon: none;
+  --ls-icon-sun: block;
   --ls-navy:        #16233d;
   --ls-navy-2:      #1d2f52;
   --ls-navy-3:      #111b30;
@@ -247,7 +255,7 @@ p + p { margin-top: var(--ls-s3); }
   border-radius: var(--ls-r-lg);
   padding: var(--ls-s4) var(--ls-s5);
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: var(--ls-s3) var(--ls-s5);
   box-shadow: var(--ls-shadow-1);
@@ -257,11 +265,15 @@ p + p { margin-top: var(--ls-s3); }
 .ls-header__logo { display: block; width: min(300px, 100%); height: auto; color: var(--ls-yellow); }
 .ls-header__logo--navy { color: var(--ls-navy); } /* Ausnahme: Logo ohne Navy-Hintergrund (Fuß, helle Fläche) */
 .ls-header__slogan { font-size: var(--ls-fs-sm); color: var(--ls-yellow); letter-spacing: 0.02em; }
+.ls-header:has(> .ls-header__title) { grid-template-columns: auto 1fr auto; } /* alte Form mit Titelblock in der Mitte */
 .ls-header__title { display: grid; gap: 2px; min-width: 0; }
 .ls-header__title h1 { color: var(--ls-on-navy); font-size: var(--ls-fs-xl); }
+/* Standard (2.1.2): Toolname rechts oben über Kunde/Projekt, kein Untertitel */
+.ls-header__meta .ls-header__title h1, .ls-header__meta h1 { font-size: 1.25rem; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; color: var(--ls-on-navy); margin: 0 0 2px; text-align: right; }
 .ls-header__sub { font-size: var(--ls-fs-sm); color: rgba(255,255,255,0.75); }
-.ls-header__meta { display: grid; gap: 2px; justify-items: end; text-align: right; font-size: var(--ls-fs-sm); color: rgba(255,255,255,0.85); white-space: nowrap; }
+.ls-header__meta { display: grid; gap: 2px; justify-items: end; justify-self: end; text-align: right; font-size: var(--ls-fs-sm); color: rgba(255,255,255,0.85); white-space: nowrap; min-width: 0; }
 .ls-header__meta b { color: var(--ls-on-navy); font-weight: 600; }
+.ls-header__meta .ls-header__title { justify-items: end; margin-bottom: 2px; }
 .ls-header a { color: var(--ls-on-navy); }
 .ls-header .ls-btn--ghost { color: var(--ls-on-navy); border-color: rgba(255,255,255,0.35); }
 .ls-header .ls-btn--ghost:hover { background: rgba(255,255,255,0.1); }
@@ -269,6 +281,17 @@ p + p { margin-top: var(--ls-s3); }
   .ls-header { grid-template-columns: 1fr; padding: var(--ls-s4); }
   .ls-header__meta { justify-items: start; text-align: left; white-space: normal; }
 }
+/* Theme-Schalter: runder Symbolknopf, Mond im Hell-, Sonne im Dunkelmodus; kein Text, kein Rahmen */
+.ls-theme-toggle { appearance: none; border: 0; background: transparent; width: 32px; height: 32px; border-radius: var(--ls-r-pill); display: inline-grid; place-items: center; color: var(--ls-on-navy); opacity: .45; cursor: pointer; transition: opacity .15s ease; -webkit-tap-highlight-color: transparent; } /* Deckkraft wie Haus-Icon: 0,45 / 1 / 0,3 */
+.ls-theme-toggle:hover, .ls-theme-toggle:focus-visible { opacity: 1; }
+.ls-theme-toggle:active { opacity: .3; }
+.ls-theme-toggle svg { width: 18px; height: 18px; }
+.ls-theme-toggle__moon { display: var(--ls-icon-moon); }
+.ls-theme-toggle__sun { display: var(--ls-icon-sun); }
+.ls-header__meta .ls-theme-toggle { justify-self: end; margin-top: 2px; }
+@media (max-width: 699.98px) { .ls-header__meta { justify-self: stretch; } .ls-header__meta .ls-theme-toggle { justify-self: start; } .ls-header__meta .ls-header__title h1, .ls-header__meta h1 { text-align: left; } }
+@media (pointer: coarse) { .ls-theme-toggle { width: 40px; height: 40px; } }
+
 /* Text-Wortmarke, falls (noch) kein Logo eingebettet ist */
 .ls-wordmark { font-weight: 800; font-size: 1.375rem; letter-spacing: -0.02em; color: var(--ls-yellow); line-height: 1; }
 .ls-wordmark small { display: block; font-weight: 600; font-size: 0.75rem; color: var(--ls-on-navy); letter-spacing: 0.08em; margin-top: 2px; }
@@ -321,6 +344,7 @@ p + p { margin-top: var(--ls-s3); }
 .ls-card--navy h2, .ls-card--navy h3, .ls-card--navy .ls-kpi__value { color: var(--ls-on-navy); }
 .ls-card--navy .ls-kpi__value, .ls-card--navy .ls-accent { color: var(--ls-yellow); }
 .ls-card--navy .ls-kpi__label, .ls-card--navy .ls-muted { color: rgba(255,255,255,0.75); }
+.ls-card--navy .ls-kpi { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }  /* Kennzahlen auf Navy, 2.1.1 */
 .ls-card--navy .ls-btn--primary { background: var(--ls-yellow); color: #1d1d1f; }
 .ls-card--navy .ls-btn--primary:hover { background: #fff566; }
 
@@ -329,7 +353,7 @@ p + p { margin-top: var(--ls-s3); }
    ------------------------------------------------------------ */
 .ls-form { display: grid; gap: var(--ls-s4); }
 .ls-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: var(--ls-s3) var(--ls-s4); }
-.ls-field { display: grid; gap: var(--ls-s1); min-width: 0; }
+.ls-field { display: grid; gap: var(--ls-s1); min-width: 0; align-content: start; } /* align-content: Felder einer Zeile beginnen oben, Regler und Eingaben stehen auf einer Höhe (2.1.1) */
 .ls-field--span { grid-column: 1 / -1; }
 .ls-label { font-size: var(--ls-fs-sm); color: var(--ls-text-2); font-weight: 500; display: flex; gap: var(--ls-s1); align-items: baseline; }
 .ls-label abbr { text-decoration: none; }
@@ -649,6 +673,23 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
 .ls-report__sign div { border-top: 1px solid var(--ls-line-strong); padding-top: var(--ls-s1); }
 .ls-report__legal { font-size: var(--ls-fs-xs); color: var(--ls-text-2); max-width: 90ch; }
 
+/* 10.12 Regler mit Zahlenfeld (kostenvergleich): Werte, die im Kundengespräch durchgespielt werden.
+   Das Zahlenfeld ist maßgeblich (Komma/Punkt, Einheit als Suffix); der Regler ist Komfort. Verhalten: LS.regler(). */
+.ls-range { display: grid; grid-template-columns: minmax(0, 1fr) 7.5em; gap: var(--ls-s3); align-items: center; }
+.ls-range input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 32px; margin: 0; background: transparent; cursor: pointer; }
+.ls-range input[type="range"]:disabled { cursor: not-allowed; opacity: .45; }
+.ls-range input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: var(--ls-r-pill); background: var(--ls-surface-3); border: 1px solid var(--ls-line); }
+.ls-range input[type="range"]::-moz-range-track { height: 6px; border-radius: var(--ls-r-pill); background: var(--ls-surface-3); border: 1px solid var(--ls-line); }
+.ls-range input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; margin-top: -10px; border-radius: 50%; background: var(--ls-primary); border: 3px solid var(--ls-surface); box-shadow: var(--ls-shadow-1); }
+.ls-range input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--ls-primary); border: 3px solid var(--ls-surface); box-shadow: var(--ls-shadow-1); }
+.ls-range input[type="range"]:focus-visible { outline: none; }
+.ls-range input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--ls-focus-ring); }
+.ls-range input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px var(--ls-focus-ring); }
+@media (pointer: coarse) {
+  .ls-range input[type="range"] { height: 44px; }
+  .ls-range input[type="range"]::-webkit-slider-thumb { width: 28px; height: 28px; margin-top: -12px; }
+}
+
 /* ------------------------------------------------------------
    11 · HILFSKLASSEN
    ------------------------------------------------------------ */
@@ -762,14 +803,14 @@ pre.code code { font-size: inherit; }
 <path fill-rule="nonzero" fill="currentColor" d="M 410.234375 168.546875 L 404.410156 137.359375 L 408.535156 137.359375 L 413.105469 162.257812 L 413.195312 162.257812 L 420.914062 137.359375 L 424.882812 137.359375 L 432.566406 162.257812 L 432.652344 162.257812 L 437.226562 137.359375 L 441.351562 137.359375 L 435.632812 168.546875 L 430.625 168.546875 L 422.949219 144.050781 L 422.847656 144.050781 L 415.269531 168.546875 Z M 442.917969 168.546875 L 453.558594 137.359375 L 459.121094 137.359375 L 469.78125 168.546875 L 464.992188 168.546875 L 461.925781 159.648438 L 450.753906 159.648438 L 447.734375 168.546875 Z M 456.320312 141.511719 L 451.792969 156.035156 L 460.6875 156.035156 L 456.398438 141.511719 Z M 448.898438 133.082031 L 448.898438 128.09375 L 454.460938 128.09375 L 454.460938 133.082031 Z M 458.210938 133.082031 L 458.210938 128.09375 L 463.769531 128.09375 L 463.769531 133.082031 Z M 473.703125 168.546875 L 473.703125 137.359375 L 482.738281 137.359375 C 485.4375 137.359375 487.574219 137.960938 489.136719 139.167969 C 490.960938 140.570312 491.871094 142.691406 491.871094 145.546875 C 491.871094 149.464844 489.828125 151.914062 485.742188 152.902344 L 485.742188 152.992188 C 487.625 153.402344 488.957031 154.257812 489.757812 155.550781 C 490.203125 156.28125 490.644531 157.730469 491.105469 159.875 L 492.953125 168.546875 L 488.851562 168.546875 L 486.953125 161.640625 C 486.246094 159.058594 485.605469 157.421875 485.035156 156.699219 C 484.207031 155.648438 482.792969 155.128906 480.789062 155.128906 L 478.230469 155.128906 L 478.230469 168.546875 Z M 478.230469 140.972656 L 478.230469 151.511719 L 480.835938 151.511719 C 482.675781 151.511719 484.160156 151.132812 485.296875 150.359375 C 486.660156 149.417969 487.34375 148 487.34375 146.078125 C 487.34375 142.683594 485.519531 140.976562 481.871094 140.976562 Z M 497.980469 168.546875 L 497.980469 137.359375 L 504.359375 137.359375 L 513.210938 162.894531 L 513.300781 162.894531 L 522.144531 137.359375 L 528.480469 137.359375 L 528.480469 168.546875 L 524.421875 168.546875 L 524.421875 142.703125 L 524.332031 142.703125 L 515.375 168.546875 L 511.097656 168.546875 L 502.128906 142.703125 L 502.039062 142.703125 L 502.039062 168.546875 Z M 535.664062 168.546875 L 535.664062 137.359375 L 553.304688 137.359375 L 553.304688 140.972656 L 540.195312 140.972656 L 540.195312 150.519531 L 552.242188 150.519531 L 552.242188 154.132812 L 540.195312 154.132812 L 540.195312 164.929688 L 553.304688 164.929688 L 553.304688 168.542969 Z M 558.261719 168.546875 L 558.261719 137.359375 L 565.769531 137.359375 C 568.914062 137.359375 571.316406 137.820312 572.96875 138.734375 C 575.453125 140.09375 576.695312 142.589844 576.695312 146.210938 C 576.695312 149.550781 575.449219 151.972656 572.945312 153.472656 C 571.238281 154.488281 569.195312 154.996094 566.808594 154.996094 L 562.789062 154.996094 L 562.789062 168.546875 Z M 562.789062 140.972656 L 562.789062 151.375 L 565.996094 151.375 C 569.820312 151.375 571.734375 149.652344 571.734375 146.207031 C 571.734375 144.050781 571.070312 142.558594 569.742188 141.75 C 568.894531 141.234375 567.644531 140.972656 565.992188 140.972656 Z M 601.660156 137.359375 L 601.660156 159.316406 C 601.660156 162.542969 600.648438 165 598.636719 166.695312 C 596.765625 168.269531 594.234375 169.050781 591.050781 169.050781 C 587.867188 169.050781 585.355469 168.269531 583.496094 166.695312 C 581.496094 165 580.492188 162.542969 580.492188 159.316406 L 580.492188 137.359375 L 585.019531 137.359375 L 585.019531 158.460938 C 585.019531 160.386719 585.265625 161.832031 585.773438 162.804688 C 586.671875 164.558594 588.410156 165.4375 591 165.4375 C 593.660156 165.4375 595.445312 164.558594 596.355469 162.804688 C 596.878906 161.832031 597.132812 160.386719 597.132812 158.460938 L 597.132812 137.359375 Z M 608.429688 168.546875 L 608.429688 137.359375 L 614.8125 137.359375 L 623.664062 162.894531 L 623.753906 162.894531 L 632.597656 137.359375 L 638.933594 137.359375 L 638.933594 168.546875 L 634.871094 168.546875 L 634.871094 142.703125 L 634.785156 142.703125 L 625.828125 168.546875 L 621.546875 168.546875 L 612.582031 142.703125 L 612.492188 142.703125 L 612.492188 168.546875 Z M 646.117188 168.546875 L 646.117188 137.359375 L 653.617188 137.359375 C 656.769531 137.359375 659.171875 137.820312 660.820312 138.734375 C 663.308594 140.09375 664.550781 142.589844 664.550781 146.210938 C 664.550781 149.550781 663.300781 151.972656 660.796875 153.472656 C 659.085938 154.488281 657.050781 154.996094 654.660156 154.996094 L 650.648438 154.996094 L 650.648438 168.546875 Z M 650.644531 140.972656 L 650.644531 151.375 L 653.839844 151.375 C 657.667969 151.375 659.585938 149.652344 659.585938 146.207031 C 659.585938 144.050781 658.921875 142.558594 657.597656 141.75 C 656.746094 141.234375 655.492188 140.972656 653.847656 140.972656 Z M 668.710938 168.546875 L 668.710938 137.359375 L 686.347656 137.359375 L 686.347656 140.972656 L 673.238281 140.972656 L 673.238281 150.519531 L 685.289062 150.519531 L 685.289062 154.132812 L 673.238281 154.132812 L 673.238281 164.929688 L 686.347656 164.929688 L 686.347656 168.542969 Z M 691.3125 168.546875 L 691.3125 137.359375 L 696.964844 137.359375 L 709.257812 161.777344 L 709.347656 161.777344 L 709.347656 137.359375 L 713.40625 137.359375 L 713.40625 168.546875 L 708.089844 168.546875 L 695.464844 143.539062 L 695.371094 143.539062 L 695.371094 168.546875 L 691.3125 168.546875 "/>
 </svg>
     </div>
-    <div class="ls-header__title">
-      <h1>Styleguide der internen Werkzeuge</h1>
-      <div class="ls-header__sub">design.css 2.1 · lebende Referenz für Bau und Umbau aller Tools</div>
-    </div>
     <div class="ls-header__meta">
+      <h1>Styleguide der internen Werkzeuge</h1>
       <span>Stand <b>25.10.2026</b></span>
       <span>Farbwelt <b>Marine &amp; Signalgelb</b></span>
-      <button type="button" class="ls-btn ls-btn--ghost ls-btn--sm ls-no-print" id="themeToggle" aria-pressed="false">Dunkel / Hell</button>
+      <button type="button" class="ls-theme-toggle ls-no-print" id="themeToggle" aria-label="Dunkel- oder Hellmodus umschalten" title="Dunkel / Hell">
+        <svg class="ls-theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+        <svg class="ls-theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>
+      </button>
     </div>
   </header>
 
@@ -785,7 +826,7 @@ pre.code code { font-size: inherit; }
     <div class="ls-card ls-card--tight">
       <ol class="plan">
         <li><b>Statuszeile</b> <span>nur wenn externe Daten geladen wurden (z. B. Lagerbestand, Stand)</span></li>
-        <li><b>Kopf</b> <span>Navy-Balken: Logo (Variante B, Slogan im Logo) · Toolname + Untertitel · Projekt, Datum, Schalter</span></li>
+        <li><b>Kopf</b> <span>Navy-Balken: links Logo (Variante B), rechts Toolname über Kunde/Projekt und Datum, darunter der Theme-Schalter; kein Untertitel</span></li>
         <li><b>Projekt &amp; Verwaltung</b> <span>Kunde/Projekt, Raum oder Position, Speichern/Laden, Export</span></li>
         <li><b>Eingaben</b> <span>Karten mit Feldern, Einheit am Feld, Standardwerte vorbelegt</span></li>
         <li><b>Aktionen</b> <span>Toolbar: ein primärer Button (Rechnen/Suchen), daneben Zurücksetzen</span></li>
@@ -933,6 +974,14 @@ pre.code code { font-size: inherit; }
             <label><input type="radio" name="sg-form"><span>nur Ventil (FTV)</span></label>
           </div>
         </div>
+        <div class="ls-field">
+          <label class="ls-label" for="sg-jaz-n">Jahresarbeitszahl JAZ <span class="ls-muted">(Regler mit Zahlenfeld <code>.ls-range</code>, 2.1.1)</span></label>
+          <div class="ls-range">
+            <input type="range" id="sg-jaz-r" min="2.5" max="5.5" step="0.01" value="3.79" aria-label="JAZ Regler">
+            <div class="ls-unit"><input class="ls-input ls-num" id="sg-jaz-n" type="text" inputmode="decimal" value="3,79"><span>–</span></div>
+          </div>
+          <div class="ls-hint">Für Werte, die im Kundengespräch durchgespielt werden. Das Zahlenfeld ist maßgeblich; Verhalten über <code>LS.regler('sg-jaz-r','sg-jaz-n',2)</code>.</div>
+        </div>
         <div class="ls-row">
           <label class="ls-check"><input type="checkbox" id="sg-bestand" checked> Heizkörper bleibt (Bestand)</label>
           <label class="ls-check"><input type="checkbox" id="sg-lager"> aus Lager</label>
@@ -965,6 +1014,7 @@ pre.code code { font-size: inherit; }
             <li>Hinweise (<code>.ls-hint</code>) erklären Herkunft oder Regel in einer Zeile.</li>
             <li>Beim Neubau wird das Formular <b>nicht kopiert, sondern aufgeräumt</b>: Reihenfolge nach Arbeitsablauf, zusammengehörige Werte gruppiert, selten geänderte Felder nach „Erweitert“, Ableitbares berechnen statt abfragen. Nur die Rechenlogik bleibt (Nachweis: Referenzwerte). Regeln in DESIGNREGELN.md 6.1.</li>
             <li>Mehrfachauswahl mit wenigen Optionen → Segment (<code>.ls-seg</code>); viele Optionen → Select.</li>
+            <li>Regler (<code>.ls-range</code>) nur zusammen mit einem Zahlenfeld und nur für Werte, die vor dem Kunden durchgespielt werden (Energiepreise, JAZ). Das Zahlenfeld ist maßgeblich.</li>
             <li>Auf dem iPad wachsen Felder und Buttons auf 44 px (automatisch über <code>pointer: coarse</code>).</li>
           </ul>
         </div>
@@ -1021,8 +1071,8 @@ pre.code code { font-size: inherit; }
         <div class="ls-card__head"><h3>Empfehlung</h3><span class="ls-badge ls-badge--yellow">Vorschlag</span></div>
         <p class="ls-muted ls-mb-4">Weishaupt Evoblock WEB 13 deckt die Heizlast am Bivalenzpunkt −7 °C ohne Heizstab. Werte sind Überschlag; maßgeblich ist das Datenblatt.</p>
         <div class="ls-kpis">
-          <div class="ls-kpi" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15)"><span class="ls-kpi__label">Heizlast</span><span class="ls-kpi__value"><span class="ls-approx">9,8</span> <small>kW</small></span></div>
-          <div class="ls-kpi" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15)"><span class="ls-kpi__label">WP-Deckung</span><span class="ls-kpi__value">100 <small>%</small></span></div>
+          <div class="ls-kpi"><span class="ls-kpi__label">Heizlast</span><span class="ls-kpi__value"><span class="ls-approx">9,8</span> <small>kW</small></span></div>
+          <div class="ls-kpi"><span class="ls-kpi__label">WP-Deckung</span><span class="ls-kpi__value">100 <small>%</small></span></div>
         </div>
         <div class="ls-toolbar ls-mt-4"><button type="button" class="ls-btn ls-btn--primary">Als PDF sichern</button></div>
       </div>
@@ -1159,7 +1209,7 @@ pre.code code { font-size: inherit; }
     <div class="ls-card ls-mt-4">
       <div class="ls-card__head"><h3>Icons</h3><span class="ls-card__sub">Inline-SVG, 24er-Raster, Strich 1,8, <code>currentColor</code> · Quelle <code>assets/icons/icons.html</code></span></div>
       <div class="icons"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg><code>home</code><span>Rücklink</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4"/><path d="M8 20v-6h8v6"/></svg><code>save</code><span>Projekt sichern</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h5l2 2h9v10H4z"/><path d="M12 11v6"/><path d="M9.5 14.5 12 17l2.5-2.5"/></svg><code>load</code><span>Projekt laden</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="1.5"/><path d="M7 14h10v6H7z"/></svg><code>print</code><span>Bericht drucken / PDF</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><code>add</code><span>Hinzufügen</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg><code>trash</code><span>Löschen</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg><code>copy</code><span>Duplizieren</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M12.5 7.5l4 4"/></svg><code>edit</code><span>Bearbeiten</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg><code>reset</code><span>Zurücksetzen</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.5-4.5"/></svg><code>search</code><span>Suchen / Berechnen</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg><code>info</code><span>Hinweis</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5L16 10"/></svg><code>ok</code><span>Hinweis</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 21 20H3z"/><path d="M12 10v4M12 17v.5"/></svg><code>warn</code><span>Hinweis</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></svg><code>error</code><span>Hinweis</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><code>chevron-down</code><span>Aufklappen</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><code>chevron-right</code><span>Weiter / Öffnen</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m8 11 4 4 4-4"/><path d="M5 19h14"/></svg><code>download</code><span>GAEB / Export</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><code>moon</code><span>Dunkel/Hell</span></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 8 8-4 8 4-8 4z"/><path d="M4 8v8l8 4 8-4V8"/><path d="M12 12v8"/></svg><code>box</code><span>Lager</span></div></div>
-      <p class="ls-small ls-muted ls-mt-2">Immer mit Text im Button („Speichern“), Icon allein nur bei Platzmangel mit <code>aria-label</code>. Homescreen-Symbol: <code>assets/icons/apple-touch-icon.png</code> (Logo A auf Navy), Favicon <code>assets/icons/favicon.svg</code>.</p>
+      <p class="ls-small ls-muted ls-mt-2">Immer mit Text im Button („Speichern“), Icon allein nur bei Platzmangel mit <code>aria-label</code>. Ausnahme mit festem Platz: der Theme-Schalter <code>.ls-theme-toggle</code> oben rechts im Kopf, ein runder Symbolknopf ohne Text (Mond im Hell-, Sonne im Dunkelmodus), Beschriftung über <code>aria-label</code>. Homescreen-Symbol: <code>assets/icons/apple-touch-icon.png</code> (Logo A auf Navy), Favicon <code>assets/icons/favicon.svg</code>.</p>
     </div>
 
     <div class="ls-card ls-mt-4">
@@ -1169,7 +1219,7 @@ pre.code code { font-size: inherit; }
   </section>
 
   <footer class="ls-footer">
-    Styleguide der internen Werkzeuge · design.css 2.1 · Beispielwerte erfunden (BV Muster) · Auslegungswerte sind Überschlagswerte und ersetzen keine Planung nach Norm. Lutz Spring GmbH · Interne Anwendung.
+    Styleguide der internen Werkzeuge · design.css 2.1.1 · Beispielwerte erfunden (BV Muster) · Auslegungswerte sind Überschlagswerte und ersetzen keine Planung nach Norm. Lutz Spring GmbH · Interne Anwendung.
   </footer>
 </div>
 
@@ -1180,7 +1230,7 @@ pre.code code { font-size: inherit; }
 <script>
 /* ============================================================
    ls.js · Lutz Spring GmbH · gemeinsame Hilfsfunktionen der Tools
-   Version 2.1 · Stand 2026-10-25
+   Version 2.1.1 · Stand 2026-10-25 (LS.regler)
    Wird beim Veröffentlichen von _build/inline.py in jedes Tool eingefügt
    (Marker ls.js:start / ls.js:end im HTML).
    Globales Objekt: LS
@@ -1338,6 +1388,16 @@ pre.code code { font-size: inherit; }
     return tool + '_' + p + '_' + LS.datumISO() + '.' + (endung || 'json');
   };
 
+  /* ---------- Regler mit Zahlenfeld (.ls-range) ---------- */
+  /* Hält Regler und Zahlenfeld synchron. Das Zahlenfeld ist maßgeblich; stellen = Nachkommastellen der Anzeige.
+     Der Regler klemmt an seinen Grenzen, das Zahlenfeld darf darüber hinausgehen (Prüfung über LS.pruefen im Tool). */
+  LS.regler = function (rangeId, inputId, stellen) {
+    var r = d.getElementById(rangeId), i = d.getElementById(inputId); if (!r || !i) return;
+    r.addEventListener('input', function () { i.value = LS.fmt(+r.value, stellen || 0); i.dispatchEvent(new Event('input', { bubbles: true })); });
+    i.addEventListener('input', function (ev) { if (ev.isTrusted) { var n = LS.zahl(i.value); if (n != null) r.value = n; } });
+    var n0 = LS.zahl(i.value); if (n0 != null) r.value = n0;
+  };
+
   /* ---------- Drucken ---------- */
   LS.drucken = function () { w.print(); };
 
@@ -1363,30 +1423,7 @@ pre.code code { font-size: inherit; }
   w.LS = LS;
 })(window, document);
 
-/* Theme-Schalter: data-theme auf <html>, Wunsch lokal gemerkt. Ohne Schalter folgt das Tool dem System. */
-(function () {
-  var root = document.documentElement;
-  var KEY = 'ls-theme';
-  function apply(t) {
-    if (t === 'dark' || t === 'light') { root.setAttribute('data-theme', t); }
-    else { root.removeAttribute('data-theme'); }
-    var b = document.getElementById('themeToggle');
-    if (b) { b.setAttribute('aria-pressed', root.getAttribute('data-theme') === 'dark' ? 'true' : 'false'); }
-  }
-  var saved = null;
-  try { saved = localStorage.getItem(KEY); } catch (e) {}
-  apply(saved);
-  document.addEventListener('click', function (ev) {
-    var b = ev.target.closest && ev.target.closest('#themeToggle');
-    if (!b) return;
-    var isDark = root.getAttribute('data-theme') === 'dark' ||
-      (!root.getAttribute('data-theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    var next = isDark ? 'light' : 'dark';
-    apply(next);
-    try { localStorage.setItem(KEY, next); } catch (e) {}
-  });
-})();
-
+/* Theme-Schalter kommt aus ls.js (LS.theme.start). Hier nur die Styleguide-Demos. */
 /* Styleguide-Demos */
 document.addEventListener('click', function (ev) {
   var t = ev.target.closest && ev.target.closest('#sgToast, #sgDialog, #sgDlgClose, #sgDel1');

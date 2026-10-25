@@ -1,6 +1,6 @@
 /* ============================================================
    ls.js · Lutz Spring GmbH · gemeinsame Hilfsfunktionen der Tools
-   Version 2.1 · Stand 2026-10-25
+   Version 2.1.1 · Stand 2026-10-25 (LS.regler)
    Wird beim Veröffentlichen von _build/inline.py in jedes Tool eingefügt
    (Marker ls.js:start / ls.js:end im HTML).
    Globales Objekt: LS
@@ -156,6 +156,16 @@
   LS.dateiname = function (tool, projekt, endung) {
     var p = (projekt || 'BV-Muster').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ß/g, 'ss').replace(/[^A-Za-z0-9-]+/g, '-').replace(/^-|-$/g, '');
     return tool + '_' + p + '_' + LS.datumISO() + '.' + (endung || 'json');
+  };
+
+  /* ---------- Regler mit Zahlenfeld (.ls-range) ---------- */
+  /* Hält Regler und Zahlenfeld synchron. Das Zahlenfeld ist maßgeblich; stellen = Nachkommastellen der Anzeige.
+     Der Regler klemmt an seinen Grenzen, das Zahlenfeld darf darüber hinausgehen (Prüfung über LS.pruefen im Tool). */
+  LS.regler = function (rangeId, inputId, stellen) {
+    var r = d.getElementById(rangeId), i = d.getElementById(inputId); if (!r || !i) return;
+    r.addEventListener('input', function () { i.value = LS.fmt(+r.value, stellen || 0); i.dispatchEvent(new Event('input', { bubbles: true })); });
+    i.addEventListener('input', function (ev) { if (ev.isTrusted) { var n = LS.zahl(i.value); if (n != null) r.value = n; } });
+    var n0 = LS.zahl(i.value); if (n0 != null) r.value = n0;
   };
 
   /* ---------- Drucken ---------- */

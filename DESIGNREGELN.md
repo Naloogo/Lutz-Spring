@@ -1,6 +1,6 @@
 # Designregeln für die internen Werkzeuge der Lutz Spring GmbH
 
-Version 2.1 · Stand 2026-10-25 · gilt für alle bestehenden und künftigen HTML-Tools im Repo
+Version 2.1.2 · Stand 2026-10-25 · gilt für alle bestehenden und künftigen HTML-Tools im Repo
 Zugehörige Dateien: `assets/css/design.css` (Stil), `assets/js/ls.js` (gemeinsames Verhalten), `assets/icons/` (Symbole), `assets/logo/` (Logo), `styleguide.html` (lebende Referenz), `vorlagen/` (tool-vorlage, bericht-vorlage, index-vorlage, feldliste-vorlage), `UMBAU-ABLAUF.md` (Schritte je Tool), `CLAUDE.md` (Anweisungen für die KI im Repo), `CHANGELOG.md`
 Kennzeichnung wie im Firmengehirn: [BESTÄTIGT] = von Fabian/GF entschieden · [VORSCHLAG] = von Claude vorgeschlagen, noch nicht bestätigt · [BELEGT] = rechnerisch oder am Datenblatt geprüft
 
@@ -56,7 +56,7 @@ Regeln:
 3. Gelb ist Marke, nicht Zustand. Warnung ist Orange. Beides nie nebeneinander als Bedeutungsträger.
 6. **Logo:** Variante B (Wortmarke mit Slogan und „GmbH“, Datei `assets/logo/logo-variante-b.svg`) in allen Tools und Dokumenten [BESTÄTIGT, 2026-10-25]. Es wird als Inline-SVG mit `currentColor` eingebettet, Farbe `--ls-yellow`, mindestens 280 px breit (darunter ist der Slogan im Logo unlesbar). Das Logo steht **immer auf Navy** – im Kopfbalken hell wie dunkel und im Druck (Hintergrundfarben erzwungen). Die Navy-Umfärbung (`.ls-header__logo--navy`) ist keine zweite Logofassung für den Regelfall, sondern die Ausweichregel für Stellen ohne Navy-Fläche (z. B. ein Fuß auf Weiß, eine Kachel auf Creme); solche Stellen gibt es in den Tools derzeit nicht. Variante A (ohne Slogan) wird nicht verwendet.
 4. Je Ansicht genau **ein** primärer Button in Navy/Stahlblau. Alles andere sekundär (weiß mit Rand) oder dezent.
-5. Kein eigener Dunkelmodus pro Tool: wer `design.css` einbindet, bekommt ihn. Der Schalter im Kopf (Vorlage) ist optional.
+5. Kein eigener Dunkelmodus pro Tool: wer `design.css` einbindet, bekommt ihn. Der Schalter im Kopf ist ein runder Symbolknopf ohne Text (`.ls-theme-toggle`, Mond im Hell-, Sonne im Dunkelmodus, `aria-label`), so zurückhaltend wie das Haus-Icon (Deckkraft 0,45 / 1 bei Berührung / 0,3 gedrückt); kein Textbutton [BESTÄTIGT, 2026-10-25].
 
 ---
 
@@ -95,7 +95,7 @@ Reihenfolge von oben nach unten (nicht benötigte Teile entfallen, die Reihenfol
 
 1. **Statuszeile** (`.ls-status`) – nur, wenn externe Daten geladen wurden („Lagerbestand geladen: 14 Positionen · Stand …“).
 1a. **So geht’s** (`.ls-help`, eingeklappt) – ersetzt lange Erklärtexte; enthält bei Tools mit Dateien den iPad-Hinweis (Safari statt Vorschau, Teilen-Blatt → Dateien).
-2. **Kopf** (`.ls-header`) – links Logo Variante B (Slogan im Logo), Mitte Toolname + ein Satz Untertitel, rechts Kunde/Projekt, Datum, optional Theme-Schalter. Der Kopf erscheint im Druck und ist damit die Kopfzeile des Berichts.
+2. **Kopf** (`.ls-header`) – zwei Spalten: links Logo Variante B (Slogan im Logo), rechts ein Block mit Toolname (20 px, halbfett) über Kunde/Projekt und Datum, darunter der Theme-Schalter. Kein Untertitel, kein Titelblock in der Mitte [BESTÄTIGT, 2026-10-25]. Der Kopf erscheint im Druck und ist damit die Kopfzeile des Berichts.
 3. **Projekt & Verwaltung** – Kunde/Projekt (Hinweis: keine Personendaten, „BV Muster“ oder Ort + Gewerk), Raum/Position, Speichern/Laden (Datei), Export (PDF, GAEB).
 3a. **Gespeicherte Positionen** (`.ls-items`) – nur bei Tools mit mehreren Räumen/Positionen: Nummer, Name, Kurzzeile, Aktionen Bearbeiten/Duplizieren/Löschen; die aktive Position ist markiert.
 4. **Eingaben** – Karten mit `.ls-fields`; Standardwerte vorbelegt.
@@ -115,6 +115,7 @@ Reihenfolge von oben nach unten (nicht benötigte Teile entfallen, die Reihenfol
 - Hinweis (`.ls-hint`) unter dem Feld: Herkunft oder Regel in einer Zeile („aus dem Heizlastbericht, Raumwert“, „15 % ist kein Standard, Einzelfall“).
 - Fehler (`.ls-error` + `aria-invalid="true"`): sagen, **was** falsch ist und **was zu tun** ist. Kein rotes Feld ohne Text. Fokus springt ins erste fehlerhafte Feld.
 - Wenige Optionen (2–4) → Segment-Steuerung `.ls-seg`; viele → `.ls-select`; Ja/Nein → `.ls-check` oder `.ls-switch` (Switch nur für sofort wirkende Schalter).
+- Regler (`.ls-range`, 2.1.1) nur zusammen mit einem Zahlenfeld und nur für Werte, die im Kundengespräch durchgespielt werden (Energiepreise, JAZ, Nutzungsgrad). Das Zahlenfeld ist maßgeblich und wird geprüft; der Regler klemmt an seinen Grenzen. Verhalten: `LS.regler(rangeId, inputId, stellen)` [BESTÄTIGT, Fabian 2026-10-25].
 - Touch: auf iPad/Handy wachsen Felder und Buttons automatisch auf 44 px (`pointer: coarse`). Nichts kleiner als 32 px antippbar.
 - Eingaben bleiben beim Verlassen der Seite erhalten (localStorage, `LS.formularMerken`), mit „Neues Projekt“ zurücksetzbar [BESTÄTIGT: bisherige Praxis].
 - Projektdateien (JSON) tragen `version`, `tool`, `exportiert`, `projekt` und die Positionsliste; Dateiname `TOOL_BV-Muster_JJJJ-MM-TT.json` ohne Personendaten (`LS.dateiname`). Beim Laden werden alte Feldnamen über eine Zuordnungstabelle im Tool (`FELD_MAPPING`) auf neue abgebildet (`LS.datei.migrieren`), damit alte Dateien weiter laden [BESTÄTIGT, 2026-10-25].
@@ -164,7 +165,7 @@ Beim Nachbau wird jedes Feld der Altfassung einmal befragt: Braucht der Nutzer e
 - Fachbegriffe wie im Betrieb: Heizlast, Bivalenzpunkt, Norm-Außentemperatur, Bauhöhe/Baulänge (BH/BL), Vorlauf/Rücklauf (VL/RL), HKV.
 - Fehler- und Hinweistexte ohne Entschuldigung, ohne Ausrufezeichen, mit Handlungsanweisung.
 - Festes Vokabular über alle Tools [BESTÄTIGT, 2026-10-25]:
-  - Buttons: „Berechnen“ / „Passende Heizkörper suchen“ (Hauptaktion), „Zurücksetzen“, „+ Position speichern“ / „+ Raum speichern“, „Neues Projekt“, „Projekt sichern (Datei)“, „Projekt laden (Datei)“, „Bericht drucken / PDF“, „GAEB (.X83) für HERO“, „Artikeldaten laden“, „Bearbeiten“, „Duplizieren“, „Löschen“, „Abbrechen“, „Dunkel / Hell“.
+  - Buttons: „Berechnen“ / „Passende Heizkörper suchen“ (Hauptaktion), „Zurücksetzen“, „+ Position speichern“ / „+ Raum speichern“, „Neues Projekt“, „Projekt sichern (Datei)“, „Projekt laden (Datei)“, „Bericht drucken / PDF“, „GAEB (.X83) für HERO“, „Artikeldaten laden“, „Bearbeiten“, „Duplizieren“, „Löschen“, „Abbrechen“, Theme-Schalter ohne Text (Symbol).
   - Felder: „Kunde / Projekt“, „Aktueller Raum“ bzw. „Position“, „Heizlast Φ<sub>HL</sub>“, „Sicherheitsreserve“, „Raumtemperatur t<sub>L</sub>“, „Norm-Außentemperatur“, „Bivalenzpunkt“, „Heizgrenze“, „Systemtemperatur VL/RL“, „Max. Bauhöhe“ / „Max. Baulänge“, „Bauform“, „Hersteller / Baureihe“, „Notiz“.
   - Zustände: „gedeckt“, „knapp“, „nicht gedeckt“, „Bestand“, „aus Lager“, „Vorschlag“, „Empfohlen“.
   - Rückmeldungen: „Gespeichert“, „Projekt geladen“, „Projektdatei erstellt“, „Raum gelöscht“, „Neues Projekt“.
@@ -243,6 +244,7 @@ Prüfen
 
 | Datum | Wer | Änderung |
 |---|---|---|
+| 2026-10-25 | Claude Code (Umbau kostenvergleich), Entscheidung Fabian Esche | 2.1.1: Baustein Regler mit Zahlenfeld `.ls-range` (design.css 10.12) und `LS.regler` in ls.js; Regel in Abschnitt 6; Beispiel im Styleguide. Kennzahlen auf Navy (`.ls-card--navy .ls-kpi`). Felder einer Zeile beginnen oben (`.ls-field` align-content: start), damit Regler und Eingaben auf einer Höhe stehen. Kopf ohne Titelblock: `.ls-header__meta` darf den Titel enthalten und steht rechts bündig |
 | 2026-10-25 | Claude (Firmenaccount), Entscheidung Fabian Esche | 2.1: Lückenanalyse umgesetzt – Startseiten-Kacheln, Positionsliste, Inline-Rückfrage, Dialog, Toast, Stepper, Datenstand, „So geht’s“, Karten-Tabellen, Diagramm-Tokens, Datei-Baustein, Berichtsvorlage; `ls.js`; Icon-Satz; Homescreen-Symbol aus Logo A; Einfügen von CSS/JS beim Veröffentlichen; Druck nur Bericht, keine Seitenzahlen; iPadOS 16; Vokabular; UMBAU-ABLAUF.md, Feldliste, CLAUDE.md, CHANGELOG.md |
 | 2026-10-25 | Claude (Firmenaccount), Entscheidung Fabian Esche | 2.0.1: Logo Variante B als Inline-SVG überall, Logo-Gelb #fff200 ersetzt #f5e400; Vorschläge zu Raster, Druck in Hell, noindex, Touch-Zielen, Schreibweisen und Dunkelmodus-Werten bestätigt; Umbau gegen Referenzwerte und aktuellen Git-Stand, Reihenfolge durch Fabian; Regel „Formularfelder bleiben unverändert“ ersetzt durch 6.1 „Formulare beim Neubau aufräumen“ – Anordnung und Inhalt der Felder werden beim Nachbau geprüft, nur die Rechenlogik bleibt (Nachweis Referenzwerte) |
 | 2026-10-19 | Claude (Firmenaccount), Entscheidung Fabian Esche | Fassung 2.0: Farbwelt „Marine & Signalgelb“ gewählt; Tokens hell/dunkel, Komponenten, Bauplan, Druck, Checkliste. Ersetzt die 1.0-Fassung von `design.css` im Branch `tools-ueberarbeitung` |

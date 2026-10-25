@@ -11,7 +11,7 @@ Vor jeder Arbeit an `heizkoerper.html`, `bestandsaufnahme.html`, `bad-angebot.ht
 ## Übergangszustand (bis alle Tools umgebaut sind)
 - Die alten Tools (Stand `Naloogo/Auslegung-WP`, 2026-10-25) laufen hier unverändert und brauchen `theme.css` und `logo.png` im Hauptordner. Beide bleiben, bis das letzte alte Tool abgelöst ist; dann nach `alt/` verschieben.
 - `bad-angebot.html` gibt es noch nicht als fertiges Tool; es wird neu gebaut (aus `vorlagen/tool-vorlage.html`, Angebotsdokument nach `vorlagen/bericht-vorlage.html`, GAEB-Export nach TOOLS-WISSEN.md). Ein Entwurf liegt im Testrepo `Naloogo/Tool-Test` und kann als Vorlage dienen. Die Kachel auf der alten Startseite läuft bis dahin ins Leere.
-- `tests/referenzwerte.md` ist noch anzulegen (Testfälle A1–A4, K1–K3, H1–H6, B1–B3, nur erfundene Werte).
+- `tests/referenzwerte.md` ist angelegt (2026-10-25, K1–K3); die Fälle A1–A4, H1–H6, B1–B3 werden beim Umbau des jeweiligen Tools ergänzt (nur erfundene Werte).
 - `alt/_vorlage-alt.html` ist die frühere Tool-Vorlage; neue Tools entstehen aus `vorlagen/tool-vorlage.html`.
 - Das alte Repo bleibt live und unverändert, bis dieses Repo geprüft ist; die iPads werden Tool für Tool umgestellt.
 
