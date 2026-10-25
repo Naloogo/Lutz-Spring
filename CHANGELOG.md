@@ -8,7 +8,8 @@ Neueste Einträge oben. Format: Datum · Bereich · Fassung · Änderung · Nach
 - Kachel „Angebotserstellung Bad“ sichtbar, ohne Link, Badge „in Vorbereitung“ statt „Öffnen“, bis `bad-angebot.html` gebaut ist [BESTÄTIGT, Fabian 2026-10-25]. Im Code als Kommentar vermerkt.
 - `theme.css` und `logo.png` werden von der Startseite nicht mehr gebraucht; sie bleiben für die alten Tools im Hauptordner (CLAUDE.md, Übergang).
 - Neu: `.claude/launch.json` (lokaler Vorschau-Server `python3 -m http.server`, Port 8731) für die Prüfung in Claude Code; ohne Wirkung auf GitHub Pages.
-- Geprüft im Browser (Chromium): Hell und Dunkel, Desktop und 400 px. Prüfung auf iPad/Safari steht aus (Schritt 6).
+- Geprüft im Browser (Chromium): Hell und Dunkel, Desktop und 400 px; auf dem iPad geprüft (Fabian, Schritt 6).
+- Nach iPad-Prüfung: Überschrift „Interne Werkzeuge“ und Untertitel aus dem Kopf entfernt, Kopf nur Logo und Theme-Schalter [BESTÄTIGT, Fabian 2026-10-25].
 
 ## 2026-10-25 · index.html · Umbau Schritt 1 (Altfassung festhalten)
 - Altfassung (Stand 04: 2026-08-07, Slogan + Kachel „Bestandsaufnahme“; Live-Datei zusätzlich mit Kachel „Angebotserstellung Badezimmer“) gesichert als `alt/index_2026-10-25.html`.
@@ -34,7 +35,7 @@ Neueste Einträge oben. Format: Datum · Bereich · Fassung · Änderung · Nach
 ## Tools (Umbau auf 2.1)
 | Tool | Stand alt (04) | Umbau | Feldliste | Referenzwerte | Freigabe |
 |---|---|---|---|---|---|
-| index.html | 2026-08-07 | in Arbeit (Schritt 4 erledigt, Schritt 6 offen) | entfällt | entfällt (Kacheln/Links erhalten) | – |
+| index.html | 2026-08-07 | umgebaut 2026-10-25 | entfällt | entfällt (Kacheln/Links erhalten) | Fabian, 2026-10-25 |
 | kostenvergleich.html | 2026-07-26 | offen | – | K1–K3 | – |
 | foerderung.html | – | offen | – | – | – |
 | auslegung.html | 2026-08-17 | offen | – | A1–A4 | – |
