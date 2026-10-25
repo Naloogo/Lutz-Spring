@@ -5,7 +5,7 @@ Zweck: Nachweis, dass ein Umbau nichts an der Rechnung ändert (UMBAU-ABLAUF.md 
 
 Die Spalte „erwartet (Formel)“ ist aus dem Rechenteil der Altfassung nachgerechnet (Python, gleiche Formeln und Rundung) und dient nur als Plausibilitätsprüfung; maßgeblich ist die Messung in der Altfassung.
 
-Testfälle je Tool: A1–A4 `auslegung.html` (angelegt 2026-10-25) · K1–K6 `kostenvergleich.html` · H1–H6 `heizkoerper.html` · B1–B3 `bestandsaufnahme.html`. Die Fälle der noch nicht begonnenen Tools werden beim jeweiligen Umbau (Schritt 2) angelegt.
+Testfälle je Tool: A1–A5 `auslegung.html` (angelegt 2026-10-25, A5 nur neu) · K1–K6 `kostenvergleich.html` · H1–H6 `heizkoerper.html` · B1–B3 `bestandsaufnahme.html`. Die Fälle der noch nicht begonnenen Tools werden beim jeweiligen Umbau (Schritt 2) angelegt.
 
 ---
 
@@ -119,7 +119,7 @@ Eingaben: Jahres-Wärmebedarf 12 000 kWh · Baugröße WEB 7/10 · Heizflächen 
 
 ---
 
-## auslegung.html · A1–A4
+## auslegung.html · A1–A5
 
 Altfassung: `alt/auslegung_2026-10-25.html` · Feldliste: `tests/feldliste-auslegung.md`.
 Angelegt 2026-10-25 (Schritt 2). Spalte „erwartet (Formel)“ aus dem Rechenteil der Altfassung nachgerechnet (Python, gleiche Stützpunkte, Interpolation und Rundung: kW auf 1 Nachkommastelle, Prozent ganzzahlig). Spalte „alt“ wird in Schritt 3 in der unveränderten Altfassung gemessen, „neu“ in Schritt 5.
@@ -130,6 +130,8 @@ Messung „alt“ am 2026-10-25 in der unveränderten Altfassung (`auslegung.htm
 1. Kühlfunktion geht beim Neuladen verloren: `standAnwenden` prüft die Sichtbarkeit der Kühlung, bevor die Heizflächen wiederhergestellt sind; dadurch wird „Kühlung ja“ auf „nein“ gesetzt und der Kühlblock bleibt ausgeblendet, bis die Heizfläche erneut angetippt wird. Betrifft auf dem iPad jedes Neuladen der Homescreen-App. Für A2 wurden die Zusatzpositionen deshalb zusätzlich im Browser nach echtem Klick (Fußbodenheizung, „Ja, aktive Kühlung“) gemessen; das PDF `auslegung_A2_alt.pdf` zeigt den Zustand nach Neuladen (Kühloption statt der vier Kühlpositionen). Die Neufassung muss den Zustand vollständig wiederherstellen; das ist eine gewollte Abweichung (Fehlerbehebung), Kennzahlen unverändert.
 2. Die Kundenfälle-Liste wird nie aus dem Speicher geladen (`kundenLaden` ist definiert, wird aber nicht aufgerufen); nach einem Neuladen ist die Liste leer, und „Speichern“ überschreibt die gespeicherte Liste. Es gibt daher keine alten Fälle, die zu übernehmen wären (Feldliste, Frage 1). Der Fallname erscheint deshalb auch nicht in den PDFs; der Seitentitel lautet „Wärmepumpenauslegungstool - Gerät - Datum“.
 3. Die Kennzahlen „Gebäudeheizlast“, „WP-Leistung bei Norm-Außentemperatur“ und „Heizstab-Anteil“ erscheinen nur bei Luft/Wasser; bei Sole/Wasser (A4) steht stattdessen der Sole-Hinweis.
+
+Messung „neu“ am 2026-10-25 in `auslegung.html` (design.css 2.1.2): gleiche Eingaben als Browser-Speicher der Neufassung gesetzt (Felder per id, Verteilerliste und Aeroblock-Zustand), Ergebnisse aus der Anzeige abgelesen (headless Chrome), PDFs `tests/pdf/auslegung_A1_neu.pdf` … `A5_neu.pdf`. **Alle Kennzahlen aller Fälle sind identisch mit „erwartet (Formel)“ und „alt“** (Vergleich per Skript, 0 Abweichungen). Unterschiede nur in der Darstellung: ganze kW mit „,0“ („10,0 kW“), Status als Badge „gedeckt / knapp / nicht gedeckt“ statt ✓ ◐ ⚠, Hinweise ohne Symbole, „Blossom-ic“ statt „Blossom-IC“, kein „R290“ im Gerätetext. A2: die vier Kühlpositionen erscheinen in der Neufassung auch nach Neuladen (Befund 1 behoben). Die Neufassung druckt Ergebnis und Bericht (Zusammenfassung, Heizlast, Ergebnis, Zusatzpositionen, Rechenweg); die PDFs sind länger als die der Altfassung, weil Karten im Druck nicht umbrechen (BACKLOG).
 Die Altfassung kennt für Norm-Außentemperatur und Bivalenzpunkt nur feste Auswahlwerte; A1–A4 nutzen deshalb −14 / −12 / −16 °C. Für die neue Vorgabe −12,7 °C (07/5) kommt in Schritt 5 ein Fall A5 nur „neu“ (wie K4 beim Kostenvergleich), sobald Fabian die Feldliste freigibt.
 Gemeinsame Vorgaben, soweit nicht anders genannt: Wärmequelle Luft/Wasser · Aufgabe Heizung + Warmwasser · Speicher getrennt WAS 300 l + WES 200 l · Abwasser ja · Zirkulation nein · Solarthermie nein · PV nein · strenge Auslegung aus · bisheriger Vorlauf unbekannt · Rohrsystem Zweirohr · RTL nein · Kühlung nein · Aeroblock-Alternative nicht aktiviert · Notizen leer.
 
@@ -139,22 +141,22 @@ Rechenweg: Verbrauch 3 000 × 10 × 0,85 ÷ 1 800 = 14,17 kW · Gebäude 120 × 
 
 | Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
 |---|---|---|---|---|---|
-| Ölverbrauchsansatz | kW | 14,2 | 14,2 | | gleich |
-| Gebäudeansatz (Pauschale 90 W/m²) | kW | 10,8 | 10,8 | | gleich |
-| Plausibilität | – | „plausibel (27 % Abweichung)“, Mittel beider Wege | „plausibel (27 % Abweichung)“, Mittel beider Wege | | gleich |
-| Auslegungswert Heizlast (inkl. 0,4 kW Warmwasser) | kW | 12,9 | 12,9 | | gleich |
-| Empfohlenes Gerät | – | Weishaupt Evoblock WEB 9/14 · Modulation 1,7–14,0 kW · 230 V | Weishaupt Evoblock WEB 9/14 · Modulation 1,7–14 kW · 230 V (Anzeige „14“) | | gleich |
-| Gebäudelast bei −7 °C | kW | 9,8 | 9,8 | | gleich |
-| WP-Leistung A−7/W50 | kW | ≈ 9,4 | ≈ 9,4 | | gleich |
-| Deckung am Bivalenzpunkt | % | 96 | 96 | | gleich |
-| Status Bivalenzpunkt | – | knapp (geringe Heizstab-Unterstützung) | „◐ Am Bivalenzpunkt −7 °C bereits geringe Heizstab-Unterstützung nötig“ (warn) | | gleich |
-| Nennwärmeleistung A−7/W35 | kW | 9,5 | 9,5 | | gleich |
-| Gebäudeheizlast bei −14 °C | kW | 12,9 | 12,9 | | gleich |
-| WP-Leistung A−14/W50 | kW | ≈ 8,7 | ≈ 8,7 | | gleich |
-| Heizstab-Anteil bei −14 °C | kW | ≈ 4,2 (Stufe 2) | ≈ 4,2; Hinweis „rechnerisch Stufe 2“ | | gleich |
-| Taktungsrisiko | – | nein | nein | | gleich |
-| Alternative Aeroblock | – | WAB 14, ≈ 10,9 kW, 100 % Deckung | Weishaupt Aeroblock WAB 14, „Leistung ≈ 10,9 kW, 100 % Deckung“, Button „Aeroblock stattdessen auslegen“ | | gleich |
-| Zusatzpositionen | – | Öltankentsorgung · WAS 300 l · WES 200 l · Schallgutachten (46 dB(A), optional) | Öltankentsorgung · WAS 300 l · WES 200 l (erforderlich) · Schallgutachten (optional) | | gleich |
+| Ölverbrauchsansatz | kW | 14,2 | 14,2 | 14,2 kW | gleich |
+| Gebäudeansatz (Pauschale 90 W/m²) | kW | 10,8 | 10,8 | 10,8 kW | gleich |
+| Plausibilität | – | „plausibel (27 % Abweichung)“, Mittel beider Wege | „plausibel (27 % Abweichung)“, Mittel beider Wege | Verbrauch und Gebäudehülle plausibel (27 % Abweichung). Auslegungswert = Mittel beider Wege, plus 0,4 kW Warmwasser für 2 Personen. | gleich |
+| Auslegungswert Heizlast (inkl. 0,4 kW Warmwasser) | kW | 12,9 | 12,9 | 12,9 kW | gleich |
+| Empfohlenes Gerät | – | Weishaupt Evoblock WEB 9/14 · Modulation 1,7–14,0 kW · 230 V | Weishaupt Evoblock WEB 9/14 · Modulation 1,7–14 kW · 230 V (Anzeige „14“) | Weishaupt Evoblock WEB 9/14 · Modulation 1,7–14,0 kW · 230 V · Luft/Wasser · Badge „Vorschlag“ | gleich |
+| Gebäudelast bei −7 °C | kW | 9,8 | 9,8 | 9,8 kW | gleich |
+| WP-Leistung A−7/W50 | kW | ≈ 9,4 | ≈ 9,4 | ≈ 9,4 kW | gleich |
+| Deckung am Bivalenzpunkt | % | 96 | 96 | 96 % | gleich |
+| Status Bivalenzpunkt | – | knapp (geringe Heizstab-Unterstützung) | „◐ Am Bivalenzpunkt −7 °C bereits geringe Heizstab-Unterstützung nötig“ (warn) | „knapp“ · Am Bivalenzpunkt −7 °C bereits geringe Heizstab-Unterstützung nötig. | gleich |
+| Nennwärmeleistung A−7/W35 | kW | 9,5 | 9,5 | 9,5 kW | gleich |
+| Gebäudeheizlast bei −14 °C | kW | 12,9 | 12,9 | 12,9 kW | gleich |
+| WP-Leistung A−14/W50 | kW | ≈ 8,7 | ≈ 8,7 | ≈ 8,7 kW | gleich |
+| Heizstab-Anteil bei −14 °C | kW | ≈ 4,2 (Stufe 2) | ≈ 4,2; Hinweis „rechnerisch Stufe 2“ | ≈ 4,2 kW (Stufe 2) | gleich |
+| Taktungsrisiko | – | nein | nein | nein | gleich |
+| Alternative Aeroblock | – | WAB 14, ≈ 10,9 kW, 100 % Deckung | Weishaupt Aeroblock WAB 14, „Leistung ≈ 10,9 kW, 100 % Deckung“, Button „Aeroblock stattdessen auslegen“ | Alternative: Weishaupt Aeroblock WAB 14 · Würde die Anforderung ebenfalls erfüllen (Leistung ≈ 10,9 kW, 100 % Deckung am Bivalenzpunkt), ist aber teurer. Nur akti… | gleich |
+| Zusatzpositionen | – | Öltankentsorgung · WAS 300 l · WES 200 l · Schallgutachten (46 dB(A), optional) | Öltankentsorgung · WAS 300 l · WES 200 l (erforderlich) · Schallgutachten (optional) | Öltankentsorgung inkl. Restölentsorgung [erforderlich] · WAS 300 l · Trinkwasserspeicher [erforderlich] · WES 200 l · Energiespeicher [erforderlich] · Schallgutachten / Schallschutzmaßnahmen [optional] | gleich |
 
 ### A2 · Gas in kWh, Bauteil-Konfigurator, Fußbodenheizung, Kühlung, WMS, Aeroblock aktiviert
 Eingaben: Bestand Gas, 18 000 kWh/a (Einheit kWh), Kesseltyp Brennwert (96 %) · Wohnfläche 150 m² · Wohneinheiten 1 · Personen 4 · Gebäudehülle Bauteile: Baujahr 1995–2001, Fenster 2-fach modern, Wand massiv / 24–36 cm / Teildämmung, Dach gut gedämmt · Heizflächen Fußbodenheizung, 2 Verteiler (Erdgeschoss 6 Kreise, 1. Obergeschoss 5 Kreise) · Kühlung ja, 3 Räume · Norm-Außentemperatur −12 °C · Bivalenzpunkt −7 °C · Ziel-Vorlauf 35 °C (automatisch) · Speicher WMS 300/120 · Abwasser nein · Zirkulation ja · Solarthermie ja, demontieren · PV geplant · im Ergebnis „Aeroblock stattdessen auslegen“ angetippt.
@@ -162,23 +164,23 @@ Rechenweg: Verbrauch 18 000 × 0,96 ÷ 1 800 = 9,60 kW · spezifisch max(15; 45 
 
 | Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
 |---|---|---|---|---|---|
-| Gasverbrauchsansatz | kW | 9,6 | 9,6 | | gleich |
-| Bauteilansatz (Zeile) | – | „≈ 55 W/m² (Basis 45 + Fenster 5 + Wand 8 + Dach −3)“ | „≈ 55 W/m² (Basis 45 + Fenster 5 + Wand 8 + Dach −3)“ | | gleich |
-| Gebäudeansatz | kW | 8,3 | 8,3 | | gleich |
-| Plausibilität | – | „plausibel (15 % Abweichung)“ | „plausibel (15 % Abweichung)“ | | gleich |
-| Auslegungswert Heizlast (inkl. 0,8 kW Warmwasser) | kW | 9,7 | 9,7 | | gleich |
-| Standardempfehlung (vor Umschalten) | – | Weishaupt Evoblock WEB 7/10 | Weishaupt Evoblock WEB 7/10 („Standardempfehlung wäre …“, Button „Zurück zur Evoblock (WEB 7/10)“) | | gleich |
-| Ausgelegtes Gerät (Ausweichlösung aktiv) | – | Weishaupt Aeroblock WAB 11 · Modulation 1,6–11,0 kW · 230 V | Weishaupt Aeroblock WAB 11 · Modulation 1,6–11 kW · 230 V, Badge „Ausweichlösung aktiv“ | | gleich |
-| Gebäudelast bei −7 °C | kW | 7,9 | 7,9 | | gleich |
-| WP-Leistung A−7/W35 | kW | ≈ 6,9 | ≈ 6,9 | | gleich |
-| Deckung am Bivalenzpunkt | % | 87 | 87 | | gleich |
-| Status Bivalenzpunkt | – | knapp (geringe Heizstab-Unterstützung) | „◐ … geringe Heizstab-Unterstützung nötig“ (warn) | | gleich |
-| Nennwärmeleistung A−7/W35 | kW | 6,9 | 6,9 | | gleich |
-| Gebäudeheizlast bei −12 °C | kW | 9,7 | 9,7 | | gleich |
-| WP-Leistung A−12/W35 | kW | ≈ 6,5 | ≈ 6,5 | | gleich |
-| Heizstab-Anteil bei −12 °C | kW | ≈ 3,3 (Stufe 2) | ≈ 3,3; Hinweis „rechnerisch Stufe 2“ | | gleich |
-| Taktungsrisiko | – | nein | nein | | gleich |
-| Zusatzpositionen | – | Kanister Solarflüssigkeit · WMS 300/120 · Hebeanlage · Zirkulationspumpe · zusätzliche Heizkreisverteiler (1 über Standard, 2 Verteiler / 11 Kreise) · Taupunktfühler · diffusionsdichte Dämmung · Blossom-ic Raumregler (3 Räume) · Umschaltung Heizen/Kühlen · Schallgutachten (49 dB(A)) | nach Klick: Kanister · WMS 300/120 · Hebeanlage · Zirkulationspumpe · zusätzliche Heizkreisverteiler (1 über Standard) · Taupunktfühler · diffusionsdichte Dämmung · Blossom-IC Raumregler (3 Räume) · Umschaltung Heizen/Kühlen (alle erforderlich) · Schallgutachten (optional). Nach Neuladen fehlen die vier Kühlpositionen (Befund 1) | | gleich nach Klick (Befund 1) |
+| Gasverbrauchsansatz | kW | 9,6 | 9,6 | 9,6 kW | gleich |
+| Bauteilansatz (Zeile) | – | „≈ 55 W/m² (Basis 45 + Fenster 5 + Wand 8 + Dach −3)“ | „≈ 55 W/m² (Basis 45 + Fenster 5 + Wand 8 + Dach −3)“ | im Rechenweg: Bauteilansatz ≈ 55 W/m² (Basis 45 + Fenster 5 + Wand 8 + Dach −3; mindestens 15) × 150 m² ÷ 1 000 = 8,25 kW | gleich |
+| Gebäudeansatz | kW | 8,3 | 8,3 | 8,3 kW | gleich |
+| Plausibilität | – | „plausibel (15 % Abweichung)“ | „plausibel (15 % Abweichung)“ | Verbrauch und Gebäudehülle plausibel (15 % Abweichung). Auslegungswert = Mittel beider Wege, plus 0,8 kW Warmwasser für 4 Personen. | gleich |
+| Auslegungswert Heizlast (inkl. 0,8 kW Warmwasser) | kW | 9,7 | 9,7 | 9,7 kW | gleich |
+| Standardempfehlung (vor Umschalten) | – | Weishaupt Evoblock WEB 7/10 | Weishaupt Evoblock WEB 7/10 („Standardempfehlung wäre …“, Button „Zurück zur Evoblock (WEB 7/10)“) | Weishaupt Evoblock WEB 7/10 (Text in der Alternativ-Karte, Button „Zurück zur Evoblock“) | gleich |
+| Ausgelegtes Gerät (Ausweichlösung aktiv) | – | Weishaupt Aeroblock WAB 11 · Modulation 1,6–11,0 kW · 230 V | Weishaupt Aeroblock WAB 11 · Modulation 1,6–11 kW · 230 V, Badge „Ausweichlösung aktiv“ | Weishaupt Aeroblock WAB 11 · Modulation 1,6–11,0 kW · 230 V · Luft/Wasser · Badge „Ausweichlösung“ | gleich |
+| Gebäudelast bei −7 °C | kW | 7,9 | 7,9 | 7,9 kW | gleich |
+| WP-Leistung A−7/W35 | kW | ≈ 6,9 | ≈ 6,9 | ≈ 6,9 kW | gleich |
+| Deckung am Bivalenzpunkt | % | 87 | 87 | 87 % | gleich |
+| Status Bivalenzpunkt | – | knapp (geringe Heizstab-Unterstützung) | „◐ … geringe Heizstab-Unterstützung nötig“ (warn) | „knapp“ · Am Bivalenzpunkt −7 °C bereits geringe Heizstab-Unterstützung nötig. | gleich |
+| Nennwärmeleistung A−7/W35 | kW | 6,9 | 6,9 | 6,9 kW | gleich |
+| Gebäudeheizlast bei −12 °C | kW | 9,7 | 9,7 | 9,7 kW | gleich |
+| WP-Leistung A−12/W35 | kW | ≈ 6,5 | ≈ 6,5 | ≈ 6,5 kW | gleich |
+| Heizstab-Anteil bei −12 °C | kW | ≈ 3,3 (Stufe 2) | ≈ 3,3; Hinweis „rechnerisch Stufe 2“ | ≈ 3,3 kW (Stufe 2) | gleich |
+| Taktungsrisiko | – | nein | nein | nein | gleich |
+| Zusatzpositionen | – | Kanister Solarflüssigkeit · WMS 300/120 · Hebeanlage · Zirkulationspumpe · zusätzliche Heizkreisverteiler (1 über Standard, 2 Verteiler / 11 Kreise) · Taupunktfühler · diffusionsdichte Dämmung · Blossom-ic Raumregler (3 Räume) · Umschaltung Heizen/Kühlen · Schallgutachten (49 dB(A)) | nach Klick: Kanister · WMS 300/120 · Hebeanlage · Zirkulationspumpe · zusätzliche Heizkreisverteiler (1 über Standard) · Taupunktfühler · diffusionsdichte Dämmung · Blossom-IC Raumregler (3 Räume) · Umschaltung Heizen/Kühlen (alle erforderlich) · Schallgutachten (optional). Nach Neuladen fehlen die vier Kühlpositionen (Befund 1) | Leerer Kanister für Solarflüssigkeit [erforderlich] · WMS 300/120 · Modularspeicher [erforderlich] · Hebeanlage für Ablauf Sicherheitsgruppe [erforderlich] · Zirkulationspumpe mit Zeit-/Temperatursteuerung [erforderlich] · Zusätzliche Heizkreisverteiler (1 über Standard) [erforderlich] · Taupunktfühler / Kondensatüberwachung [erforderlich] · Diffusionsdichte Dämmung der kälteführenden Leitungen [erforderlich] · Blossom-ic Raumregler (3 Räume) [erforderlich] · Umschaltung Heizen/Kühlen + Kühlstation [erforderlich] · Schallgutachten / Schallschutzmaßnahmen [optional] | gleich, auch nach Neuladen (Befund 1 behoben) |
 
 ### A3 · Vorhandene Wärmepumpe, U-Werte direkt, Heizkörper + FBH, nur Heizung, streng, bisheriger Vorlauf bekannt
 Eingaben: Bestand Wärmepumpe, 6 000 kWh/a Strom, JAZ 3,0 · Wohnfläche 200 m² · Wohneinheiten 2 · Personen 3 (ohne Wirkung, WW extern) · Gebäudehülle U-Werte: Außenwand 180 m² / 1,2 · Dach 120 m² / 0,6 · Fenster 30 m² / 2,8 · Boden 120 m² / 0,8 · Heizflächen Beides: 6 Heizkörper, Einrohr, RTL ja (2 Stück), Vorlauf Heizkörper-Kreis 50 °C, FBH-Kreis 40 °C, 1 Verteiler (Erdgeschoss 4 Kreise) · bisheriger Vorlauf bekannt: 70 °C, „knapp“ · Aufgabe nur Heizung · WES 500 l · Norm-Außentemperatur −16 °C · Bivalenzpunkt −7 °C · Ziel-Vorlauf 50 °C (aus Heizkörper-Kreis) · strenge Auslegung an.
@@ -186,24 +188,24 @@ Rechenweg: Verbrauch 6 000 × 3,0 ÷ 1 800 = 10,00 kW · ΔT = 36 K · Σ(A × U
 
 | Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
 |---|---|---|---|---|---|
-| WP-Verbrauchsansatz | kW | 10,0 | 10 (Anzeige „10 kW“) | | gleich |
-| U-Wert-Zeile | – | „Transmission ≈ 16,8 kW + Lüftung ≈ 3,1 kW bei ΔT=36 K“ | „Transmission ≈ 16,8 kW + Lüftung ≈ 3,1 kW bei ΔT=36 K“ | | gleich |
-| Gebäudeansatz | kW | 19,9 | 19,9 | | gleich |
-| Plausibilität | – | „Große Abweichung (66 %) … Gebäudeansatz 60 %“ | „Große Abweichung (66 %) … Gebäudeansatz 60 %“ | | gleich |
-| Auslegungswert Heizlast (ohne Warmwasser) | kW | 15,9 | 15,9 | | gleich |
-| Empfohlenes Gerät | – | Weishaupt Evoblock WEB 13/20 · Modulation 3,2–20,0 kW · 400 V | Weishaupt Evoblock WEB 13/20 · Modulation 3,2–20 kW · 400 V | | gleich |
-| Gebäudelast bei −7 °C | kW | 11,3 | 11,3 | | gleich |
-| WP-Leistung A−7/W50 | kW | ≈ 13,0 | ≈ 13 (Anzeige „≈ 13 kW“) | | gleich |
-| Deckung am Bivalenzpunkt | % | 100 | 100 | | gleich |
-| Status Bivalenzpunkt | – | gedeckt (ohne Heizstab) | „✓ Die Wärmepumpe deckt den Bivalenzpunkt −7 °C vollständig ohne Heizstab“ (success) | | gleich |
-| Nennwärmeleistung A−7/W35 | kW | 13,2 | 13,2 | | gleich |
-| Gebäudeheizlast bei −16 °C | kW | 15,9 | 15,9 | | gleich |
-| WP-Leistung A−16/W50 | kW | ≈ 12,4 | ≈ 12,4 | | gleich |
-| Heizstab-Anteil bei −16 °C | kW | ≈ 3,6 (Stufe 2) | ≈ 3,6; Hinweis „rechnerisch Stufe 2“ | | gleich |
-| Taktungsrisiko | – | nein | nein | | gleich |
-| Alternative Aeroblock | – | keine | keine | | gleich |
-| Heizflächen-Bewertung | – | „Absenkung prüfen“ (70 → 50 °C = 20 K, warn) | „Von 70 °C auf 50 °C sind 20 K Absenkung — das ist deutlich …“ (warn); Zusatzposition „Absenkversuch vor Angebotslegung“ (objektabhängig) | | gleich |
-| Zusatzpositionen | – | WES 500 l · Erweiterungsmodul 2. Heizkreis · Absenkversuch vor Angebotslegung (objektabhängig) · Kühlfunktion optional · Schallgutachten (45 dB(A)) | WES 500 l · Erweiterungsmodul 2. Heizkreis (erforderlich) · Absenkversuch (objektabhängig) · Kühlfunktion optional · Schallgutachten (optional) | | gleich |
+| WP-Verbrauchsansatz | kW | 10,0 | 10 (Anzeige „10 kW“) | 10,0 kW | gleich |
+| U-Wert-Zeile | – | „Transmission ≈ 16,8 kW + Lüftung ≈ 3,1 kW bei ΔT=36 K“ | „Transmission ≈ 16,8 kW + Lüftung ≈ 3,1 kW bei ΔT=36 K“ | im Rechenweg: Transmission Σ(A × U) × ΔT = 468,0 W/K × 36,0 K ÷ 1 000 ≈ 16,8 kW + Lüftung 0,5 1/h × 200 m² × 2,5 m × 0,34 Wh/(m³·K) × 36,0 K ÷ 1 000 ≈ 3,1 kW (Norm-Innentemperatur 20 °C) = 19,91 kW | gleich |
+| Gebäudeansatz | kW | 19,9 | 19,9 | 19,9 kW | gleich |
+| Plausibilität | – | „Große Abweichung (66 %) … Gebäudeansatz 60 %“ | „Große Abweichung (66 %) … Gebäudeansatz 60 %“ | Große Abweichung zwischen Verbrauch und Gebäudehülle (66 %). Altanlage evtl. über- oder unterdimensioniert oder untypisches Nutzerverhalten; der Gebäudeansatz wird mit 60 % stärker gewichtet. Vor dem Angebot prüfen. | gleich |
+| Auslegungswert Heizlast (ohne Warmwasser) | kW | 15,9 | 15,9 | 15,9 kW | gleich |
+| Empfohlenes Gerät | – | Weishaupt Evoblock WEB 13/20 · Modulation 3,2–20,0 kW · 400 V | Weishaupt Evoblock WEB 13/20 · Modulation 3,2–20 kW · 400 V | Weishaupt Evoblock WEB 13/20 · Modulation 3,2–20,0 kW · 400 V · Luft/Wasser · Badge „Vorschlag“ | gleich |
+| Gebäudelast bei −7 °C | kW | 11,3 | 11,3 | 11,3 kW | gleich |
+| WP-Leistung A−7/W50 | kW | ≈ 13,0 | ≈ 13 (Anzeige „≈ 13 kW“) | ≈ 13,0 kW | gleich |
+| Deckung am Bivalenzpunkt | % | 100 | 100 | 100 % | gleich |
+| Status Bivalenzpunkt | – | gedeckt (ohne Heizstab) | „✓ Die Wärmepumpe deckt den Bivalenzpunkt −7 °C vollständig ohne Heizstab“ (success) | „gedeckt“ · Die Wärmepumpe deckt den Bivalenzpunkt −7 °C vollständig ohne Heizstab. | gleich |
+| Nennwärmeleistung A−7/W35 | kW | 13,2 | 13,2 | 13,2 kW | gleich |
+| Gebäudeheizlast bei −16 °C | kW | 15,9 | 15,9 | 15,9 kW | gleich |
+| WP-Leistung A−16/W50 | kW | ≈ 12,4 | ≈ 12,4 | ≈ 12,4 kW | gleich |
+| Heizstab-Anteil bei −16 °C | kW | ≈ 3,6 (Stufe 2) | ≈ 3,6; Hinweis „rechnerisch Stufe 2“ | ≈ 3,6 kW (Stufe 2) | gleich |
+| Taktungsrisiko | – | nein | nein | nein | gleich |
+| Alternative Aeroblock | – | keine | keine | keine | gleich |
+| Heizflächen-Bewertung | – | „Absenkung prüfen“ (70 → 50 °C = 20 K, warn) | „Von 70 °C auf 50 °C sind 20 K Absenkung — das ist deutlich …“ (warn); Zusatzposition „Absenkversuch vor Angebotslegung“ (objektabhängig) | „Heizflächen: Absenkung prüfen. Von 70 °C auf 50 °C sind 20 K Absenkung, das ist deutlich. Vor dem Angebot einen Absenkversuch durchführen oder die Heizflächen r…“ (warn) | gleich |
+| Zusatzpositionen | – | WES 500 l · Erweiterungsmodul 2. Heizkreis · Absenkversuch vor Angebotslegung (objektabhängig) · Kühlfunktion optional · Schallgutachten (45 dB(A)) | WES 500 l · Erweiterungsmodul 2. Heizkreis (erforderlich) · Absenkversuch (objektabhängig) · Kühlfunktion optional · Schallgutachten (optional) | WES 500 l · Energiespeicher [erforderlich] · Erweiterungsmodul 2. Heizkreis + gemischte Pumpengruppe [erforderlich] · Absenkversuch vor Angebotslegung [objektabhängig] · Kühlfunktion über Flächenheizung (optional) [optional] · Schallgutachten / Schallschutzmaßnahmen [optional] | gleich |
 
 ### A4 · Sole/Wasser, kleiner Neubau ohne Verbrauch, Taktungsrisiko
 Eingaben: Bestand Gas mit Verbrauch 0 (Feld geleert), Einheit kWh, Kesseltyp Niedertemperatur (90 %) · Wohnfläche 60 m² · Wohneinheiten 1 · Personen 2 · Gebäudehülle Pauschale „Neubau GEG (30 W/m²)“ · Heizflächen Fußbodenheizung, 1 Verteiler (Erdgeschoss 6 Kreise) · Wärmequelle Sole/Wasser · Speicher getrennt WAS 200 l + WES 70 l · Norm-Außentemperatur −14 °C · Bivalenzpunkt −7 °C · Ziel-Vorlauf 35 °C (automatisch).
@@ -211,18 +213,40 @@ Rechenweg: kein Verbrauchsansatz · Gebäude 60 × 30 ÷ 1 000 = 1,80 kW · + 0,
 
 | Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
 |---|---|---|---|---|---|
-| Gasverbrauchsansatz | – | „—“ (kein Verbrauch) | „—“ (kein Verbrauch) | | gleich |
-| Gebäudeansatz (Pauschale 30 W/m²) | kW | 1,8 | 1,8 | | gleich |
-| Plausibilität | – | „Nur Gebäudeansatz genutzt“ | „Nur Gebäudeansatz genutzt“ | | gleich |
-| Auslegungswert Heizlast (inkl. 0,4 kW Warmwasser) | kW | 2,2 | 2,2 | | gleich |
-| Empfohlenes Gerät | – | Weishaupt Geoblock WGB 8 · Modulation 1,7–8,6 kW · 400 V | Weishaupt Geoblock WGB 8 · Modulation 1,7–8,6 kW · 400 V | | gleich |
-| Gebäudelast bei −7 °C | kW | 1,7 | 1,7 | | gleich |
-| WP-Leistung A−7/W35 | kW | ≈ 8,6 | ≈ 8,6 | | gleich |
-| Deckung am Bivalenzpunkt | % | 100 | 100 | | gleich |
-| Status Bivalenzpunkt | – | gedeckt (ohne Heizstab) | „✓ … vollständig ohne Heizstab“ (success) | | gleich |
-| Sole-Hinweis | – | monovalenter Betrieb, Heizlast 2,2 kW gedeckt | „Monovalenter Betrieb — die Sole/Wasser-Wärmepumpe deckt die volle Heizlast von 2,2 kW …“ (success) | | gleich |
-| Taktungsrisiko | – | ja (1,7 kW nahe 1,7 kW Modulationsminimum) | ja: „↻ Taktungsrisiko im Teillastbetrieb: Last am Bivalenzpunkt (1,7 kW) nahe der unteren Modulationsgrenze (1,7 kW)“ | | gleich |
-| Zusatzpositionen | – | Erdwärmesonde · Soleverteiler · WAS 200 l · WES 70 l · zusätzliches Anlagenvolumen (Reihenpuffer) · Kühlfunktion optional · Schallgutachten (39 dB(A)) | Erdwärmesonde · Soleverteiler · WAS 200 l · WES 70 l · zusätzliches Anlagenvolumen (erforderlich) · Kühlfunktion optional · Schallgutachten (optional) | | gleich |
+| Gasverbrauchsansatz | – | „—“ (kein Verbrauch) | „—“ (kein Verbrauch) | – | gleich |
+| Gebäudeansatz (Pauschale 30 W/m²) | kW | 1,8 | 1,8 | 1,8 kW | gleich |
+| Plausibilität | – | „Nur Gebäudeansatz genutzt“ | „Nur Gebäudeansatz genutzt“ | Nur Gebäudeansatz genutzt (kein Verbrauch angegeben), plus 0,4 kW Warmwasser für 2 Personen. | gleich |
+| Auslegungswert Heizlast (inkl. 0,4 kW Warmwasser) | kW | 2,2 | 2,2 | 2,2 kW | gleich |
+| Empfohlenes Gerät | – | Weishaupt Geoblock WGB 8 · Modulation 1,7–8,6 kW · 400 V | Weishaupt Geoblock WGB 8 · Modulation 1,7–8,6 kW · 400 V | Weishaupt Geoblock WGB 8 · Modulation 1,7–8,6 kW · 400 V · Sole/Wasser · Badge „Vorschlag“ | gleich |
+| Gebäudelast bei −7 °C | kW | 1,7 | 1,7 | 1,7 kW | gleich |
+| WP-Leistung A−7/W35 | kW | ≈ 8,6 | ≈ 8,6 | ≈ 8,6 kW | gleich |
+| Deckung am Bivalenzpunkt | % | 100 | 100 | 100 % | gleich |
+| Status Bivalenzpunkt | – | gedeckt (ohne Heizstab) | „✓ … vollständig ohne Heizstab“ (success) | „gedeckt“ · Die Wärmepumpe deckt den Bivalenzpunkt −7 °C vollständig ohne Heizstab. | gleich |
+| Sole-Hinweis | – | monovalenter Betrieb, Heizlast 2,2 kW gedeckt | „Monovalenter Betrieb — die Sole/Wasser-Wärmepumpe deckt die volle Heizlast von 2,2 kW …“ (success) | „Monovalenter Betrieb. Die Sole/Wasser-Wärmepumpe deckt die volle Heizlast von 2,2 kW auch an den kältesten Tagen, da die…“ (ok) | gleich |
+| Taktungsrisiko | – | ja (1,7 kW nahe 1,7 kW Modulationsminimum) | ja: „↻ Taktungsrisiko im Teillastbetrieb: Last am Bivalenzpunkt (1,7 kW) nahe der unteren Modulationsgrenze (1,7 kW)“ | ja: „Taktungsrisiko im Teillastbetrieb. Last am Bivalenzpunkt (1,7 kW) nahe der unteren Modulationsgrenze (1,7 kW). Ausreichendes Anlagenvolumen bzw. Pufferspeicher vorsehen.“ | gleich |
+| Zusatzpositionen | – | Erdwärmesonde · Soleverteiler · WAS 200 l · WES 70 l · zusätzliches Anlagenvolumen (Reihenpuffer) · Kühlfunktion optional · Schallgutachten (39 dB(A)) | Erdwärmesonde · Soleverteiler · WAS 200 l · WES 70 l · zusätzliches Anlagenvolumen (erforderlich) · Kühlfunktion optional · Schallgutachten (optional) | Erdwärmesonde inkl. Bohrung [erforderlich] · Soleverteiler + Solekreis-Zubehör [erforderlich] · WAS 200 l · Trinkwasserspeicher [erforderlich] · WES 70 l · Energiespeicher [erforderlich] · Zusätzliches Anlagenvolumen (Reihenpuffer) [erforderlich] · Kühlfunktion über Flächenheizung (optional) [optional] · Schallgutachten / Schallschutzmaßnahmen [optional] | gleich |
+
+### A5 · wie A1, Norm-Außentemperatur −12,7 °C (nur Neufassung)
+Eingaben wie A1, Norm-Außentemperatur −12,7 °C (Vorgabe der Neufassung, Region Oranienburg; in der Altfassung nicht wählbar, Entscheidung Fabian 2026-10-25, 06). Angelegt 2026-10-25 in Schritt 5.
+Rechenweg: Heizlast wie A1 = 12,88 kW · Lastanteil (15 + 7) ÷ (15 + 12,7) = 0,7942 → 10,23 kW · WEB 7/10: 8,05 < 10,23 → WEB 9/14: 10,75 ≥ 10,23 · bei −12,7 °C: 8,55 + (2,3 ÷ 8) × 0,8 = 8,78 kW → Heizstab 12,88 − 8,78 = 4,10 kW.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen 2026-10-25) | Status |
+|---|---|---|---|---|---|
+| Ölverbrauchsansatz | kW | 14,2 | – | 14,2 kW | gleich |
+| Gebäudeansatz (Pauschale 90 W/m²) | kW | 10,8 | – | 10,8 kW | gleich |
+| Auslegungswert Heizlast (inkl. 0,4 kW Warmwasser) | kW | 12,9 | – | 12,9 kW | gleich |
+| Empfohlenes Gerät | – | Weishaupt Evoblock WEB 9/14 · Modulation 1,7–14,0 kW · 230 V | – | Weishaupt Evoblock WEB 9/14 · Modulation 1,7–14,0 kW · 230 V · Luft/Wasser | gleich |
+| Gebäudelast bei −7 °C | kW | 10,2 | – | 10,2 kW | gleich |
+| WP-Leistung A−7/W50 | kW | ≈ 9,4 | – | ≈ 9,4 kW | gleich |
+| Deckung am Bivalenzpunkt | % | 91 | – | 91 % | gleich |
+| Status Bivalenzpunkt | – | knapp (Heizstab 0,88 kW ≤ 15 % von 14 kW) | – | „knapp“ | gleich |
+| Nennwärmeleistung A−7/W35 | kW | 9,5 | – | 9,5 kW | gleich |
+| Gebäudeheizlast bei −12,7 °C | kW | 12,9 | – | 12,9 kW | gleich |
+| WP-Leistung A−12,7/W50 | kW | ≈ 8,8 | – | ≈ 8,8 kW | gleich |
+| Heizstab-Anteil bei −12,7 °C | kW | ≈ 4,1 (Stufe 2) | – | ≈ 4,1 kW (Stufe 2) | gleich |
+| Taktungsrisiko | – | nein | – | nein | gleich |
+| Alternative Aeroblock | – | WAB 14, ≈ 10,9 kW, 100 % Deckung | – | Alternative: Weishaupt Aeroblock WAB 14 | gleich |
+| Zusatzpositionen | – | Öltankentsorgung · WAS 300 l · WES 200 l · Schallgutachten (optional) | – | Öltankentsorgung inkl. Restölentsorgung [erforderlich] · WAS 300 l · Trinkwasserspeicher [erforderlich] · WES 200 l · Energiespeicher [erforderlich] · Schallgutachten / Schallschutzmaßnahmen [optional] | gleich |
 
 ## heizkoerper.html · H1–H6
 Noch anzulegen beim Umbau des Tools (Schritt 2). Je Fall: Eingaben, alle Kennzahlen, gewählte Artikel, Bestellnummern, Lagerabgleich-Status.

@@ -1291,17 +1291,19 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
         </div>
       </div>
       <div id="hinweiseNach" class="ls-stack ls-mt-4"></div>
-      <div id="alternativeBlock" class="ls-card ls-card--flat ls-mt-4" hidden>
+      <div id="alternativeBlock" class="ls-card ls-card--flat ls-mt-4 ls-no-print" hidden>
         <div class="ls-card__head"><h3 id="altTitel">Alternative</h3><span class="ls-badge" id="altBadge">Aeroblock</span></div>
         <p class="ls-muted" id="altText"></p>
         <div class="ls-toolbar ls-no-print ls-mt-2"><button type="button" class="ls-btn ls-btn--secondary ls-btn--sm" id="btnAero">Aeroblock stattdessen auslegen</button></div>
       </div>
-      <div class="ls-mt-4">
-        <h3>Objektabhängige Zusatzpositionen <span class="ls-muted">· nicht im Standardumfang</span></h3>
-        <div class="ls-list ls-mt-2" id="komponenten"></div>
-        <div class="ls-legend ls-mt-2"><span class="ls-badge ls-badge--navy">erforderlich</span> <span class="ls-badge ls-badge--warn">objektabhängig</span> <span class="ls-badge">optional</span></div>
-      </div>
     </div>
+  </section>
+
+  <!-- 6a · Zusatzpositionen und Rechenweg (Bildschirm; im Druck stehen sie im Bericht) -->
+  <section class="ls-card ls-no-print" id="zusatzCard" aria-labelledby="h-zusatz" hidden>
+    <div class="ls-card__head"><h2 id="h-zusatz">Objektabhängige Zusatzpositionen</h2><span class="ls-card__sub">nicht im Standardumfang</span></div>
+    <div class="ls-list" id="komponenten"></div>
+    <div class="ls-legend ls-mt-2"><span class="ls-badge ls-badge--navy">erforderlich</span> <span class="ls-badge ls-badge--warn">objektabhängig</span> <span class="ls-badge">optional</span></div>
     <details class="ls-details ls-mt-4" id="rechenwegBlock">
       <summary>Rechenweg</summary>
       <dl class="ls-dl ls-mt-2" id="rechenweg"></dl>
@@ -1317,20 +1319,29 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
       <div><span>Norm-Außentemperatur</span><b id="berichtNormAT">–</b></div>
       <div><span>Bivalenzpunkt</span><b id="berichtBiv">–</b></div>
     </div>
-    <div class="ls-grid ls-grid--2 ls-mt-4">
-      <div><h3>Objekt / Gebäude</h3><dl class="ls-dl ls-mt-2" id="berichtGebaeude"></dl></div>
-      <div><h3>Bestandsanlage und Heizflächen</h3><dl class="ls-dl ls-mt-2" id="berichtBestand"></dl></div>
-    </div>
-    <h3 class="ls-mt-4">Heizlast-Abschätzung</h3>
+    <h3 class="ls-mt-4">Objekt / Gebäude</h3>
+    <dl class="ls-dl ls-mt-2" id="berichtGebaeude"></dl>
+  </section>
+  <!-- Bericht, Teil 1b: Bestandsanlage und Heizflächen (kurze Karten, damit der Druck zwischen den Karten umbricht) -->
+  <section class="ls-card" aria-labelledby="h-bericht-bestand">
+    <h3 id="h-bericht-bestand">Bestandsanlage und Heizflächen</h3>
+    <dl class="ls-dl ls-mt-2" id="berichtBestand"></dl>
+  </section>
+  <!-- Bericht, Teil 2: Heizlast und Ergebnis (eigene Karte, damit der Druck zwischen den Karten umbricht) -->
+  <section class="ls-card" aria-labelledby="h-bericht-ergebnis">
+    <h2 id="h-bericht-ergebnis" class="ls-sr-only">Heizlast und Ergebnis</h2>
+    <h3>Heizlast-Abschätzung</h3>
     <dl class="ls-dl ls-mt-2" id="berichtHeizlast"></dl>
     <h3 class="ls-mt-4">Ergebnis</h3>
     <dl class="ls-dl ls-mt-2" id="berichtErgebnis"></dl>
-    <div id="berichtKomponentenBlock" class="ls-mt-4" hidden>
-      <h3>Objektabhängige Zusatzpositionen</h3>
-      <div class="ls-list ls-mt-2" id="berichtKomponenten"></div>
-    </div>
-    <h3 class="ls-mt-4">Rechenweg</h3>
-    <dl class="ls-dl ls-mt-2" id="berichtRechenweg"></dl>
+  </section>
+  <section class="ls-card" id="berichtKomponentenBlock" aria-labelledby="h-bericht-zusatz" hidden>
+    <div class="ls-card__head"><h2 id="h-bericht-zusatz">Objektabhängige Zusatzpositionen</h2><span class="ls-card__sub">nicht im Standardumfang</span></div>
+    <div class="ls-list" id="berichtKomponenten"></div>
+  </section>
+  <section class="ls-card" aria-labelledby="h-bericht-rechenweg">
+    <div class="ls-card__head"><h2 id="h-bericht-rechenweg">Rechenweg</h2><span class="ls-card__sub">Formel, Eingangswerte, Zwischenergebnisse</span></div>
+    <dl class="ls-dl" id="berichtRechenweg"></dl>
     <div id="berichtNotizen" class="ls-stack ls-mt-4"></div>
   </section>
 
@@ -1629,9 +1640,9 @@ function optional(id, min, max, beispiel){ var el = $(id); if(!el.value.trim()){
 function optText(id){ var e = $(id); return e.options[e.selectedIndex] ? e.options[e.selectedIndex].text : ''; }
 function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function kpi(id, text, einheit, richtwert){ $(id).innerHTML = (richtwert ? '<span class="ls-approx">' : '<span>') + text + '</span>' + (einheit ? ' <small>' + einheit + '</small>' : ''); }
-function note(art, fett, text){
+function note(art, fett, text, nurBildschirm){
   var icon = art === 'ok' ? '<path d="M5 10.5l3.5 3.5L15 7" stroke-linecap="round" stroke-linejoin="round"/>' : (art === 'info' ? '<circle cx="10" cy="10" r="8"/><path d="M10 9v5M10 6.5v.5" stroke-linecap="round"/>' : '<path d="M10 3l8 14H2z" stroke-linejoin="round"/><path d="M10 8v4M10 14.5v.5" stroke-linecap="round"/>');
-  return '<div class="ls-note ls-note--'+art+'"><svg class="ls-note__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">'+icon+'</svg><div><b>'+fett+'</b> '+text+'</div></div>';
+  return '<div class="ls-note ls-note--'+art+(nurBildschirm ? ' ls-no-print' : '')+'"><svg class="ls-note__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">'+icon+'</svg><div><b>'+fett+'</b> '+text+'</div></div>';
 }
 function dl(id, zeilen){ $(id).innerHTML = zeilen.map(function(z){ return '<dt'+(z[2]?' class="ls-dl__strong"':'')+'>'+esc(z[0])+'</dt><dd'+(z[2]?' class="ls-dl__strong"':'')+'>'+(z[3] ? z[1] : esc(z[1]))+'</dd>'; }).join(''); }
 function grad(n){ return LS.fmt(n, n % 1 ? 1 : 0) + ' °C'; }
@@ -1876,13 +1887,13 @@ function rechne(){
   /* ---- Heizflächen sind Pflichtwahl (Entscheidung Feldliste Frage 9) ---- */
   if(!b.heizflaechen){
     LS.fehler('heizflaechen', 'Heizflächen wählen: Heizkörper, Fußbodenheizung oder Beides.');
-    $('leerzustand').hidden = false; $('empfehlungBlock').hidden = true; $('hinweiseVorab').innerHTML = '';
+    $('leerzustand').hidden = false; $('empfehlungBlock').hidden = true; $('zusatzCard').hidden = true; $('hinweiseVorab').innerHTML = '';
     $('ergebnisSub').textContent = 'Heizlast ' + LS.fmt(hlFinal,1) + ' kW · Heizflächen fehlen';
     $('rechenweg').innerHTML = ''; $('berichtRechenweg').innerHTML = ''; berichtSchreiben(b, {hlVerbrauch:hlVerbrauch, geb:geb, hlGebaeude:hlGebaeude, wwZuschlag:wwZuschlag, hlFinal:hlFinal, abw:abw, wG:wG, vLabel:vLabel});
     document.title = 'Wärmepumpenauslegung – ' + ($('projekt').value.trim() || 'BV Muster') + ' – ' + LS.datum();
     return;
   }
-  $('leerzustand').hidden = true; $('empfehlungBlock').hidden = false;
+  $('leerzustand').hidden = true; $('empfehlungBlock').hidden = false; $('zusatzCard').hidden = false;
 
   /* ---- Baugröße (wie alt) ---- */
   var apTemp = b.bivalenz, normAT = b.normAT, vl = b.vorlauf;
@@ -1954,7 +1965,7 @@ function rechne(){
   var bivTxt = (b.waermequelle === "sole")
     ? "Sole/Wasser-Auslegung (Geoblock). Die Erdwärmequelle liefert nahezu konstante Leistung über das ganze Jahr, monovalenter Betrieb ohne nennenswerte Elektro-Zusatzheizung. Voraussetzung: fachgerecht dimensionierte Erdsonden-Bohrung (Entzugsleistung nach VDI 4640, Genehmigung erforderlich)."
     : "Auslegung monoenergetisch mit Bivalenzpunkt "+grad(apTemp)+" bei einer Norm-Außentemperatur von "+grad(normAT)+". Bei 0 Sperrstunden (§ 14a EnWG, Neuanlage) unkritisch. Weishaupt-Werksauslegung: Bivalenztemperatur −5 °C (laut Datenblatt prüfen).";
-  nach += note('info', 'Auslegung.', bivTxt);
+  nach += note('info', 'Auslegung.', bivTxt, true);   /* im Druck steht der Text unter „Bewertung“ im Bericht */
   $('hinweiseVorab').innerHTML = vorab; $('hinweiseNach').innerHTML = nach;
 
   if(aeroWahl && b.waermequelle !== 'sole'){
@@ -2001,7 +2012,7 @@ function rechne(){
 }
 function ergebnisLeer(text){
   ['kpiVerbrauch','kpiGebaeude','kpiHeizlast'].forEach(function(id){ $(id).textContent = '–'; });
-  $('plausi').textContent = ''; $('leerzustand').hidden = true; $('empfehlungBlock').hidden = true; $('hinweiseVorab').innerHTML = '';
+  $('plausi').textContent = ''; $('leerzustand').hidden = true; $('empfehlungBlock').hidden = true; $('zusatzCard').hidden = true; $('hinweiseVorab').innerHTML = '';
   $('ergebnisSub').textContent = text; $('rechenweg').innerHTML = ''; $('berichtRechenweg').innerHTML = '';
   dl('berichtHeizlast', [['Hinweis', text]]); dl('berichtErgebnis', []);
 }
