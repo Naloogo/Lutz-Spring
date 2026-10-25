@@ -2,6 +2,19 @@
 
 Neueste Einträge oben. Format: Datum · Bereich · Fassung · Änderung · Nachweis.
 
+## 2026-10-25 · index.html · Umbau Schritt 4 (Neubau aus Vorlage)
+- Neue `index.html` aus `vorlagen/index-vorlage.html` (design.css 2.1, ls.js eingefügt mit `_build/inline.py`). Logo B als Inline-SVG im Kopf, kein Text-Slogan mehr (steht im Logo); Favicon `assets/icons/favicon.svg`, Homescreen-Symbol `assets/icons/apple-touch-icon.png`; Homescreen-Name bleibt „Lutz Spring“; `noindex`; Theme-Schalter.
+- Alle sechs Kacheln der Altfassung erhalten, Bilder aus `bilder/`. Links unverändert: auslegung, foerderung, kostenvergleich, heizkoerper, bestandsaufnahme. Titel gekürzt (freigegeben von Fabian): „Wärmepumpen-Auslegung“ (statt „Wärmepumpen Auslegungstool“), „Förderrechner Wärmepumpe“, „Heizkörper-Auslegung“, „Angebotserstellung Bad“.
+- Kachel „Angebotserstellung Bad“ sichtbar, ohne Link, Badge „in Vorbereitung“ statt „Öffnen“, bis `bad-angebot.html` gebaut ist [BESTÄTIGT, Fabian 2026-10-25]. Im Code als Kommentar vermerkt.
+- `theme.css` und `logo.png` werden von der Startseite nicht mehr gebraucht; sie bleiben für die alten Tools im Hauptordner (CLAUDE.md, Übergang).
+- Neu: `.claude/launch.json` (lokaler Vorschau-Server `python3 -m http.server`, Port 8731) für die Prüfung in Claude Code; ohne Wirkung auf GitHub Pages.
+- Geprüft im Browser (Chromium): Hell und Dunkel, Desktop und 400 px. Prüfung auf iPad/Safari steht aus (Schritt 6).
+
+## 2026-10-25 · index.html · Umbau Schritt 1 (Altfassung festhalten)
+- Altfassung (Stand 04: 2026-08-07, Slogan + Kachel „Bestandsaufnahme“; Live-Datei zusätzlich mit Kachel „Angebotserstellung Badezimmer“) gesichert als `alt/index_2026-10-25.html`.
+- Inhalt der Altfassung: Kopf mit Logo (Base64-PNG) und Text-Slogan; Abschnitt „Interne Werkzeuge“; sechs Kacheln mit relativen Links: auslegung, foerderung, kostenvergleich, heizkoerper, bestandsaufnahme, bad-angebot; Fuß „Lutz Spring GmbH · Interne Anwendung · Alle Berechnungen sind Überschlagswerte …“. Keine Rechenlogik, keine Dateifunktionen, keine Datenquellen. Abhängigkeiten: `theme.css`, Favicon/Homescreen-Symbol als Base64.
+- Sechs eingebettete Kachelbilder als JPEG nach `bilder/` ausgelagert (Originalbytes, unverändert): `evoblock.jpg`, `foerderung.jpg`, `kosten.jpg`, `heizkoerper.jpg`, `lager.jpg`; `bad.jpg` war 840 × 473 und wurde auf 900 × 506 gebracht. Alle 16:9, 900 × 506. Keine Personen, Klingelschilder oder Kennzeichen.
+
 ## 2026-10-25 · Repo · Übernahme
 - Neues Repo `Naloogo/lutz-spring-tools` ohne Historie. Aus `Naloogo/Auslegung-WP` (Stand 4cfc7ae) übernommen: index, auslegung, bestandsaufnahme, foerderung, heizkoerper, kostenvergleich, lager.json, theme.css, logo.png, robots.txt; alte CLAUDE.md als `TOOLS-WISSEN.md`; alte Vorlage nach `alt/`. Geprüft: keine Kundendaten, keine Preise (nur öffentliche Energiepreise und KfW-Sätze).
 - `bad-angebot.html` wird neu gebaut (noch kein fertiges Tool); `tests/referenzwerte.md` ist anzulegen.
@@ -21,7 +34,7 @@ Neueste Einträge oben. Format: Datum · Bereich · Fassung · Änderung · Nach
 ## Tools (Umbau auf 2.1)
 | Tool | Stand alt (04) | Umbau | Feldliste | Referenzwerte | Freigabe |
 |---|---|---|---|---|---|
-| index.html | 2026-08-07 | offen | – | – | – |
+| index.html | 2026-08-07 | in Arbeit (Schritt 4 erledigt, Schritt 6 offen) | entfällt | entfällt (Kacheln/Links erhalten) | – |
 | kostenvergleich.html | 2026-07-26 | offen | – | K1–K3 | – |
 | foerderung.html | – | offen | – | – | – |
 | auslegung.html | 2026-08-17 | offen | – | A1–A4 | – |

@@ -1,6 +1,6 @@
 # Start-Prompt für eine Claude-Code-Sitzung (je Tool)
 
-Sitzung in der Claude-App unter „Code“ mit dem Ordner `lutz-spring-tools` starten (oder im Terminal: `cd "/Users/Arbeit/Lutz Spring/lutz-spring-tools"` und `claude`). Zuerst `/add-dir ../Firmengehirn` eingeben, dann den folgenden Text unverändert einfügen:
+Sitzung in der Claude-App unter „Code“ mit dem Ordner `lutz-spring-tools` starten, dann den folgenden Text unverändert einfügen. Fragt Claude Code nach Erlaubnis für den Ordner `../Firmengehirn`, bestätigen. Darf es dort nicht lesen, stattdessen eine Sitzung mit dem übergeordneten Ordner `Lutz Spring` starten und dem Prompt die Zeile „Arbeite im Unterordner lutz-spring-tools, dort liegt die CLAUDE.md.“ voranstellen. (Im Terminal zusätzlich möglich: `claude --add-dir ../Firmengehirn`.)
 
 ```
 Lies CLAUDE.md, DESIGNREGELN.md, UMBAU-ABLAUF.md und die Tabelle „Tools (Umbau auf 2.1)“

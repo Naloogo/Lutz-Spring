@@ -16,7 +16,7 @@ Vor jeder Arbeit an `heizkoerper.html`, `bestandsaufnahme.html`, `bad-angebot.ht
 - Das alte Repo bleibt live und unverändert, bis dieses Repo geprüft ist; die iPads werden Tool für Tool umgestellt.
 
 ## Firmengehirn (liegt außerhalb des Repos)
-Das Firmenwissen (Dateien 00–08, Fachwerte, Kommunikation, Entscheidungen) liegt auf dem Mac neben dem Repo unter `../Firmengehirn/`. Bei fachlichen Fragen dort nachlesen (`05_fachwissen.md`, `06_entscheidungen.md`, `07_offene-punkte.md`); nur [BESTÄTIGT] und [BELEGT] gelten als Firmenwissen. Diese Dateien nie ins Repo kopieren oder committen – das Repo ist öffentlich. Sitzung im Ordner `Lutz Spring` starten oder im Repo `/add-dir ../Firmengehirn`.
+Das Firmenwissen (Dateien 00–08, Fachwerte, Kommunikation, Entscheidungen) liegt auf dem Mac neben dem Repo unter `../Firmengehirn/`. Bei fachlichen Fragen dort nachlesen (`05_fachwissen.md`, `06_entscheidungen.md`, `07_offene-punkte.md`); nur [BESTÄTIGT] und [BELEGT] gelten als Firmenwissen. Diese Dateien nie ins Repo kopieren oder committen – das Repo ist öffentlich. Beim Lesen dort nach Erlaubnis fragen; alternativ die Sitzung im übergeordneten Ordner `Lutz Spring` starten (Terminal: `claude --add-dir ../Firmengehirn`).
 
 ## Arbeitsteilung
 - Umbau eines Tools: eine eigene Claude-Code-Sitzung je Tool nach `UMBAU-ABLAUF.md`, gestartet mit dem Text aus `START-PROMPT.md` (Tools auflisten, nachfragen, dann Schritt 1–2 bis zur Freigabe).
