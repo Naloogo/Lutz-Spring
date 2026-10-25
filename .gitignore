@@ -1,3 +1,6 @@
+# Artikeldaten aus der DATANORM des Großhandels: Weitergabe an Dritte nicht erlaubt,
+# gehören NICHT in dieses öffentliche Repository (werden im Tool per Dateiauswahl geladen).
+artikeldaten*.json
 *datanorm*
 *DATANORM*
 *datpreis*

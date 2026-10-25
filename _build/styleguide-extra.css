@@ -1,0 +1,37 @@
+/* Nur für den Styleguide selbst (Dokumentation), nicht Teil von design.css */
+.plan { margin: 0; padding: 0 0 0 0; list-style: none; counter-reset: plan; display: grid; }
+.plan li { counter-increment: plan; display: grid; grid-template-columns: 28px 160px 1fr; gap: var(--ls-s3); align-items: baseline; padding: var(--ls-s2) var(--ls-s2); border-top: 1px solid var(--ls-line); font-size: var(--ls-fs-sm); }
+.plan li:first-child { border-top: 0; }
+.plan li::before { content: counter(plan); font-weight: 700; color: var(--ls-on-navy); background: var(--ls-navy); border-radius: var(--ls-r-pill); width: 24px; height: 24px; display: grid; place-items: center; font-size: var(--ls-fs-xs); }
+.plan li b { font-weight: 600; }
+.plan li span { color: var(--ls-text-2); }
+@media (max-width: 599.98px) { .plan li { grid-template-columns: 28px 1fr; } .plan li span { grid-column: 2; } }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: var(--ls-s3); }
+.sw { display: grid; grid-template-columns: 44px 1fr; grid-template-rows: auto auto auto; gap: 0 var(--ls-s3); align-items: start; background: var(--ls-surface); border: 1px solid var(--ls-line); border-radius: var(--ls-r-md); padding: var(--ls-s3); font-size: var(--ls-fs-sm); }
+.sw i { grid-row: 1 / span 3; width: 44px; height: 44px; border-radius: var(--ls-r-sm); border: 1px solid var(--ls-line); }
+.sw b { font-weight: 600; }
+.sw code { font-size: var(--ls-fs-xs); color: var(--ls-text-2); }
+.sw span { color: var(--ls-text-2); font-size: var(--ls-fs-xs); }
+
+.type { display: grid; gap: var(--ls-s2); }
+.type > div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--ls-s3); border-top: 1px solid var(--ls-line); padding-top: var(--ls-s2); flex-wrap: wrap; }
+.type > div:first-child { border-top: 0; padding-top: 0; }
+.type code { font-size: var(--ls-fs-xs); color: var(--ls-text-2); }
+
+.scale, .radii { display: flex; align-items: flex-end; gap: var(--ls-s2); margin: var(--ls-s3) 0; }
+.scale i { display: block; height: 28px; background: var(--ls-primary); border-radius: 2px; }
+.radii i { display: block; width: 40px; height: 40px; background: var(--ls-surface-3); border: 1px solid var(--ls-line-strong); }
+
+.rules { margin: 0; padding-left: 18px; font-size: var(--ls-fs-sm); display: grid; gap: var(--ls-s1); }
+.rules li { padding-left: 2px; }
+
+pre.code { margin: 0; background: var(--ls-surface-2); border: 1px solid var(--ls-line); border-radius: var(--ls-r-md); padding: var(--ls-s3) var(--ls-s4); overflow-x: auto; font-size: var(--ls-fs-xs); line-height: 1.55; }
+pre.code code { font-size: inherit; }
+@media print { pre.code { white-space: pre-wrap; } #themeToggle { display: none; } }
+
+.icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--ls-s2); }
+.ico { display: grid; grid-template-columns: 24px 1fr; grid-template-rows: auto auto; gap: 0 var(--ls-s2); align-items: center; padding: var(--ls-s2); border: 1px solid var(--ls-line); border-radius: var(--ls-r-sm); font-size: var(--ls-fs-xs); }
+.ico svg { grid-row: 1 / span 2; width: 22px; height: 22px; }
+.ico code { font-size: var(--ls-fs-xs); }
+.ico span { color: var(--ls-text-2); }
