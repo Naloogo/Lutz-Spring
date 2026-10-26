@@ -5,7 +5,7 @@ Zweck: Nachweis, dass ein Umbau nichts an der Rechnung ändert (UMBAU-ABLAUF.md 
 
 Die Spalte „erwartet (Formel)“ ist aus dem Rechenteil der Altfassung nachgerechnet (Python, gleiche Formeln und Rundung) und dient nur als Plausibilitätsprüfung; maßgeblich ist die Messung in der Altfassung.
 
-Testfälle je Tool: A1–A5 `auslegung.html` (angelegt 2026-10-25, A5 nur neu) · K1–K6 `kostenvergleich.html` · H1–H6 `heizkoerper.html` · B1–B3 `bestandsaufnahme.html`. Die Fälle der noch nicht begonnenen Tools werden beim jeweiligen Umbau (Schritt 2) angelegt.
+Testfälle je Tool: A1–A6 `auslegung.html` (angelegt 2026-10-25; A5 nur neu, A6 Erweiterung Kaskade) · K1–K6 `kostenvergleich.html` · H1–H6 `heizkoerper.html` · B1–B3 `bestandsaufnahme.html`. Die Fälle der noch nicht begonnenen Tools werden beim jeweiligen Umbau (Schritt 2) angelegt.
 
 ---
 
@@ -119,7 +119,7 @@ Eingaben: Jahres-Wärmebedarf 12 000 kWh · Baugröße WEB 7/10 · Heizflächen 
 
 ---
 
-## auslegung.html · A1–A5
+## auslegung.html · A1–A6
 
 Altfassung: `alt/auslegung_2026-10-25.html` · Feldliste: `tests/feldliste-auslegung.md`.
 Angelegt 2026-10-25 (Schritt 2). Spalte „erwartet (Formel)“ aus dem Rechenteil der Altfassung nachgerechnet (Python, gleiche Stützpunkte, Interpolation und Rundung: kW auf 1 Nachkommastelle, Prozent ganzzahlig). Spalte „alt“ wird in Schritt 3 in der unveränderten Altfassung gemessen, „neu“ in Schritt 5.
@@ -247,6 +247,30 @@ Rechenweg: Heizlast wie A1 = 12,88 kW · Lastanteil (15 + 7) ÷ (15 + 12,7) = 0,
 | Taktungsrisiko | – | nein | – | nein | gleich |
 | Alternative Aeroblock | – | WAB 14, ≈ 10,9 kW, 100 % Deckung | – | Alternative: Weishaupt Aeroblock WAB 14 | gleich |
 | Zusatzpositionen | – | Öltankentsorgung · WAS 300 l · WES 200 l · Schallgutachten (optional) | – | Öltankentsorgung inkl. Restölentsorgung [erforderlich] · WAS 300 l · Trinkwasserspeicher [erforderlich] · WES 200 l · Energiespeicher [erforderlich] · Schallgutachten / Schallschutzmaßnahmen [optional] | gleich |
+
+### A6 · Mehrfamilienhaus, Kaskade (Erweiterung Schritt 10, nur Neufassung)
+Erweiterung „Kaskaden-Planung“ [Entscheidung Fabian 2026-10-25, 06]: Aufstellung „Kaskade“, n baugleiche Geräte; Anzahl automatisch = kleinste Zahl ≥ 2, deren Leistung am Bivalenzpunkt × Faktor (1,15 bzw. 1,0 streng) die Gebäudelast deckt, oder von Hand (2–8). Gesamtleistung = n × Einzelleistung an beiden Betriebspunkten; Status mit n × maximaler Leistung; Taktung gegen das Modulationsminimum eines Geräts; Zusatzposition „Kaskadenregelung und hydraulische Einbindung“. Methode ist ein [VORSCHLAG]; Kaskadierbarkeit, Höchstzahl und Regelung je Baureihe laut Weishaupt-Planungsunterlagen prüfen (07/25). Einzelgerät-Pfad und A1–A5 unverändert.
+Eingaben: Bestand Gas 60 000 kWh/a (kWh), Kesseltyp Niedertemperatur (90 %) · Wohnfläche 600 m² · Wohneinheiten 8 · Personen 16 · Pauschale „Teilsaniert / 90er Jahre (70 W/m²)“ · Heizkörper, 40 Stück, Zweirohr · Norm-Außentemperatur −12,7 °C · Bivalenzpunkt −7 °C · Vorlauf 50 °C (automatisch) · WAS 600 l + WES 910 l · Aufstellung Kaskade, Gerät WWP LA 20/30-A R, Anzahl automatisch.
+Rechenweg: Verbrauch 60 000 × 0,90 ÷ 1 800 = 30,00 kW · Gebäude 600 × 70 ÷ 1 000 = 42,00 kW · Abweichung 33,3 % → 50/50 → 36,00 kW · + 16 × 0,2 = 39,20 kW · Lastanteil 22 ÷ 27,7 = 0,7942 → 31,13 kW · je Gerät bei −7/W50: (20,0 + 19,5) ÷ 2 = 19,75 kW · n = max(2; aufgerundet(31,13 ÷ (19,75 × 1,15) = 1,37)) = 2 · gesamt 39,50 kW · bei −12,7 °C je Gerät 16,75 + (2,3 ÷ 8) × 3,0 = 17,61 kW, gesamt 35,23 kW → Heizstab 39,20 − 35,23 = 3,98 kW · Taktung 31,13 ≥ 1,3 × 6,8 → nein.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
+|---|---|---|---|---|---|
+| Gasverbrauchsansatz | kW | 30,0 | – | 30,0 kW | gleich |
+| Gebäudeansatz (Pauschale 70 W/m²) | kW | 42,0 | – | 42,0 kW | gleich |
+| Plausibilität | – | „plausibel (33 % Abweichung)“, Mittel beider Wege | – | Verbrauch und Gebäudehülle plausibel (33 % Abweichung). Auslegungswert = Mittel beider Wege, plus 3,2 kW Warmwasser für 16 Personen. | gleich |
+| Auslegungswert Heizlast (inkl. 3,2 kW Warmwasser) | kW | 39,2 | – | 39,2 kW | gleich |
+| Empfohlene Baugröße | – | 2 × Weishaupt WWP LA 20/30-A R · Modulation 6,8–61,2 kW gesamt · 2 × 400 V | – | 2 × Weishaupt WWP LA 20/30-A R · Kaskade aus 2 baugleichen Geräten (Anzahl automatisch) · Modulation 6,8–61,2 kW gesamt · 2 × 400 V · Luft/Wasser | gleich |
+| Gebäudelast bei −7 °C | kW | 31,1 | – | 31,1 kW | gleich |
+| WP-Leistung A−7/W50 (gesamt) | kW | ≈ 39,5 | – | ≈ 39,5 kW | gleich |
+| Deckung am Bivalenzpunkt | % | 100 | – | 100 % | gleich |
+| Status Bivalenzpunkt | – | gedeckt | – | „gedeckt“ · Die Wärmepumpen-Kaskade deckt den Bivalenzpunkt −7 °C vollständig ohne Heizstab. | gleich |
+| Nennwärmeleistung A−7/W35 | kW | 2 × 20,0 | – | 2 × 20,0 kW | gleich |
+| Gebäudeheizlast bei −12,7 °C | kW | 39,2 | – | 39,2 kW | gleich |
+| WP-Leistung A−12,7/W50 (gesamt) | kW | ≈ 35,2 | – | ≈ 35,2 kW | gleich |
+| Heizstab-Anteil bei −12,7 °C | kW | ≈ 4,0 | – | ≈ 4,0 kW | gleich |
+| Taktungsrisiko | – | nein | – | nein | gleich |
+| Alternative Aeroblock | – | keine (bei Kaskade) | – | keine | gleich |
+| Zusatzpositionen | – | Kaskadenregelung und hydraulische Einbindung (2 Geräte) · WAS 600 l · WES 910 l · Schallgutachten (54 dB(A), optional) | – | Kaskadenregelung und hydraulische Einbindung (2 Geräte) [erforderlich] · WAS 600 l · Trinkwasserspeicher [erforderlich] · WES 910 l · Energiespeicher [erforderlich] · Schallgutachten / Schallschutzmaßnahmen [optional] | gleich |
 
 ## heizkoerper.html · H1–H6
 Noch anzulegen beim Umbau des Tools (Schritt 2). Je Fall: Eingaben, alle Kennzahlen, gewählte Artikel, Bestellnummern, Lagerabgleich-Status.

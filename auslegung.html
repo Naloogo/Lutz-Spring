@@ -1130,6 +1130,27 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
           </div>
           <div class="ls-hint" id="aufgabeHint">Nur Heizung: Warmwasser extern, kein Zuschlag, kein Trinkwasserspeicher.</div>
         </div>
+        <div class="ls-field">
+          <span class="ls-label" id="aufstellungLabel">Aufstellung</span>
+          <div class="ls-seg ls-seg--full" role="group" aria-labelledby="aufstellungLabel">
+            <label><input type="radio" name="aufstellung" id="aufstellungEinzel" value="einzel" checked><span>Einzelgerät</span></label>
+            <label><input type="radio" name="aufstellung" id="aufstellungKaskade" value="kaskade"><span>Kaskade</span></label>
+          </div>
+          <div class="ls-hint">Kaskade: mehrere gleiche Geräte für größere Heizlasten (Mehrfamilienhaus, Gewerbe). Kaskadierbarkeit und Regelung laut Weishaupt-Planungsunterlagen prüfen.</div>
+        </div>
+      </div>
+      <div class="ls-fields ls-mt-4" id="blockKaskade" hidden>
+        <div class="ls-field">
+          <label class="ls-label" for="kaskadeGeraet">Gerät der Kaskade</label>
+          <select class="ls-select" id="kaskadeGeraet"></select>
+          <div class="ls-hint">Alle Geräte der Kaskade sind baugleich; die Liste folgt der Wärmequelle.</div>
+        </div>
+        <div class="ls-field">
+          <label class="ls-label" for="kaskadeAnzahl">Anzahl Geräte</label>
+          <div class="ls-unit"><input class="ls-input ls-num" id="kaskadeAnzahl" type="text" inputmode="numeric" placeholder="automatisch"><span>Stück</span></div>
+          <div class="ls-hint" id="kaskadeHint">Leer = automatisch: kleinste Anzahl (mindestens 2), deren Leistung am Bivalenzpunkt die Gebäudelast deckt.</div>
+          <div class="ls-error" id="kaskadeAnzahlErr" hidden></div>
+        </div>
       </div>
       <div class="ls-fields ls-mt-4">
         <div class="ls-field">
@@ -1260,7 +1281,7 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
   </form>
 
   <!-- 6 · Ergebnis -->
-  <section class="ls-card" id="ergebnis" aria-labelledby="h-ergebnis">
+  <section class="ls-card ls-no-print" id="ergebnis" aria-labelledby="h-ergebnis">
     <div class="ls-card__head"><h2 id="h-ergebnis">Heizlast und Baugröße</h2><span class="ls-card__sub" id="ergebnisSub">rechnet bei jeder Änderung mit</span></div>
     <div id="hinweiseVorab" class="ls-stack"></div>
     <div class="ls-kpis ls-mt-4">
@@ -1310,44 +1331,46 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
     </details>
   </section>
 
-  <!-- 7 · Bericht (Druck) -->
-  <section class="ls-card ls-report" id="bericht" aria-labelledby="h-bericht">
+  <!-- 7 · Bericht (Druck): kompakt; kurze Karten, damit der Druck zwischen den Karten umbricht (design.css: Karten brechen nicht) -->
+  <section class="ls-card ls-card--tight ls-report" id="bericht" aria-labelledby="h-bericht">
     <div class="ls-card__head"><h2 id="h-bericht">Zusammenfassung Wärmepumpen-Ersteinschätzung</h2><span class="ls-card__sub">Grundlage des Angebots</span></div>
-    <div class="ls-report__meta">
+    <div class="ls-report__meta ls-mt-2">
       <div><span>Kunde / Projekt</span><b id="berichtProjekt">BV Muster</b></div>
       <div><span>Datum</span><b id="berichtDatum">–</b></div>
-      <div><span>Norm-Außentemperatur</span><b id="berichtNormAT">–</b></div>
-      <div><span>Bivalenzpunkt</span><b id="berichtBiv">–</b></div>
+      <div><span>Norm-Außentemperatur</span><b><span id="berichtNormAT">–</span> · <span id="berichtBiv">–</span></b></div>
     </div>
-    <h3 class="ls-mt-4">Objekt / Gebäude</h3>
-    <dl class="ls-dl ls-mt-2" id="berichtGebaeude"></dl>
+    <div class="ls-grid ls-mt-4">
+      <div>
+        <h3>Objekt / Gebäude</h3>
+        <div class="ls-table-wrap ls-mt-2"><table class="ls-table ls-table--compact"><tbody id="berichtGebaeude"></tbody></table></div>
+        <h3 class="ls-mt-4">Heizlast-Abschätzung</h3>
+        <div class="ls-table-wrap ls-mt-2"><table class="ls-table ls-table--compact"><tbody id="berichtHeizlast"></tbody></table></div>
+      </div>
+      <div>
+        <h3>Bestandsanlage und Heizflächen</h3>
+        <div class="ls-table-wrap ls-mt-2"><table class="ls-table ls-table--compact"><tbody id="berichtBestand"></tbody></table></div>
+      </div>
+    </div>
   </section>
-  <!-- Bericht, Teil 1b: Bestandsanlage und Heizflächen (kurze Karten, damit der Druck zwischen den Karten umbricht) -->
-  <section class="ls-card" aria-labelledby="h-bericht-bestand">
-    <h3 id="h-bericht-bestand">Bestandsanlage und Heizflächen</h3>
-    <dl class="ls-dl ls-mt-2" id="berichtBestand"></dl>
+  <section class="ls-card ls-card--navy ls-card--tight" id="berichtErgebnisKarte" aria-labelledby="h-bericht-ergebnis">
+    <div class="ls-card__head"><h3 id="h-bericht-ergebnis">Ergebnis</h3><span class="ls-badge ls-badge--yellow" id="berichtBadge">Vorschlag</span></div>
+    <p class="ls-muted" id="berichtGeraetMeta">–</p>
+    <div class="ls-kpis ls-mt-2" id="berichtKpis"></div>
+    <div class="ls-row ls-mt-2"><span class="ls-badge" id="berichtStatus">–</span><span class="ls-muted" id="berichtBewertung"></span></div>
   </section>
-  <!-- Bericht, Teil 2: Heizlast und Ergebnis (eigene Karte, damit der Druck zwischen den Karten umbricht) -->
-  <section class="ls-card" aria-labelledby="h-bericht-ergebnis">
-    <h2 id="h-bericht-ergebnis" class="ls-sr-only">Heizlast und Ergebnis</h2>
-    <h3>Heizlast-Abschätzung</h3>
-    <dl class="ls-dl ls-mt-2" id="berichtHeizlast"></dl>
-    <h3 class="ls-mt-4">Ergebnis</h3>
-    <dl class="ls-dl ls-mt-2" id="berichtErgebnis"></dl>
-  </section>
-  <section class="ls-card" id="berichtKomponentenBlock" aria-labelledby="h-bericht-zusatz" hidden>
-    <div class="ls-card__head"><h2 id="h-bericht-zusatz">Objektabhängige Zusatzpositionen</h2><span class="ls-card__sub">nicht im Standardumfang</span></div>
+  <section class="ls-card ls-card--tight" id="berichtKomponentenBlock" aria-labelledby="h-bericht-zusatz" hidden>
+    <div class="ls-card__head"><h3 id="h-bericht-zusatz">Objektabhängige Zusatzpositionen</h3><span class="ls-card__sub">nicht im Standardumfang</span></div>
     <div class="ls-list" id="berichtKomponenten"></div>
   </section>
-  <section class="ls-card" aria-labelledby="h-bericht-rechenweg">
-    <div class="ls-card__head"><h2 id="h-bericht-rechenweg">Rechenweg</h2><span class="ls-card__sub">Formel, Eingangswerte, Zwischenergebnisse</span></div>
-    <dl class="ls-dl" id="berichtRechenweg"></dl>
+  <section class="ls-card ls-card--tight" aria-labelledby="h-bericht-rechenweg">
+    <div class="ls-card__head"><h3 id="h-bericht-rechenweg">Rechenweg</h3><span class="ls-card__sub">Formel, Eingangswerte, Zwischenergebnisse</span></div>
+    <div class="ls-table-wrap ls-mt-2"><table class="ls-table ls-table--compact"><tbody id="berichtRechenweg"></tbody></table></div>
     <div id="berichtNotizen" class="ls-stack ls-mt-4"></div>
   </section>
 
   <!-- 8 · Fuß -->
   <footer class="ls-footer">
-    Verbrauchsansatz: Öl L × 10 kWh, Gas m³ × 10 kWh bzw. kWh, jeweils × Nutzungsgrad ÷ 1 800 Volllaststunden; vorhandene WP: Strom × JAZ ÷ 1 800 h. Gebäudeansatz: Pauschale, Bauteile oder U-Werte (Transmission × ΔT bei Norm-Innentemperatur 20 °C zzgl. Lüftung). Auslegungswert = Mittel beider Ansätze (bei Abweichung über 35 % Gebäude 60 %) zzgl. 0,2 kW je Person Warmwasser. Last am Bivalenzpunkt über eine lineare Lastlinie zwischen Heizgrenze 15 °C und Norm-Außentemperatur. WP-Leistung interpoliert aus den Heizleistungskurven (Weishaupt Fachinformation 83603801, Stützpunkte −15/−7/+2/+7 °C, W35–W75; Aeroblock- und Großgerätewerte aus Diagrammen abgelesen, Aeroblock-Werte werden am Datenblatt geprüft). Norm-Außentemperaturen je Postleitzahl: BWP-Klimakarte nach DIN/TS 12831-1:2020-04, Stand 25.10.2026. Überschlägige Ersteinschätzung für die Angebotserstellung; die verbindliche Auslegung folgt nach raumweiser Heizlastberechnung (DIN EN 12831) und Abgleich mit dem Weishaupt-Planungshandbuch. Angaben ohne Gewähr – maßgeblich sind die Herstellerunterlagen. Erstellt mit dem internen Auslegungstool der Lutz Spring GmbH · auslegung.html · Stand 25.10.2026.
+    Überschlägige Ersteinschätzung aus Verbrauchs- und Gebäudeansatz mit den Weishaupt-Heizleistungskurven (Fachinformation 83603801; Aeroblock- und Großgerätewerte aus Diagrammen, in Prüfung) und Norm-Außentemperaturen je PLZ nach DIN/TS 12831-1:2020-04 (BWP-Klimakarte, Stand 25.10.2026); Rechenweg siehe oben. Verbindliche Auslegung nach raumweiser Heizlastberechnung (DIN EN 12831) und Weishaupt-Planungshandbuch. Angaben ohne Gewähr – maßgeblich sind die Herstellerunterlagen. Erstellt mit dem internen Auslegungstool der Lutz Spring GmbH · auslegung.html · Stand 25.10.2026.
   </footer>
 </div>
 
@@ -1565,6 +1588,7 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
    mit Vorgabe −12,7 °C, automatisch aus der Postleitzahl (normaussentemperatur.json); Heizflächen sind
    Pflichtwahl (alt rechnete ohne Wahl mit 45 °C); PDF-Dateiname „Wärmepumpenauslegung – Gerät – Kunde – Datum“;
    Zustand wird nach Neuladen vollständig wiederhergestellt (alt verlor die Kühlung).
+   Erweiterung Schritt 10 (Fabian 2026-10-25): Kaskaden-Planung (Aufstellung „Kaskade“, baugleiche Geräte, Anzahl automatisch oder von Hand), Referenzfall A6.
    Theme-Schalter, Datum und Drucken übernimmt ls.js (LS.start).
    ============================================================ */
 var PROJEKT_KEY = 'auslegung-projekt';
@@ -1681,6 +1705,21 @@ function sichtbarkeit(){
     : pv === 'geplant' ? 'PV geplant: SG-Ready-Vorbereitung vorsehen (Leerrohr/Steuerleitung zum künftigen Wechselrichter).'
     : 'Die Wärmepumpe ist SG-Ready und kann PV-Überschuss nutzen. Wir bauen keine PV.';
   $('erweitertKurz').textContent = $('streng').checked ? '· streng: 100 % Wärmepumpe' : '· Heizstab bis 15 % zulässig';
+  var kask = seg('aufstellung') === 'kaskade'; $('blockKaskade').hidden = !kask;
+  kaskadeListe();
+}
+/* Geräteliste der Kaskade: alle Geräte der gewählten Wärmequelle; Vorgabe WWP LA 20/30-A R (Luft) bzw. WGB 14 (Sole) */
+var kaskadeWunsch = null;   /* gewünschtes Kaskadengerät aus Browser-Speicher oder Projektdatei, bis die Liste gebaut ist */
+function kaskadeListe(){
+  var sel = $('kaskadeGeraet'), sole = seg('waermequelle') === 'sole';
+  var vorher = sel.value || kaskadeWunsch || (LS.speicher.lesen(PROJEKT_KEY + '-felder', {}) || {}).kaskadeGeraet || '';
+  kaskadeWunsch = null;
+  var liste = geraete.filter(function(g){ return sole ? g.typ === 'sole' : g.typ !== 'sole'; });
+  if(sel.options.length === liste.length && sel.options[0] && sel.options[0].value === liste[0].name) return;
+  sel.innerHTML = '';
+  liste.forEach(function(g){ var o = document.createElement('option'); o.value = g.name; o.textContent = geraeteBez(g) + ' (' + LS.fmt(g.min,1) + '–' + LS.fmt(g.max,1) + ' kW)'; sel.appendChild(o); });
+  var std = sole ? 'WGB 14' : 'WWP LA 20/30-A R';
+  sel.value = liste.some(function(g){ return g.name === vorher; }) ? vorher : std;
 }
 
 /* ---------- Vorlauf-Vorschlag aus den Heizflächen (wie alt: hk 50, fbh 35, beides = Heizkörper-Kreis) ---------- */
@@ -1761,8 +1800,9 @@ function altVlBewerten(zielVl, altVl, komfort){
   }
   return { cls: cls, kurz: kurz, txt: txt, altVl: altVl, komfort: komfort };
 }
-function komponentenErmitteln(b, gewaehlt, hlFinal){
+function komponentenErmitteln(b, gewaehlt, hlFinal, kaskade){
   var k = [];
+  if(kaskade) k.push({art:"pflicht", name:"Kaskadenregelung und hydraulische Einbindung ("+kaskade.n+" Geräte)", desc:"Kaskadenmanager bzw. Regelung für "+kaskade.n+" baugleiche Geräte, hydraulische Weiche oder Pufferspeicher als Systemtrennung, Verteilung und Rohrnetz für die Gesamtleistung. Kaskadierbarkeit, maximale Geräteanzahl und Puffervolumen laut Weishaupt-Planungsunterlagen prüfen."});
   if(b.solar === "ja" && b.solarDemontage === "ja") k.push({art:"pflicht", name:"Leerer Kanister für Solarflüssigkeit", desc:"Zum Auffangen der Solarflüssigkeit beim Rückbau der Solarthermie-Anlage. Der Kanister verbleibt beim Kunden."});
   if(b.bestand === "oel") k.push({art:"pflicht", name:"Öltankentsorgung inkl. Restölentsorgung", desc:"Demontage und fachgerechte Entsorgung des Öltanks samt Restöl und Ölschlamm. Bei erdverlegten oder Kellertanks ggf. Fachbetrieb erforderlich. Entsorgungsnachweis dokumentieren."});
   if(b.waermequelle === "sole"){
@@ -1835,6 +1875,9 @@ function eingaben(){
   b.kuehlRaeume = fl && b.kuehlung === 'ja' ? wert('kuehlRaeume', 1, 40, '1') : 0;
   if(b.kuehlRaeume != null) b.kuehlRaeume = parseInt(b.kuehlRaeume) || 1;
   b.waermequelle = seg('waermequelle');
+  b.aufstellung = seg('aufstellung'); b.kaskadeGeraet = $('kaskadeGeraet').value;
+  b.kaskadeAnzahl = b.aufstellung === 'kaskade' ? optional('kaskadeAnzahl', 2, 8, '2') : 0;
+  if(b.kaskadeAnzahl != null) b.kaskadeAnzahl = Math.round(b.kaskadeAnzahl);
   b.normAT = wert('normAT', -25, 5, '−12,7'); b.bivalenz = wert('bivalenz', -15, 0, '−7'); b.vorlauf = wert('vorlauf', 25, 75, '50');
   b.streng = $('streng').checked;
   b.speicherKonzept = seg('speicherKonzept'); b.abwasser = seg('abwasser'); b.zirkulation = seg('zirkulation');
@@ -1844,7 +1887,7 @@ function eingaben(){
     [['wandA','uWandA',0,10000,'140'],['wandU','uWandU',0.1,5,'0,8'],['dachA','uDachA',0,10000,'90'],['dachU','uDachU',0.1,5,'0,4'],['fenA','uFensterA',0,5000,'25'],['fenU','uFensterU',0.1,6,'1,3'],['bodA','uBodenA',0,10000,'90'],['bodU','uBodenU',0.1,5,'0,6']]
       .forEach(function(p){ b.u[p[0]] = optional(p[1], p[2], p[3], p[4]); });
   }
-  var pflicht = [b.flaeche, b.wohneinheiten, b.personen, b.oelVerbrauch, b.gasVerbrauch, b.wpStrom, b.wpJaz, b.altVl, b.hkAnzahl, b.rtlAnzahl, b.beidesVlHk, b.beidesVlFbh, b.kuehlRaeume, b.normAT, b.bivalenz, b.vorlauf].concat(Object.keys(b.u).map(function(k){ return b.u[k]; }));
+  var pflicht = [b.flaeche, b.wohneinheiten, b.personen, b.oelVerbrauch, b.gasVerbrauch, b.wpStrom, b.wpJaz, b.altVl, b.hkAnzahl, b.rtlAnzahl, b.beidesVlHk, b.beidesVlFbh, b.kuehlRaeume, b.kaskadeAnzahl, b.normAT, b.bivalenz, b.vorlauf].concat(Object.keys(b.u).map(function(k){ return b.u[k]; }));
   if(pflicht.some(function(v){ return v == null; })) return null;
   return b;
 }
@@ -1889,7 +1932,7 @@ function rechne(){
     LS.fehler('heizflaechen', 'Heizflächen wählen: Heizkörper, Fußbodenheizung oder Beides.');
     $('leerzustand').hidden = false; $('empfehlungBlock').hidden = true; $('zusatzCard').hidden = true; $('hinweiseVorab').innerHTML = '';
     $('ergebnisSub').textContent = 'Heizlast ' + LS.fmt(hlFinal,1) + ' kW · Heizflächen fehlen';
-    $('rechenweg').innerHTML = ''; $('berichtRechenweg').innerHTML = ''; berichtSchreiben(b, {hlVerbrauch:hlVerbrauch, geb:geb, hlGebaeude:hlGebaeude, wwZuschlag:wwZuschlag, hlFinal:hlFinal, abw:abw, wG:wG, vLabel:vLabel});
+    $('rechenweg').innerHTML = ''; $('berichtRechenweg').innerHTML = ''; berichtSchreiben(b, {hlVerbrauch:hlVerbrauch, geb:geb, hlGebaeude:hlGebaeude, wwZuschlag:wwZuschlag, hlFinal:hlFinal, abw:abw, wG:wG, vLabel:vLabel, gewaehlt:null});
     document.title = 'Wärmepumpenauslegung – ' + ($('projekt').value.trim() || 'BV Muster') + ' – ' + LS.datum();
     return;
   }
@@ -1914,30 +1957,45 @@ function rechne(){
     if(!aeroWahl){ aeroblockAktiv = false; }
     gewaehlt = (aeroblockAktiv && aeroWahl) ? aeroWahl : evoWahl;
   }
-  var apLeistung = apLeistungKurve(gewaehlt, apTemp, vl);
+  /* ---- Erweiterung Kaskade (Fabian 2026-10-25, Referenzfall A6): n baugleiche Geräte; Anzahl automatisch = kleinste n ≥ 2 mit n × Leistung(Bivalenzpunkt) × Faktor ≥ Last ---- */
+  var kaskade = null;
+  if(b.aufstellung === 'kaskade'){
+    var kg = geraete.filter(function(g){ return g.name === b.kaskadeGeraet; })[0] || geraete[geraete.length-1];
+    var einzelBiv = apLeistungKurve(kg, apTemp, vl);
+    var nAuto = Math.max(2, Math.ceil(lastAmBivalenzpunkt / (einzelBiv * monoTol)));
+    var nK = b.kaskadeAnzahl > 0 ? b.kaskadeAnzahl : nAuto;
+    kaskade = {g: kg, n: nK, nAuto: nAuto, einzelBiv: einzelBiv, einzelNorm: apLeistungKurve(kg, normAT, vl)};
+    gewaehlt = kg; evoWahl = kg; aeroWahl = null; aeroblockAktiv = false;
+  }
+  var nGer = kaskade ? kaskade.n : 1;
+  var apLeistung = nGer * apLeistungKurve(gewaehlt, apTemp, vl);
   var deckung = Math.min(100, apLeistung/lastAmBivalenzpunkt*100);
   var heizstabAnteil = Math.max(0, lastAmBivalenzpunkt - apLeistung);
-  var leistungBeiNormAT = apLeistungKurve(gewaehlt, normAT, vl);
+  var leistungBeiNormAT = nGer * apLeistungKurve(gewaehlt, normAT, vl);
   var heizstabBeiNormAT = Math.max(0, hlFinal - leistungBeiNormAT);
   var taktRisiko = lastAmBivalenzpunkt < gewaehlt.min*1.3;
   var statusCls, statusWort, statusTxt;
-  if(heizstabAnteil <= 0.05){ statusCls="ok"; statusWort="gedeckt"; statusTxt="Die Wärmepumpe deckt den Bivalenzpunkt "+grad(apTemp)+" vollständig ohne Heizstab."; }
-  else if(heizstabAnteil <= gewaehlt.max*0.15){ statusCls="warn"; statusWort="knapp"; statusTxt="Am Bivalenzpunkt "+grad(apTemp)+" bereits geringe Heizstab-Unterstützung nötig."; }
+  if(heizstabAnteil <= 0.05){ statusCls="ok"; statusWort="gedeckt"; statusTxt="Die Wärmepumpe"+(kaskade ? "n-Kaskade deckt" : " deckt")+" den Bivalenzpunkt "+grad(apTemp)+" vollständig ohne Heizstab."; }
+  else if(heizstabAnteil <= nGer*gewaehlt.max*0.15){ statusCls="warn"; statusWort="knapp"; statusTxt="Am Bivalenzpunkt "+grad(apTemp)+" bereits geringe Heizstab-Unterstützung nötig."; }
   else { statusCls="danger"; statusWort="nicht gedeckt"; statusTxt="Deutlicher Heizstab-Anteil schon am Bivalenzpunkt; nächstgrößere Baugröße prüfen."; }
   var altVlInfo = b.altVlBekannt === 'ja' ? altVlBewerten(vl, b.altVl, b.altVlKomfort) : null;
-  var komponenten = komponentenErmitteln(b, gewaehlt, hlFinal);
+  var komponenten = komponentenErmitteln(b, gewaehlt, hlFinal, kaskade);
 
   /* ---- Anzeige ---- */
   var ausweich = aeroblockAktiv && aeroWahl && gewaehlt === aeroWahl;
-  $('geraetName').textContent = geraeteBez(gewaehlt);
+  var geraetText = (kaskade ? kaskade.n + ' × ' : '') + geraeteBez(gewaehlt);
+  var geraetMetaText = kaskade
+    ? 'Kaskade aus ' + kaskade.n + ' baugleichen Geräten (' + (b.kaskadeAnzahl > 0 ? 'Anzahl von Hand' : 'Anzahl automatisch') + ') · Modulation ' + LS.fmt(gewaehlt.min,1) + '–' + LS.fmt(kaskade.n*gewaehlt.max,1) + ' kW gesamt · ' + kaskade.n + ' × ' + gewaehlt.phase + (b.waermequelle === 'sole' ? ' · Sole/Wasser' : ' · Luft/Wasser')
+    : 'Modulation ' + LS.fmt(gewaehlt.min,1) + '–' + LS.fmt(gewaehlt.max,1) + ' kW · ' + gewaehlt.phase + (b.waermequelle === 'sole' ? ' · Sole/Wasser' : ' · Luft/Wasser');
+  $('geraetName').textContent = geraetText;
   $('geraetBadge').textContent = ausweich ? 'Ausweichlösung' : 'Vorschlag';
-  $('geraetMeta').textContent = 'Modulation ' + LS.fmt(gewaehlt.min,1) + '–' + LS.fmt(gewaehlt.max,1) + ' kW · ' + gewaehlt.phase + (b.waermequelle === 'sole' ? ' · Sole/Wasser' : ' · Luft/Wasser');
+  $('geraetMeta').textContent = geraetMetaText;
   $('kpiLastBivLabel').textContent = 'Gebäudelast bei ' + grad(apTemp);
   kpi('kpiLastBiv', LS.fmt(lastAmBivalenzpunkt,1), 'kW');
   $('kpiWpBivLabel').textContent = 'WP-Leistung A' + LS.fmt(apTemp, apTemp % 1 ? 1 : 0) + '/W' + LS.fmt(vl, vl % 1 ? 1 : 0);
   kpi('kpiWpBiv', LS.fmt(apLeistung,1), 'kW', true);
   kpi('kpiDeckung', LS.fmt(deckung,0), '%');
-  kpi('kpiNenn', LS.fmt(gewaehlt.biv,1), 'kW');
+  kpi('kpiNenn', (kaskade ? kaskade.n + ' × ' : '') + LS.fmt(gewaehlt.biv,1), 'kW');
   $('statusBadge').className = 'ls-badge ls-badge--' + statusCls; $('statusBadge').textContent = statusWort; $('statusText2').textContent = statusTxt;
 
   var vorab = '', nach = '';
@@ -1955,20 +2013,21 @@ function rechne(){
     if(heizstabBeiNormAT <= 0.05) kpi('kpiHeizstab', '0', 'kW'); else kpi('kpiHeizstab', LS.fmt(heizstabBeiNormAT,1), 'kW', true);
     var hsStufen = Math.ceil(heizstabBeiNormAT / 3);
     if(heizstabBeiNormAT > 0.05){
-      var stufenTxt = hsStufen <= 3 ? 'Die integrierte dreistufige Zusatzheizung (3/6/9 kW, laut Datenblatt prüfen) deckt das ab, rechnerisch Stufe '+hsStufen+'.' : 'Die benötigte Zusatzleistung übersteigt die integrierte Zusatzheizung; Auslegung prüfen.';
+      var stufenTxt = kaskade ? 'Zusatzheizung je Gerät und Kaskadenregelung laut Datenblatt prüfen.' : (hsStufen <= 3 ? 'Die integrierte dreistufige Zusatzheizung (3/6/9 kW, laut Datenblatt prüfen) deckt das ab, rechnerisch Stufe '+hsStufen+'.' : 'Die benötigte Zusatzleistung übersteigt die integrierte Zusatzheizung; Auslegung prüfen.');
       nach += note(hsStufen <= 3 ? 'warn' : 'danger', 'Heizstab zwischen '+grad(apTemp)+' und '+grad(normAT)+'.', 'Unterstützt mit bis zu '+LS.fmt(heizstabBeiNormAT,1)+' kW. '+stufenTxt+' Jahresanteil an der Heizarbeit typisch unter 5 %, da diese Temperaturen nur an wenigen Tagen auftreten.');
     } else nach += note('ok', 'Monovalent.', 'Die Wärmepumpe deckt auch die Norm-Außentemperatur '+grad(normAT)+' vollständig ohne Heizstab.');
   }
   if(statusCls === 'danger') vorab += note('danger', 'Nicht gedeckt.', statusTxt);
   if(taktRisiko) vorab += note('warn', 'Taktungsrisiko im Teillastbetrieb.', 'Last am Bivalenzpunkt ('+LS.fmt(lastAmBivalenzpunkt,1)+' kW) nahe der unteren Modulationsgrenze ('+LS.fmt(gewaehlt.min,1)+' kW). Ausreichendes Anlagenvolumen bzw. Pufferspeicher vorsehen.');
   if(altVlInfo) vorab += note(altVlInfo.cls, 'Heizflächen: '+altVlInfo.kurz+'.', altVlInfo.txt);
+  if(!kaskade && b.waermequelle !== 'sole' && hlFinal > 20) nach += note('info', 'Große Heizlast.', 'Die Heizlast liegt über dem größten Evoblock (20 kW). Für Mehrfamilienhäuser unter Auslegung → Aufstellung „Kaskade“ prüfen.', true);
   var bivTxt = (b.waermequelle === "sole")
     ? "Sole/Wasser-Auslegung (Geoblock). Die Erdwärmequelle liefert nahezu konstante Leistung über das ganze Jahr, monovalenter Betrieb ohne nennenswerte Elektro-Zusatzheizung. Voraussetzung: fachgerecht dimensionierte Erdsonden-Bohrung (Entzugsleistung nach VDI 4640, Genehmigung erforderlich)."
     : "Auslegung monoenergetisch mit Bivalenzpunkt "+grad(apTemp)+" bei einer Norm-Außentemperatur von "+grad(normAT)+". Bei 0 Sperrstunden (§ 14a EnWG, Neuanlage) unkritisch. Weishaupt-Werksauslegung: Bivalenztemperatur −5 °C (laut Datenblatt prüfen).";
   nach += note('info', 'Auslegung.', bivTxt, true);   /* im Druck steht der Text unter „Bewertung“ im Bericht */
   $('hinweiseVorab').innerHTML = vorab; $('hinweiseNach').innerHTML = nach;
 
-  if(aeroWahl && b.waermequelle !== 'sole'){
+  if(aeroWahl && b.waermequelle !== 'sole' && !kaskade){
     var aeroLeistung = apLeistungKurve(aeroWahl, apTemp, vl), aeroDeckung = Math.min(100, aeroLeistung/lastAmBivalenzpunkt*100);
     $('alternativeBlock').hidden = false;
     if(ausweich){
@@ -1982,7 +2041,7 @@ function rechne(){
     }
   } else $('alternativeBlock').hidden = true;
   $('komponenten').innerHTML = komponentenHtml(komponenten, false);
-  $('ergebnisSub').textContent = 'Heizlast ' + LS.fmt(hlFinal,1) + ' kW · ' + geraeteBez(gewaehlt) + ' · ' + statusWort;
+  $('ergebnisSub').textContent = 'Heizlast ' + LS.fmt(hlFinal,1) + ' kW · ' + geraetText + ' · ' + statusWort;
 
   /* ---- Rechenweg ---- */
   var rw = [];
@@ -1997,39 +2056,47 @@ function rechne(){
   rw.push(['Warmwasser', b.aufgabe === 'nur_heizung' ? 'entfällt (extern)' : LS.fmt(b.personen,0)+' Personen × 0,2 kW = '+LS.fmt(wwZuschlag,1)+' kW']);
   rw.push(['Auslegungswert Heizlast', LS.fmt(gebaeudeAnteil,2)+' + '+LS.fmt(wwZuschlag,1)+' = '+LS.fmt(hlFinal,2)+' kW', true]);
   rw.push(['Last am Bivalenzpunkt', '(15 − ('+LS.fmt(apTemp,1)+')) ÷ (15 − ('+LS.fmt(normAT,1)+')) = '+LS.fmt(lastAnteilBiv,4)+' × '+LS.fmt(hlFinal,2)+' kW = '+LS.fmt(lastAmBivalenzpunkt,2)+' kW (Heizgrenze 15 °C)']);
+  if(kaskade){
+    rw.push(['Kaskade', geraeteBez(gewaehlt)+': Leistung je Gerät bei A'+LS.fmt(apTemp,1)+'/W'+LS.fmt(vl,0)+' = '+LS.fmt(kaskade.einzelBiv,2)+' kW · Anzahl automatisch = max(2; aufgerundet('+LS.fmt(lastAmBivalenzpunkt,2)+' ÷ ('+LS.fmt(kaskade.einzelBiv,2)+' × '+LS.fmt(monoTol,2)+'))) = '+kaskade.nAuto+(b.kaskadeAnzahl > 0 ? ' · von Hand gesetzt: '+kaskade.n : '')+' → '+kaskade.n+' Geräte']);
+    rw.push(['WP-Leistung am Bivalenzpunkt', kaskade.n+' × '+LS.fmt(kaskade.einzelBiv,2)+' = '+LS.fmt(apLeistung,2)+' kW → Deckung '+LS.fmt(deckung,1)+' %, Heizstab '+LS.fmt(heizstabAnteil,2)+' kW']);
+    if(b.waermequelle !== 'sole') rw.push(['Bei Norm-Außentemperatur', kaskade.n+' × '+LS.fmt(kaskade.einzelNorm,2)+' kW (A'+LS.fmt(normAT,1)+'/W'+LS.fmt(vl,0)+') = '+LS.fmt(leistungBeiNormAT,2)+' kW → Heizstab '+LS.fmt(hlFinal,2)+' − '+LS.fmt(leistungBeiNormAT,2)+' = '+LS.fmt(heizstabBeiNormAT,2)+' kW']);
+  } else {
   rw.push(['Baugröße', 'erstes Gerät mit Leistung bei A'+LS.fmt(apTemp,1)+'/W'+LS.fmt(vl,0)+' × '+LS.fmt(monoTol,2)+(b.streng ? ' (streng)' : ' (Heizstab bis 15 %)')+' ≥ '+LS.fmt(lastAmBivalenzpunkt,2)+' kW → '+geraeteBez(gewaehlt)+(ausweich ? ' (Ausweichlösung, Standard '+evoWahl.name+')' : '')]);
   rw.push(['WP-Leistung am Bivalenzpunkt', 'interpoliert aus der Kurve: '+LS.fmt(apLeistung,2)+' kW → Deckung '+LS.fmt(deckung,1)+' %, Heizstab '+LS.fmt(heizstabAnteil,2)+' kW']);
   if(b.waermequelle !== 'sole') rw.push(['Bei Norm-Außentemperatur', 'Leistung bei A'+LS.fmt(normAT,1)+'/W'+LS.fmt(vl,0)+' = '+LS.fmt(leistungBeiNormAT,2)+' kW → Heizstab '+LS.fmt(hlFinal,2)+' − '+LS.fmt(leistungBeiNormAT,2)+' = '+LS.fmt(heizstabBeiNormAT,2)+' kW (Stützpunkte −15/−7/+2/+7 °C, außerhalb geklemmt)']);
+  }
   rw.push(['Taktungsrisiko', LS.fmt(lastAmBivalenzpunkt,2)+' kW '+(taktRisiko ? '<' : '≥')+' 1,3 × '+LS.fmt(gewaehlt.min,1)+' kW → '+(taktRisiko ? 'ja' : 'nein')]);
   rw.push(['Hinweis', 'Zwischenwerte gerundet dargestellt, gerechnet wird ungerundet. Kurvenpunkte außer A−7/W35 der WEB aus Diagrammen abgelesen (≈). Richtwerte, keine Zusage.']);
-  dl('rechenweg', rw); dl('berichtRechenweg', rw);
+  tbl('berichtRechenweg', rw);
+  dl('rechenweg', rw.slice(0, -1).concat([['Plausibilität', plausiTxt], ['Auslegung', bivTxt], rw[rw.length-1]]));
 
   letztesErgebnis = {hlVerbrauch:hlVerbrauch, geb:geb, hlGebaeude:hlGebaeude, wwZuschlag:wwZuschlag, hlFinal:hlFinal, abw:abw, wG:wG, vLabel:vLabel,
     gewaehlt:gewaehlt, ausweich:ausweich, evoWahl:evoWahl, apLeistung:apLeistung, deckung:deckung, lastAmBivalenzpunkt:lastAmBivalenzpunkt, leistungBeiNormAT:leistungBeiNormAT,
-    heizstabBeiNormAT:heizstabBeiNormAT, statusWort:statusWort, statusTxt:statusTxt, bivTxt:bivTxt, taktRisiko:taktRisiko, altVlInfo:altVlInfo, komponenten:komponenten};
+    heizstabBeiNormAT:heizstabBeiNormAT, statusWort:statusWort, statusCls:statusCls, statusTxt:statusTxt, bivTxt:bivTxt, taktRisiko:taktRisiko, altVlInfo:altVlInfo, komponenten:komponenten, kaskade:kaskade, geraetText:geraetText, geraetMetaText:geraetMetaText, wwZuschlag:wwZuschlag};
   berichtSchreiben(b, letztesErgebnis);
-  document.title = 'Wärmepumpenauslegung – ' + geraeteBez(gewaehlt).replace(/\//g, '-') + ' – ' + ($('projekt').value.trim() || 'BV Muster') + ' – ' + LS.datum();
+  document.title = 'Wärmepumpenauslegung – ' + geraetText.replace(/\//g, '-').replace(' × ', 'x ') + ' – ' + ($('projekt').value.trim() || 'BV Muster') + ' – ' + LS.datum();
 }
 function ergebnisLeer(text){
   ['kpiVerbrauch','kpiGebaeude','kpiHeizlast'].forEach(function(id){ $(id).textContent = '–'; });
   $('plausi').textContent = ''; $('leerzustand').hidden = true; $('empfehlungBlock').hidden = true; $('zusatzCard').hidden = true; $('hinweiseVorab').innerHTML = '';
   $('ergebnisSub').textContent = text; $('rechenweg').innerHTML = ''; $('berichtRechenweg').innerHTML = '';
-  dl('berichtHeizlast', [['Hinweis', text]]); dl('berichtErgebnis', []);
+  tbl('berichtHeizlast', [['Hinweis', text]]); $('berichtKpis').innerHTML = ''; $('h-bericht-ergebnis').textContent = text; $('berichtKomponentenBlock').hidden = true;
 }
 
-/* ---------- Bericht (Druck) ---------- */
+/* ---------- Bericht (Druck): kompakt ---------- */
+function tbl(id, zeilen){ $(id).innerHTML = zeilen.map(function(z){ var s = z[2] ? ' style="font-weight:700"' : ''; return '<tr><td'+s+'>'+esc(z[0])+'</td><td'+s+'>'+esc(z[1])+'</td></tr>'; }).join(''); }
 function berichtSchreiben(b, e){
   var p = $('projekt').value.trim() || 'BV Muster';
   $('berichtProjekt').textContent = p; $('berichtDatum').textContent = LS.datum();
-  $('berichtNormAT').textContent = grad(b.normAT) + (normATQuelle ? ' (' + normATQuelle + ')' : '');
-  $('berichtBiv').textContent = grad(b.bivalenz);
-  var g = [['Beheizte Wohnfläche', LS.fmt(b.flaeche,0)+' m²'], ['Wohneinheiten', LS.fmt(b.wohneinheiten,0)]];
-  if(b.aufgabe !== 'nur_heizung') g.push(['Personen (Warmwasser)', LS.fmt(b.personen,0)]);
+  $('berichtNormAT').textContent = grad(b.normAT) + (normATQuelle && normATQuelle !== 'von Hand' ? ' (' + normATQuelle.replace(', DIN/TS 12831-1', '') + ')' : '');
+  $('berichtBiv').textContent = 'Bivalenzpunkt ' + grad(b.bivalenz);
+  var g = [['Wohnfläche', LS.fmt(b.flaeche,0)+' m²'], ['Wohneinheiten', LS.fmt(b.wohneinheiten,0)]];
+  if(b.aufgabe !== 'nur_heizung') g.push(['Personen', LS.fmt(b.personen,0)+' (Warmwasser)']);
   if(b.huelle === 'schnell') g.push(['Gebäudehülle', 'Pauschale · '+optText('pauschale')]);
-  else if(b.huelle === 'detail'){ g.push(['Gebäudehülle', 'Bauteile · '+optText('baujahr')]); g.push(['Fenster', optText('fenster')]); g.push(['Wand', optText('wandWerkstoff')+', '+optText('wandDicke')+', '+optText('wandDaemmung')]); g.push(['Dach / oberste Decke', optText('dach')]); g.push(['Spezifische Heizlast', LS.fmt(e.geb.spez,0)+' W/m²']); }
+  else if(b.huelle === 'detail'){ g.push(['Gebäudehülle', 'Bauteile · '+optText('baujahr')]); g.push(['Fenster', optText('fenster')]); g.push(['Wand', optText('wandWerkstoff').split(' (')[0]+', '+optText('wandDicke')+', '+optText('wandDaemmung').split(' / ')[0]]); g.push(['Dach', optText('dach')]); g.push(['Spez. Heizlast', LS.fmt(e.geb.spez,0)+' W/m²']); }
   else { g.push(['Gebäudehülle', 'U-Werte direkt']); g.push(['Wand', LS.fmt(b.u.wandA,0)+' m² · U = '+LS.fmt(b.u.wandU,2)]); g.push(['Dach / Decke', LS.fmt(b.u.dachA,0)+' m² · U = '+LS.fmt(b.u.dachU,2)]); g.push(['Fenster', LS.fmt(b.u.fenA,0)+' m² · U = '+LS.fmt(b.u.fenU,2)]); g.push(['Boden / Keller', LS.fmt(b.u.bodA,0)+' m² · U = '+LS.fmt(b.u.bodU,2)]); }
   if($('plz').value.trim()) g.push(['Postleitzahl', $('plz').value.trim()]);
-  dl('berichtGebaeude', g);
+  tbl('berichtGebaeude', g);
   var s = [['Wärmeerzeuger', {oel:'Öl', gas:'Gas', wp:'Vorhandene Wärmepumpe'}[b.bestand]]];
   if(b.bestand === 'oel'){ s.push(['Ölverbrauch', b.oelVerbrauch > 0 ? LS.fmt(b.oelVerbrauch,0)+' L/a' : 'unbekannt']); s.push(['Kesseltyp', optText('oelNutzungsgrad')]); }
   else if(b.bestand === 'gas'){ s.push(['Gasverbrauch', b.gasVerbrauch > 0 ? LS.fmt(b.gasVerbrauch,0)+(b.gasEinheit==='m3' ? ' m³/a' : ' kWh/a') : 'unbekannt']); s.push(['Kesseltyp', optText('gasNutzungsgrad')]); }
@@ -2037,37 +2104,45 @@ function berichtSchreiben(b, e){
   if(b.altVlBekannt === 'ja') s.push(['Bisheriger Vorlauf', grad(b.altVl)+' · '+({ja:'Räume wurden warm', knapp:'knapp, einzelne Räume kühl', nein:'zu kalt'}[b.altVlKomfort])]);
   var hfName = {hk:'Heizkörper', fbh:'Fußbodenheizung', beides:'Heizkörper + Fußbodenheizung'}[b.heizflaechen];
   s.push(['Heizflächen', hfName || 'nicht gewählt']);
-  if(b.heizflaechen === 'hk' || b.heizflaechen === 'beides'){ s.push([b.heizflaechen === 'beides' ? 'Heizkörper (Pumpengruppe 1)' : 'Anzahl Heizkörper', LS.fmt(b.hkAnzahl,0)+' Stück']); s.push(['Rohrsystem', b.rohrsystem === 'einrohr' ? 'Einrohrsystem' : 'Zweirohrsystem']); if(b.rtl === 'ja') s.push(['RTL-Boxen', LS.fmt(b.rtlAnzahl,0)+' Stück'+(b.rtlTyp ? ' ('+b.rtlTyp+')' : '')]); }
-  if(b.heizflaechen === 'fbh' || b.heizflaechen === 'beides'){ s.push([b.heizflaechen === 'beides' ? 'FBH-Verteiler (Pumpengruppe 2)' : 'Heizkreisverteiler', verteiler.length+' ('+verteilerKreiseGesamt()+' Kreise): '+verteiler.map(function(v){ return (v.name||'Verteiler')+' '+(v.kreise||0); }).join(', ')]); if(b.kuehlung === 'ja') s.push(['Kühlfunktion', 'aktive Kühlung, '+b.kuehlRaeume+' Räume (Blossom-ic)']); }
+  if(b.heizflaechen === 'hk' || b.heizflaechen === 'beides'){ s.push([b.heizflaechen === 'beides' ? 'Heizkörper (Pumpengruppe 1)' : 'Anzahl Heizkörper', LS.fmt(b.hkAnzahl,0)+' Stück · '+(b.rohrsystem === 'einrohr' ? 'Einrohr' : 'Zweirohr')+(b.rtl === 'ja' ? ' · RTL-Boxen '+LS.fmt(b.rtlAnzahl,0)+(b.rtlTyp ? ' ('+b.rtlTyp+')' : '') : '')]); }
+  if(b.heizflaechen === 'fbh' || b.heizflaechen === 'beides'){ s.push([b.heizflaechen === 'beides' ? 'FBH-Verteiler' : 'Verteiler', verteiler.length+' Stück · '+verteilerKreiseGesamt()+' Kreise']); if(b.kuehlung === 'ja') s.push(['Kühlung', b.kuehlRaeume+' Räume, Blossom-ic']); }
   if(b.heizflaechen === 'beides') s.push(['Vorlauf HK / FBH', grad(b.beidesVlHk)+' / '+grad(b.beidesVlFbh)]);
-  s.push(['Systemtemperatur Vorlauf', grad(b.vorlauf)]);
-  s.push(['Wärmequelle', b.waermequelle === 'sole' ? 'Sole/Wasser (Geoblock)' : 'Luft/Wasser']);
-  s.push(['Aufgabe der Wärmepumpe', b.aufgabe === 'nur_heizung' ? 'Nur Heizung (Warmwasser extern)' : 'Heizung + Warmwasser']);
-  s.push(['Speicherkonzept', b.aufgabe === 'nur_heizung' ? 'WES '+$('wes').value+' l (nur Puffer)' : b.speicherKonzept === 'getrennt' ? 'WAS '+$('was').value+' l + WES '+$('wes').value+' l (getrennt)' : ($('wms').value === '200_80' ? 'WMS 200 l TW / 80 l Puffer' : 'WMS 300 l TW / 120 l Puffer')]);
-  s.push(['Abwasseranschluss', b.abwasser === 'ja' ? 'vorhanden' : 'nicht vorhanden']); s.push(['Zirkulationsleitung', b.zirkulation === 'ja' ? 'vorhanden' : 'nicht vorhanden']);
+  s.push(['Vorlauf', grad(b.vorlauf)]);
+  s.push(['Wärmequelle', (b.waermequelle === 'sole' ? 'Sole/Wasser' : 'Luft/Wasser')+', '+(b.aufgabe === 'nur_heizung' ? 'nur Heizung' : 'Heizung + WW')]);
+  s.push(['Speicher', b.aufgabe === 'nur_heizung' ? 'WES '+$('wes').value+' l (Puffer)' : b.speicherKonzept === 'getrennt' ? 'WAS '+$('was').value+' l + WES '+$('wes').value+' l' : ($('wms').value === '200_80' ? 'WMS 200/80' : 'WMS 300/120')]);
+  s.push(['Anschlüsse', 'Abwasser '+(b.abwasser === 'ja' ? 'ja' : 'nein')+' · Zirkulation '+(b.zirkulation === 'ja' ? 'ja' : 'nein')]);
   if(b.solar === 'ja') s.push(['Solarthermie', b.solarDemontage === 'ja' ? 'vorhanden, wird demontiert' : 'vorhanden, bleibt bestehen']);
   s.push(['Photovoltaik', b.pv === 'ja' ? 'vorhanden (SG-Ready-Anbindung)' : b.pv === 'geplant' ? 'geplant' : 'nicht vorhanden']);
-  s.push(['Auslegung', b.streng ? 'streng, 100 % Wärmepumpe' : 'monoenergetisch, Heizstab bis 15 %']);
-  dl('berichtBestand', s);
+  s.push(['Auslegung', (b.streng ? 'streng, 100 % WP' : 'Heizstab bis 15 %')+(b.aufstellung === 'kaskade' ? ' · Kaskade' : '')]);
+  tbl('berichtBestand', s);
+  var plausi = e.abw != null ? LS.fmt(e.abw,0)+' % Abweichung, Gewichtung Gebäude '+LS.fmt(e.wG*100,0)+' %' : 'nur Gebäudeansatz';
   var h = [];
   if(e.hlVerbrauch > 0) h.push([e.vLabel, LS.fmt(e.hlVerbrauch,1)+' kW']);
-  h.push(['Gebäudeansatz ('+e.geb.txt+')', LS.fmt(e.hlGebaeude,1)+' kW']);
-  if(e.abw != null) h.push(['Plausibilität', LS.fmt(e.abw,0)+' % Abweichung, Gewichtung Gebäude '+LS.fmt(e.wG*100,0)+' %']);
-  h.push(['Warmwasser-Zuschlag', b.aufgabe === 'nur_heizung' ? 'entfällt (extern)' : LS.fmt(e.wwZuschlag,1)+' kW']);
-  h.push(['Auslegungswert Heizlast', LS.fmt(e.hlFinal,1)+' kW', true]);
-  dl('berichtHeizlast', h);
-  if(!e.gewaehlt){ dl('berichtErgebnis', [['Hinweis', 'Heizflächen nicht gewählt; keine Baugröße ermittelt.']]); $('berichtKomponentenBlock').hidden = true; }
-  else {
-    var r = [['Empfohlene Baugröße', geraeteBez(e.gewaehlt)+(e.ausweich ? ' (Ausweichlösung, Standard '+geraeteBez(e.evoWahl)+')' : ''), true],
-      ['Modulation', LS.fmt(e.gewaehlt.min,1)+'–'+LS.fmt(e.gewaehlt.max,1)+' kW · '+e.gewaehlt.phase],
-      ['Nennwärmeleistung A−7/W35', LS.fmt(e.gewaehlt.biv,1)+' kW'],
-      ['Am Bivalenzpunkt '+grad(b.bivalenz), 'Gebäudelast '+LS.fmt(e.lastAmBivalenzpunkt,1)+' kW · WP-Leistung ≈ '+LS.fmt(e.apLeistung,1)+' kW · Deckung '+LS.fmt(e.deckung,0)+' % · '+e.statusWort]];
-    if(b.waermequelle !== 'sole') r.push(['Bei Norm-Außentemperatur '+grad(b.normAT), 'Heizlast '+LS.fmt(e.hlFinal,1)+' kW · WP-Leistung ≈ '+LS.fmt(e.leistungBeiNormAT,1)+' kW · Heizstab '+(e.heizstabBeiNormAT <= 0.05 ? '0 kW' : '≈ '+LS.fmt(e.heizstabBeiNormAT,1)+' kW')]);
-    var bew = e.statusTxt+' '+e.bivTxt;
-    if(e.taktRisiko) bew += ' Hinweis: Heizlast nahe der unteren Modulationsgrenze; ausreichendes Anlagenvolumen bzw. Pufferspeicher vorsehen.';
+  h.push(['Gebäudeansatz', LS.fmt(e.hlGebaeude,1)+' kW ('+e.geb.txt+')']);
+  if(e.abw != null) h.push(['Abweichung', LS.fmt(e.abw,0)+' % → Gebäude '+LS.fmt(e.wG*100,0)+' %']);
+  h.push(['Warmwasser', b.aufgabe === 'nur_heizung' ? 'entfällt (extern)' : LS.fmt(e.wwZuschlag,1)+' kW']);
+  h.push(['Heizlast', LS.fmt(e.hlFinal,1)+' kW', true]);
+  tbl('berichtHeizlast', h);
+  var k = $('berichtKpis');
+  if(!e.gewaehlt){
+    $('h-bericht-ergebnis').textContent = 'Keine Baugröße ermittelt'; $('berichtBadge').textContent = 'offen'; $('berichtGeraetMeta').textContent = 'Heizflächen nicht gewählt.';
+    k.innerHTML = ''; $('berichtStatus').className = 'ls-badge'; $('berichtStatus').textContent = '–'; $('berichtBewertung').textContent = ''; $('berichtKomponentenBlock').hidden = true;
+  } else {
+    $('h-bericht-ergebnis').textContent = e.geraetText + (e.ausweich ? ' (Ausweichlösung, Standard '+geraeteBez(e.evoWahl)+')' : '');
+    $('berichtBadge').textContent = e.ausweich ? 'Ausweichlösung' : 'Vorschlag';
+    $('berichtGeraetMeta').textContent = (e.kaskade ? 'Kaskade ' + e.kaskade.n + ' × (' + (b.kaskadeAnzahl > 0 ? 'von Hand' : 'automatisch') + ') · Modulation ' + LS.fmt(e.gewaehlt.min,1) + '–' + LS.fmt(e.kaskade.n*e.gewaehlt.max,1) + ' kW · ' + e.kaskade.n + ' × ' + e.gewaehlt.phase : 'Modulation ' + LS.fmt(e.gewaehlt.min,1) + '–' + LS.fmt(e.gewaehlt.max,1) + ' kW · ' + e.gewaehlt.phase) + (b.waermequelle === 'sole' ? ' · Sole/Wasser' : ' · Luft/Wasser') + ' · Nennwärmeleistung A−7/W35 ' + (e.kaskade ? e.kaskade.n+' × ' : '') + LS.fmt(e.gewaehlt.biv,1) + ' kW';
+    function kp(l, v, u, r, n){ return '<div class="ls-kpi"><span class="ls-kpi__label">'+l+'</span><span class="ls-kpi__value">'+(r ? '<span class="ls-approx">' : '<span>')+v+'</span>'+(u ? ' <small>'+u+'</small>' : '')+'</span>'+(n ? '<span class="ls-kpi__note">'+n+'</span>' : '')+'</div>'; }
+    var kh = kp('Heizlast', LS.fmt(e.hlFinal,1), 'kW', false, b.aufgabe === 'nur_heizung' ? 'ohne Warmwasser' : 'inkl. '+LS.fmt(e.wwZuschlag,1)+' kW Warmwasser')
+      + kp('WP-Leistung A'+LS.fmt(b.bivalenz, b.bivalenz % 1 ? 1 : 0)+'/W'+LS.fmt(b.vorlauf,0), LS.fmt(e.apLeistung,1), 'kW', true, 'Deckung '+LS.fmt(e.deckung,0)+' % · Last '+LS.fmt(e.lastAmBivalenzpunkt,1)+' kW');
+    kh += b.waermequelle !== 'sole'
+      ? kp('Heizstab bei '+grad(b.normAT), e.heizstabBeiNormAT <= 0.05 ? '0' : LS.fmt(e.heizstabBeiNormAT,1), 'kW', e.heizstabBeiNormAT > 0.05, 'WP-Leistung ≈ '+LS.fmt(e.leistungBeiNormAT,1)+' kW')
+      : kp('Deckung am Bivalenzpunkt', LS.fmt(e.deckung,0), '%', false, 'Sole/Wasser, monovalent');
+    k.innerHTML = kh;
+    $('berichtStatus').className = 'ls-badge ls-badge--'+e.statusCls; $('berichtStatus').textContent = e.statusWort;
+    var bew = e.statusTxt;
+    if(e.taktRisiko) bew += ' Taktungsrisiko: Last am Bivalenzpunkt nahe der unteren Modulationsgrenze; ausreichendes Anlagenvolumen bzw. Pufferspeicher vorsehen.';
     if(e.altVlInfo) bew += ' Heizflächen: '+e.altVlInfo.kurz+' (Altanlage lief mit '+grad(e.altVlInfo.altVl)+').';
-    r.push(['Bewertung', bew]);
-    dl('berichtErgebnis', r);
+    $('berichtBewertung').textContent = bew;
     $('berichtKomponentenBlock').hidden = !e.komponenten.length;
     $('berichtKomponenten').innerHTML = komponentenHtml(e.komponenten, false);
   }
@@ -2131,6 +2206,7 @@ $('btnSichern').addEventListener('click', function(){
 LS.datei.laden($('dateiLaden'), function(daten){
   if(!daten || daten.tool !== 'auslegung' || !daten.felder){ LS.toast('Keine Projektdatei der Wärmepumpen-Auslegung.', 'danger', 5000); return; }
   daten.felder = LS.datei.migrieren(daten.felder, FELD_MAPPING);
+  kaskadeWunsch = daten.felder.kaskadeGeraet || null;
   form.reset(); felderSetzen(daten.felder);
   verteiler = (daten.verteiler && daten.verteiler.length) ? daten.verteiler : [{name:'Erdgeschoss', kreise:6}];
   aeroblockAktiv = !!daten.aeroblockAktiv; vorlaufManuell = !!daten.vorlaufManuell; normATQuelle = daten.normATQuelle || '';
