@@ -1,989 +1,1734 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Förderungsrechner Wärmepumpe · Lutz Spring GmbH</title>
-
-<!-- iOS-Homescreen-Betrieb: bitte unverändert lassen -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1a2b4a">
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Lutz Spring">
-<!-- Literal nötig: var() ist in <meta> ungültig -->
-<meta name="theme-color" content="#1a2b4a">
-<link rel="apple-touch-icon" href="logo.png">
-<link rel="icon" href="logo.png">
-
-<!-- Zentrale Design-Tokens. Muss VOR dem <style>-Block stehen. -->
-<link rel="stylesheet" href="theme.css">
-
+<meta name="apple-mobile-web-app-title" content="Förderrechner">
+<title>Förderrechner Wärmepumpe · Lutz Spring GmbH</title>
+<!-- design.css:start -->
 <style>
-  /* Datei-eigene Namen -> zentrale Tokens aus theme.css.
-     Farbwerte stehen ausschliesslich in theme.css. */
-  :root{
-    --accent:      var(--brand-navy);
-    --accent-text: var(--brand-navy);
-  }
+/* ============================================================
+   design.css · Lutz Spring GmbH · Heizung · Sanitär · Wärmepumpen
+   Gemeinsames Designsystem für alle internen HTML-Tools.
+   Version 2.1.2 · Stand 2026-10-25
+   Einbinden:  Beim Veröffentlichen fügt _build/inline.py diese Datei in jedes
+               Tool ein (Marker design.css:start / design.css:end im HTML).
+               Ein Tool bleibt so eine einzelne Datei.
+   Regeln:     DESIGNREGELN.md · Referenz: styleguide.html
+   Keine externen Abhängigkeiten. Systemschrift. Hell + Dunkel.
+   ============================================================ */
 
-  *{box-sizing:border-box;}
-  html{-webkit-text-size-adjust:100%;}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:var(--font);
-    line-height:1.55;
-    padding:env(safe-area-inset-top) env(safe-area-inset-right)
-            env(safe-area-inset-bottom) env(safe-area-inset-left);
-    -webkit-tap-highlight-color:transparent;
-  }
-  .wrap{width:100%; max-width:1100px; margin:0 auto; padding:20px 20px 70px;}
+/* ------------------------------------------------------------
+   1 · TOKENS (hell = Standard)
+   Alle Farben nur über diese Variablen verwenden.
+   ------------------------------------------------------------ */
+:root {
+  color-scheme: light;
 
-  /* --- Kopfbereich --- */
-  header{
-    background:var(--accent);
-    color:var(--text-on-dark);
-    border-radius:var(--radius-lg);
-    padding:22px 24px;
-    margin-bottom:18px;
-    display:flex; flex-wrap:wrap; gap:14px;
-    align-items:center; justify-content:space-between;
-  }
-  .logo-img{height:38px; width:auto; display:block;}
-  .brand-sub{font-size:12px; color:var(--text-on-dark-2); margin-top:6px;}
-  .tool-title{text-align:right; font-size:14px; color:var(--text-on-dark-2);}
-  .tool-title strong{display:block; font-size:19px; color:var(--text-on-dark); margin-bottom:2px;}
+  /* Marke [BESTÄTIGT 03_design-system.md] */
+  --ls-navy:        #1a2b4a;
+  --ls-navy-2:      #223a63;   /* Hover/aktiv auf Navy */
+  --ls-navy-3:      #142238;   /* gedrückt */
+  --ls-yellow:      #fff200;   /* Logo-Gelb [BESTÄTIGT 2026-10-25]; nur Logo + Akzent, nie Textfarbe auf hellem Grund */
+  --ls-yellow-ink:  #8a6d00;   /* lesbares „Gelb“ als Text auf Weiß (≥ 4,5:1) */
 
-  .hinweis{
-    background:var(--status-amber-bg);
-    border:1px solid var(--status-amber);
-    color:var(--warn-text);
-    border-radius:var(--radius);
-    padding:12px 14px; font-size:13px; margin-bottom:18px;
-  }
+  /* Flächen */
+  --ls-bg:          #f4f3ee;   /* Creme, Seitenhintergrund [BESTÄTIGT] */
+  --ls-surface:     #ffffff;   /* Karten */
+  --ls-surface-2:   #faf9f5;   /* Eingaben, Zebra-Zeilen, Tabellenköpfe */
+  --ls-surface-3:   #efede6;   /* gedrückt / ausgewählt */
+  --ls-line:        rgba(0, 0, 0, 0.10);
+  --ls-line-strong: rgba(0, 0, 0, 0.20);
 
-  /* --- Schritte --- */
-  .schritt{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:18px 20px 20px;
-    margin-bottom:16px;
-  }
-  .schritt-kopf{display:flex; align-items:center; gap:11px; margin-bottom:16px;}
-  .schritt-nr{
-    flex:0 0 auto; width:28px; height:28px; border-radius:50%;
-    background:var(--accent); color:var(--text-on-dark);
-    display:flex; align-items:center; justify-content:center;
-    font-size:14px; font-weight:700;
-  }
-  .schritt-kopf h2{font-size:17px; margin:0; font-weight:650; color:var(--accent-text);}
+  /* Text */
+  --ls-text:        #1d1d1f;
+  --ls-text-2:      #6b6b70;   /* Sekundär, Labels (4,8:1 auf Creme) */
+  --ls-text-3:      #8e8e93;   /* nur Platzhalter, deaktiviert */
+  --ls-on-navy:     #ffffff;
 
-  /* --- Eingaben --- */
-  .fld{display:block; margin-bottom:16px; font-size:14px;}
-  .fld > span{display:block; color:var(--text-2); margin-bottom:6px;}
-  .raster{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:0 18px;}
+  /* Interaktion */
+  --ls-primary:     var(--ls-navy);
+  --ls-primary-hover: var(--ls-navy-2);
+  --ls-primary-active: var(--ls-navy-3);
+  --ls-on-primary:  #ffffff;
+  --ls-link:        var(--ls-navy);
+  --ls-focus:       var(--ls-navy);
+  --ls-focus-ring:  rgba(26, 43, 74, 0.25);
+  --ls-selection:   rgba(255, 242, 0, 0.45);
 
-  input[type=number], input[type=date], select{
-    width:100%; min-height:44px; padding:9px 11px;
-    border:1px solid var(--border-strong);
-    border-radius:var(--radius);
-    background:var(--surface); color:var(--text);
-    font-family:var(--font); font-size:16px;
-  }
-  input:focus-visible, select:focus-visible, button:focus-visible,
-  input[type=range]:focus-visible, summary:focus-visible{
-    outline:3px solid var(--interactive); outline-offset:2px;
-  }
+  /* Zustände (semantisch, nicht Akzent) */
+  --ls-ok:          #1a7a36;  --ls-ok-bg:     #e3f3e7;
+  --ls-warn:        #b25000;  --ls-warn-bg:   #fdebdd;
+  --ls-danger:      #d70015;  --ls-danger-bg: #fde4e6;
+  --ls-info:        #1a2b4a;  --ls-info-bg:   #e8edf6;
 
-  /* Schieberegler mit gekoppeltem Zahlenfeld */
-  .regler-zeile{display:flex; align-items:center; gap:12px;}
-  .regler-zeile input[type=range]{flex:1; min-width:0;}
-  .regler-zeile .zahl{flex:0 0 128px;}
-  input[type=range]{
-    -webkit-appearance:none; appearance:none;
-    height:34px; background:transparent; cursor:pointer;
-  }
-  input[type=range]::-webkit-slider-runnable-track{
-    height:6px; border-radius:3px; background:var(--border-strong);
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none; appearance:none;
-    width:26px; height:26px; margin-top:-10px; border-radius:50%;
-    background:var(--accent); border:3px solid var(--card);
-    box-shadow:0 1px 3px var(--shadow-sm);
-  }
-  input[type=range]::-moz-range-track{height:6px; border-radius:3px; background:var(--border-strong);}
-  input[type=range]::-moz-range-thumb{
-    width:22px; height:22px; border-radius:50%;
-    background:var(--accent); border:3px solid var(--card);
-  }
+  /* Diagramme: Reihenfarben mit fester Bedeutung (Wärmepumpe = Navy, Bestand Gas/Öl = Grau, Strom/PV = Gelb-Ocker, Vergleich = Stahlblau) */
+  --ls-chart-wp:    #1a2b4a;
+  --ls-chart-alt:   #8e8e93;
+  --ls-chart-pv:    #c9a800;
+  --ls-chart-2:     #4f75b8;
+  --ls-chart-grid:  rgba(0, 0, 0, 0.08);
+  --ls-chart-text:  #6b6b70;
 
-  /* Auswahlknöpfe statt Radio-Buttons */
-  .wahl{display:flex; flex-wrap:wrap; gap:8px;}
-  .wahl button{
-    min-height:44px; padding:9px 15px;
-    border:1px solid var(--border-strong); border-radius:var(--radius);
-    background:var(--card); color:var(--text);
-    font-family:var(--font); font-size:14px; font-weight:600; cursor:pointer;
-  }
-  .wahl button[aria-pressed="true"]{
-    background:var(--accent); color:var(--text-on-dark); border-color:var(--accent);
-  }
-  .schalter{
-    display:flex; align-items:center; gap:10px; min-height:44px;
-    font-size:14px; cursor:pointer;
-  }
-  .schalter input{width:22px; height:22px; flex:0 0 auto;}
+  /* Schatten (Tiefe sparsam) */
+  --ls-shadow-1: 0 1px 2px rgba(20, 30, 50, 0.06), 0 1px 1px rgba(20, 30, 50, 0.04);
+  --ls-shadow-2: 0 4px 16px rgba(20, 30, 50, 0.08), 0 1px 2px rgba(20, 30, 50, 0.05);
 
-  details.jahre{margin-top:-4px; margin-bottom:16px;}
-  details.jahre summary{
-    cursor:pointer; font-size:13.5px; color:var(--interactive);
-    min-height:44px; display:flex; align-items:center;
-  }
-  details.jahre .raster{margin-top:8px;}
+  /* Schrift: Systemschrift wie auf iPad und Mac [BESTÄTIGT: keine externen Abhängigkeiten] */
+  --ls-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ls-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --ls-fs-xs: 0.75rem;    /* 12 · Fußnoten */
+  --ls-fs-sm: 0.8125rem;  /* 13 · Labels, Tabellen dicht */
+  --ls-fs-md: 0.9375rem;  /* 15 · Fließtext, Eingaben */
+  --ls-fs-lg: 1.0625rem;  /* 17 · Kartentitel */
+  --ls-fs-xl: 1.375rem;   /* 22 · Abschnitt */
+  --ls-fs-2xl: 1.75rem;   /* 28 · Seitentitel */
+  --ls-fs-kpi: 2rem;      /* 32 · Kennzahl */
+  --ls-lh: 1.45;
 
-  /* --- Erklärkasten hinter jedem Schritt --- */
-  .erklaer{
-    background:var(--info-bg-soft);
-    border-left:3px solid var(--interactive);
-    border-radius:0 var(--radius) var(--radius) 0;
-    padding:13px 16px; margin-top:4px;
-  }
-  .erklaer-titel{
-    font-size:11px; font-weight:700; text-transform:uppercase;
-    letter-spacing:.06em; color:var(--info-text); margin-bottom:7px;
-  }
-  .erklaer p{margin:0 0 8px; font-size:14px; line-height:1.55; color:var(--text);}
-  .erklaer p:last-child{margin-bottom:0;}
-  .erklaer b{font-weight:650;}
-  .erklaer .rechnung{
-    font-family:'SF Mono',Menlo,Consolas,monospace; font-size:13px;
-    background:var(--card); border:1px solid var(--border);
-    border-radius:6px; padding:8px 11px; margin:8px 0 0;
-    overflow-x:auto; white-space:pre;
-  }
+  /* Abstände: 8-px-Raster */
+  --ls-s1: 4px; --ls-s2: 8px; --ls-s3: 12px; --ls-s4: 16px;
+  --ls-s5: 24px; --ls-s6: 32px; --ls-s7: 48px; --ls-s8: 64px;
 
-  /* --- Ergebnis --- */
-  .ergebnis{
-    background:linear-gradient(135deg, var(--brand-navy), var(--brand-navy-light));
-    color:var(--text-on-dark);
-    border-radius:var(--radius-lg);
-    padding:22px 24px; margin-bottom:16px;
-  }
-  .ergebnis h2{font-size:13px; text-transform:uppercase; letter-spacing:.7px;
-    color:var(--text-on-dark-2); margin:0 0 4px; font-weight:600;}
-  .zuschuss{font-size:40px; font-weight:700; letter-spacing:-.02em; line-height:1.1;}
-  .zuschuss small{font-size:16px; font-weight:400; color:var(--text-on-dark-2);}
-  .erg-zeilen{margin-top:16px; border-top:1px solid var(--overlay-white-30); padding-top:12px;}
-  .erg-zeile{display:flex; justify-content:space-between; gap:12px;
-    padding:5px 0; font-size:14px;}
-  .erg-zeile .lbl{color:var(--text-on-dark-2);}
-  .erg-zeile.summe{border-top:1px solid var(--overlay-white-30);
-    margin-top:6px; padding-top:9px; font-weight:700;}
-  .erg-hinweis{
-    margin-top:14px; background:var(--overlay-white-15);
-    border:1px solid var(--overlay-white-30); border-radius:var(--radius);
-    padding:10px 13px; font-size:13px; line-height:1.5;
-  }
+  /* Radien */
+  --ls-r-sm: 8px; --ls-r-md: 12px; --ls-r-lg: 16px; --ls-r-pill: 999px;
 
-  /* --- Frist --- */
-  .frist{
-    background:var(--card); border:1px solid var(--border);
-    border-radius:var(--radius); padding:16px 20px; margin-bottom:16px;
-  }
-  .frist h3{font-size:15px; margin:0 0 10px; font-weight:650; color:var(--accent-text);}
-  .frist-gross{font-size:15px; margin-bottom:12px;}
-  .frist-gross b{font-size:19px;}
-  table.stufen{width:100%; border-collapse:collapse; font-size:13.5px;
-    font-variant-numeric:tabular-nums;}
-  table.stufen th{
-    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em;
-    color:var(--text-2); font-weight:600; padding:6px 10px 6px 0;
-    border-bottom:1px solid var(--border);
-  }
-  table.stufen td{padding:6px 10px 6px 0; border-bottom:1px solid var(--border);}
-  table.stufen tr.jetzt td{font-weight:700; background:var(--accent-bg);}
-  table.stufen td:last-child, table.stufen th:last-child{padding-right:0; text-align:right;}
-  .tabelle-huelle{overflow-x:auto;}
+  /* Maße */
+  --ls-max: 1400px;           /* [BESTÄTIGT] */
+  --ls-control-h: 40px;       /* Höhe Eingaben/Buttons (Maus) */
+  --ls-touch-h: 44px;         /* Höhe auf Touch (iPad) */
+  --ls-gutter: 16px;
 
-  /* --- Kundenhinweis EE-Heizung --- */
-  .ee-hinweis{
-    background:var(--warn-bg-soft); border:1px solid var(--status-amber);
-    border-radius:var(--radius); padding:16px 18px; margin-bottom:16px;
+  /* Theme-Schalter: welches Symbol sichtbar ist (hell → Mond anbieten) */
+  --ls-icon-moon: block;
+  --ls-icon-sun: none;
+}
+
+/* Dunkel: folgt dem System, solange kein data-theme gesetzt ist */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ls-navy:        #16233d;
+    --ls-navy-2:      #1d2f52;
+    --ls-navy-3:      #111b30;
+    --ls-yellow-ink:  #fff200;
+    --ls-bg:          #141416;
+    --ls-surface:     #1e1e20;
+    --ls-surface-2:   #27272a;
+    --ls-surface-3:   #313134;
+    --ls-line:        rgba(255, 255, 255, 0.11);
+    --ls-line-strong: rgba(255, 255, 255, 0.22);
+    --ls-text:        #f5f5f7;
+    --ls-text-2:      #a1a1a6;
+    --ls-text-3:      #7c7c82;
+    --ls-primary:     #4f75b8;
+    --ls-primary-hover: #5d83c6;
+    --ls-primary-active: #43669f;
+    --ls-link:        #8fb3f0;
+    --ls-focus:       #8fb3f0;
+    --ls-focus-ring:  rgba(143, 179, 240, 0.30);
+    --ls-selection:   rgba(255, 242, 0, 0.30);
+    --ls-ok:     #30d158; --ls-ok-bg:     rgba(48, 209, 88, 0.14);
+    --ls-warn:   #ff9f0a; --ls-warn-bg:   rgba(255, 159, 10, 0.14);
+    --ls-danger: #ff453a; --ls-danger-bg: rgba(255, 69, 58, 0.14);
+    --ls-info:   #8fb3f0; --ls-info-bg:   rgba(143, 179, 240, 0.14);
+    --ls-chart-wp: #8fb3f0; --ls-chart-alt: #7c7c82; --ls-chart-pv: #e6c800; --ls-chart-2: #4f75b8; --ls-chart-grid: rgba(255,255,255,0.09); --ls-chart-text: #a1a1a6;
+    --ls-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --ls-shadow-2: 0 6px 20px rgba(0, 0, 0, 0.45);
+    --ls-icon-moon: none;
+    --ls-icon-sun: block;
   }
-  .ee-hinweis h3{font-size:16px; margin:0 0 8px; font-weight:650; color:var(--warn-text);}
-  .ee-hinweis p{margin:0 0 8px; font-size:14.5px; line-height:1.55;}
-  .ee-hinweis p:last-child{margin-bottom:0;}
-  .ee-hinweis .klein{font-size:12.5px; color:var(--text-2); font-style:italic;}
+}
+/* Dunkel: ausdrücklich gewählt (Schalter im Tool) – gleiche Werte */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ls-icon-moon: none;
+  --ls-icon-sun: block;
+  --ls-navy:        #16233d;
+  --ls-navy-2:      #1d2f52;
+  --ls-navy-3:      #111b30;
+  --ls-yellow-ink:  #fff200;
+  --ls-bg:          #141416;
+  --ls-surface:     #1e1e20;
+  --ls-surface-2:   #27272a;
+  --ls-surface-3:   #313134;
+  --ls-line:        rgba(255, 255, 255, 0.11);
+  --ls-line-strong: rgba(255, 255, 255, 0.22);
+  --ls-text:        #f5f5f7;
+  --ls-text-2:      #a1a1a6;
+  --ls-text-3:      #7c7c82;
+  --ls-primary:     #4f75b8;
+  --ls-primary-hover: #5d83c6;
+  --ls-primary-active: #43669f;
+  --ls-link:        #8fb3f0;
+  --ls-focus:       #8fb3f0;
+  --ls-focus-ring:  rgba(143, 179, 240, 0.30);
+  --ls-selection:   rgba(255, 242, 0, 0.30);
+  --ls-ok:     #30d158; --ls-ok-bg:     rgba(48, 209, 88, 0.14);
+  --ls-warn:   #ff9f0a; --ls-warn-bg:   rgba(255, 159, 10, 0.14);
+  --ls-danger: #ff453a; --ls-danger-bg: rgba(255, 69, 58, 0.14);
+  --ls-info:   #8fb3f0; --ls-info-bg:   rgba(143, 179, 240, 0.14);
+  --ls-chart-wp: #8fb3f0; --ls-chart-alt: #7c7c82; --ls-chart-pv: #e6c800; --ls-chart-2: #4f75b8; --ls-chart-grid: rgba(255,255,255,0.09); --ls-chart-text: #a1a1a6;
+  --ls-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --ls-shadow-2: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
 
-  details.quelle{margin-top:10px;}
-  details.quelle summary{cursor:pointer; font-size:12.5px; color:var(--text-2);
-    min-height:44px; display:flex; align-items:center;}
-  details.quelle p{font-size:12.5px; color:var(--text-2); margin:0 0 6px;}
+/* ------------------------------------------------------------
+   2 · BASIS
+   ------------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; height: 100%; }
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--ls-bg);
+  color: var(--ls-text);
+  font: var(--ls-fs-md) / var(--ls-lh) var(--ls-font);
+  -webkit-font-smoothing: antialiased;
+  padding-block: calc(var(--ls-s4) + env(safe-area-inset-top, 0px)) calc(var(--ls-s8) + env(safe-area-inset-bottom, 0px)); /* oben: Statusleiste der Homescreen-App; unten: Haus-Icon */
+  padding-left:  max(var(--ls-gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--ls-gutter), env(safe-area-inset-right, 0px));
+}
+::selection { background: var(--ls-selection); }
+img, svg, canvas { max-width: 100%; height: auto; }
+[hidden] { display: none !important; }
+a { color: var(--ls-link); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+hr { border: 0; border-top: 1px solid var(--ls-line); margin: var(--ls-s5) 0; }
+code, kbd, .ls-mono { font-family: var(--ls-font-mono); font-size: 0.92em; }
+small, .ls-small { font-size: var(--ls-fs-sm); }
+sub, sup { line-height: 0; }
 
-  footer{margin-top:26px; text-align:center; font-size:13px;}
-  footer a{color:var(--interactive); text-decoration:none;}
-  footer a:hover{text-decoration:underline;}
-  .fuss-text{color:var(--text-3); font-size:12px; margin-top:14px; line-height:1.5;}
+h1, h2, h3, h4 { margin: 0; color: var(--ls-text); font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; hyphens: auto; -webkit-hyphens: auto; }
+h1 { font-size: var(--ls-fs-2xl); line-height: 1.15; letter-spacing: -0.02em; }
+h2 { font-size: var(--ls-fs-xl);  line-height: 1.2; }
+h3 { font-size: var(--ls-fs-lg);  line-height: 1.3; }
+h4 { font-size: var(--ls-fs-md);  line-height: 1.35; }
+p  { margin: 0; }
+p + p { margin-top: var(--ls-s3); }
+.ls-prose { max-width: 70ch; }
+.ls-prose p + p { margin-top: var(--ls-s3); }
 
-  @media (max-width:560px){
-    header{flex-direction:column; align-items:flex-start;}
-    .tool-title{text-align:left;}
-    .zuschuss{font-size:32px;}
-    .regler-zeile{flex-wrap:wrap;}
-    .regler-zeile .zahl{flex:1 1 100%;}
+/* Fokus: immer sichtbar, Tastatur und Touch */
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--ls-focus); outline-offset: 2px; border-radius: var(--ls-r-sm); }
+
+/* Reduzierte Bewegung respektieren */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* ------------------------------------------------------------
+   3 · LAYOUT
+   ------------------------------------------------------------ */
+.ls-container { max-width: var(--ls-max); margin-inline: auto; width: 100%; min-width: 0; }
+.ls-stack  { display: grid; gap: var(--ls-s4); }
+/* Grid-Kinder dürfen nie breiter werden als ihr Platz (Tabellen/Code scrollen im eigenen Rahmen) */
+.ls-container > *, .ls-stack > *, .ls-form > *, .ls-fields > *, .ls-card > * { min-width: 0; }
+.ls-stack--tight { gap: var(--ls-s2); }
+.ls-stack--loose { gap: var(--ls-s5); }
+.ls-row    { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ls-s2) var(--ls-s3); }
+.ls-row--between { justify-content: space-between; }
+.ls-row--end { justify-content: flex-end; }
+.ls-grow { flex: 1 1 auto; min-width: 0; }
+.ls-section { margin-top: var(--ls-s6); }
+.ls-section > h2 { margin-bottom: var(--ls-s4); }
+
+/* Karten-Raster [BESTÄTIGT: minmax(250px,1fr), einspaltig < 700 px] */
+.ls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--ls-s4); }
+.ls-grid--2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+.ls-grid--3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+.ls-grid > * { min-width: 0; }
+@media (max-width: 699.98px) { .ls-grid, .ls-grid--2, .ls-grid--3 { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------
+   4 · KOPF (Navy-Balken mit runden Ecken [BESTÄTIGT]) + FUSS
+   ------------------------------------------------------------ */
+.ls-header {
+  background: var(--ls-navy);
+  color: var(--ls-on-navy);
+  border-radius: var(--ls-r-lg);
+  padding: var(--ls-s4) var(--ls-s5);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--ls-s3) var(--ls-s5);
+  box-shadow: var(--ls-shadow-1);
+}
+.ls-header__brand { display: grid; gap: 2px; }
+/* Logo Variante B (Wortmarke mit Slogan) als Inline-SVG; Farbe über currentColor. Mindestens 280 px breit, sonst ist der Slogan im Logo unlesbar. */
+.ls-header__logo { display: block; width: min(300px, 100%); height: auto; color: var(--ls-yellow); }
+.ls-header__logo--navy { color: var(--ls-navy); } /* Ausnahme: Logo ohne Navy-Hintergrund (Fuß, helle Fläche) */
+.ls-header__slogan { font-size: var(--ls-fs-sm); color: var(--ls-yellow); letter-spacing: 0.02em; }
+.ls-header:has(> .ls-header__title) { grid-template-columns: auto 1fr auto; } /* alte Form mit Titelblock in der Mitte */
+.ls-header__title { display: grid; gap: 2px; min-width: 0; }
+.ls-header__title h1 { color: var(--ls-on-navy); font-size: var(--ls-fs-xl); }
+/* Standard (2.1.2): Toolname rechts oben über Kunde/Projekt, kein Untertitel */
+.ls-header__meta .ls-header__title h1, .ls-header__meta h1 { font-size: 1.25rem; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; color: var(--ls-on-navy); margin: 0 0 2px; text-align: right; }
+.ls-header__sub { font-size: var(--ls-fs-sm); color: rgba(255,255,255,0.75); }
+.ls-header__meta { display: grid; gap: 2px; justify-items: end; justify-self: end; text-align: right; font-size: var(--ls-fs-sm); color: rgba(255,255,255,0.85); white-space: nowrap; min-width: 0; }
+.ls-header__meta b { color: var(--ls-on-navy); font-weight: 600; }
+.ls-header__meta .ls-header__title { justify-items: end; margin-bottom: 2px; }
+.ls-header a { color: var(--ls-on-navy); }
+.ls-header .ls-btn--ghost { color: var(--ls-on-navy); border-color: rgba(255,255,255,0.35); }
+.ls-header .ls-btn--ghost:hover { background: rgba(255,255,255,0.1); }
+@media (max-width: 699.98px) {
+  .ls-header { grid-template-columns: 1fr; padding: var(--ls-s4); }
+  .ls-header__meta { justify-items: start; text-align: left; white-space: normal; }
+}
+/* Theme-Schalter: runder Symbolknopf, Mond im Hell-, Sonne im Dunkelmodus; kein Text, kein Rahmen */
+.ls-theme-toggle { appearance: none; border: 0; background: transparent; width: 32px; height: 32px; border-radius: var(--ls-r-pill); display: inline-grid; place-items: center; color: var(--ls-on-navy); opacity: .45; cursor: pointer; transition: opacity .15s ease; -webkit-tap-highlight-color: transparent; } /* Deckkraft wie Haus-Icon: 0,45 / 1 / 0,3 */
+.ls-theme-toggle:hover, .ls-theme-toggle:focus-visible { opacity: 1; }
+.ls-theme-toggle:active { opacity: .3; }
+.ls-theme-toggle svg { width: 18px; height: 18px; }
+.ls-theme-toggle__moon { display: var(--ls-icon-moon); }
+.ls-theme-toggle__sun { display: var(--ls-icon-sun); }
+.ls-header__meta .ls-theme-toggle { justify-self: end; margin-top: 2px; }
+@media (max-width: 699.98px) { .ls-header__meta { justify-self: stretch; } .ls-header__meta .ls-theme-toggle { justify-self: start; } .ls-header__meta .ls-header__title h1, .ls-header__meta h1 { text-align: left; } }
+@media (pointer: coarse) { .ls-theme-toggle { width: 40px; height: 40px; } }
+
+/* Text-Wortmarke, falls (noch) kein Logo eingebettet ist */
+.ls-wordmark { font-weight: 800; font-size: 1.375rem; letter-spacing: -0.02em; color: var(--ls-yellow); line-height: 1; }
+.ls-wordmark small { display: block; font-weight: 600; font-size: 0.75rem; color: var(--ls-on-navy); letter-spacing: 0.08em; margin-top: 2px; }
+
+.ls-footer { margin-top: var(--ls-s6); padding-top: var(--ls-s4); border-top: 1px solid var(--ls-line); font-size: var(--ls-fs-xs); color: var(--ls-text-2); max-width: 90ch; }
+
+/* Haus-Icon: Rücklink zur Startseite [BESTÄTIGT: 48×48, unten mittig, Deckkraft 0,45 / 1 / 0,3, im Druck aus] */
+.ls-home {
+  position: fixed; left: 50%; bottom: calc(var(--ls-s3) + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  width: 48px; height: 48px; border-radius: var(--ls-r-pill);
+  display: grid; place-items: center;
+  background: var(--ls-surface); color: var(--ls-text); border: 1px solid var(--ls-line);
+  box-shadow: var(--ls-shadow-2); opacity: 0.45; transition: opacity .15s ease; z-index: 50;
+}
+.ls-home:hover, .ls-home:focus-visible { opacity: 1; }
+.ls-home:active { opacity: 0.3; }
+.ls-home svg { width: 22px; height: 22px; }
+
+/* ------------------------------------------------------------
+   5 · KARTEN
+   ------------------------------------------------------------ */
+.ls-card {
+  background: var(--ls-surface);
+  border: 1px solid var(--ls-line);
+  border-radius: var(--ls-r-lg);
+  padding: var(--ls-s5);
+  box-shadow: var(--ls-shadow-1);
+  min-width: 0;
+}
+.ls-card--tight { padding: var(--ls-s4); }
+.ls-card--flat { box-shadow: none; }
+.ls-card__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ls-s3); margin-bottom: var(--ls-s4); flex-wrap: wrap; }
+.ls-card__head h2, .ls-card__head h3 { margin: 0; }
+.ls-card__sub { font-size: var(--ls-fs-sm); color: var(--ls-text-2); }
+/* Abstand zwischen Karten kommt vom Eltern-Raster (.ls-stack / .ls-grid), nicht von Margins */
+
+/* Nummerierte Blockkarten (Schritte einer Auslegung) – nur bei echter Reihenfolge */
+.ls-steps { counter-reset: ls-step; display: grid; gap: var(--ls-s4); }
+.ls-steps > .ls-card { counter-increment: ls-step; position: relative; padding-left: calc(var(--ls-s5) + 40px); }
+.ls-steps > .ls-card::before {
+  content: counter(ls-step); position: absolute; left: var(--ls-s4); top: var(--ls-s5);
+  width: 28px; height: 28px; border-radius: var(--ls-r-pill);
+  background: var(--ls-navy); color: var(--ls-on-navy); font-weight: 700; font-size: var(--ls-fs-sm);
+  display: grid; place-items: center;
+}
+
+/* Empfehlungskarte: Navy mit gelben Kennwerten (z. B. Kostenvergleich) */
+.ls-card--navy { background: var(--ls-navy); color: var(--ls-on-navy); border-color: transparent; }
+.ls-card--navy h2, .ls-card--navy h3, .ls-card--navy .ls-kpi__value { color: var(--ls-on-navy); }
+.ls-card--navy .ls-kpi__value, .ls-card--navy .ls-accent { color: var(--ls-yellow); }
+.ls-card--navy .ls-kpi__label, .ls-card--navy .ls-muted { color: rgba(255,255,255,0.75); }
+.ls-card--navy .ls-kpi { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }  /* Kennzahlen auf Navy, 2.1.1 */
+.ls-card--navy .ls-btn--primary { background: var(--ls-yellow); color: #1d1d1f; }
+.ls-card--navy .ls-btn--primary:hover { background: #fff566; }
+
+/* ------------------------------------------------------------
+   6 · FORMULARE
+   ------------------------------------------------------------ */
+.ls-form { display: grid; gap: var(--ls-s4); }
+.ls-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: var(--ls-s3) var(--ls-s4); }
+.ls-field { display: grid; gap: var(--ls-s1); min-width: 0; align-content: start; } /* align-content: Felder einer Zeile beginnen oben, Regler und Eingaben stehen auf einer Höhe (2.1.1) */
+.ls-field--span { grid-column: 1 / -1; }
+.ls-label { font-size: var(--ls-fs-sm); color: var(--ls-text-2); font-weight: 500; display: flex; gap: var(--ls-s1); align-items: baseline; }
+.ls-label abbr { text-decoration: none; }
+.ls-hint { font-size: var(--ls-fs-xs); color: var(--ls-text-2); }
+.ls-error { font-size: var(--ls-fs-xs); color: var(--ls-danger); font-weight: 500; }
+
+.ls-input, .ls-select, .ls-textarea {
+  width: 100%; min-height: var(--ls-control-h);
+  padding: 0 var(--ls-s3);
+  font: inherit; color: var(--ls-text);
+  background: var(--ls-surface-2);
+  border: 1px solid var(--ls-line); border-radius: var(--ls-r-sm);
+  transition: border-color .12s ease, box-shadow .12s ease, background .12s ease;
+  font-variant-numeric: tabular-nums;
+}
+.ls-textarea { min-height: calc(var(--ls-control-h) * 2.2); padding: var(--ls-s2) var(--ls-s3); resize: vertical; line-height: var(--ls-lh); }
+.ls-input::placeholder, .ls-textarea::placeholder { color: var(--ls-text-3); }
+.ls-input:hover, .ls-select:hover, .ls-textarea:hover { border-color: var(--ls-line-strong); }
+.ls-input:focus, .ls-select:focus, .ls-textarea:focus { outline: none; border-color: var(--ls-focus); box-shadow: 0 0 0 3px var(--ls-focus-ring); background: var(--ls-surface); }
+.ls-input[aria-invalid="true"], .ls-select[aria-invalid="true"] { border-color: var(--ls-danger); }
+.ls-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px var(--ls-danger-bg); }
+.ls-input:disabled, .ls-select:disabled, .ls-textarea:disabled { color: var(--ls-text-3); background: var(--ls-surface-3); cursor: not-allowed; }
+.ls-input[readonly] { background: var(--ls-surface-3); }
+.ls-input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.ls-input::-webkit-outer-spin-button, .ls-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ls-select {
+  appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path d='M4 6l4 4 4-4' fill='none' stroke='%236b6b70' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+
+/* Eingabe mit Einheit (Suffix) – Einheit steht am Feld, nie im Wert */
+.ls-unit { position: relative; display: grid; }
+.ls-unit .ls-input { padding-right: 3.2em; }
+.ls-unit > span { position: absolute; right: var(--ls-s3); top: 50%; transform: translateY(-50%); font-size: var(--ls-fs-sm); color: var(--ls-text-2); pointer-events: none; }
+.ls-unit--pre .ls-input { padding-left: 2.4em; padding-right: var(--ls-s3); }
+.ls-unit--pre > span { right: auto; left: var(--ls-s3); }
+
+/* Auswahlfelder */
+.ls-check { display: inline-flex; align-items: center; gap: var(--ls-s2); font-size: var(--ls-fs-md); cursor: pointer; min-height: 32px; }
+.ls-check input { width: 20px; height: 20px; margin: 0; accent-color: var(--ls-primary); flex: none; }
+.ls-switch { display: inline-flex; align-items: center; gap: var(--ls-s3); cursor: pointer; }
+.ls-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.ls-switch i { width: 44px; height: 26px; border-radius: var(--ls-r-pill); background: var(--ls-line-strong); position: relative; transition: background .15s ease; flex: none; }
+.ls-switch i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .15s ease; }
+.ls-switch input:checked + i { background: var(--ls-ok); }
+.ls-switch input:checked + i::after { transform: translateX(18px); }
+.ls-switch input:focus-visible + i { outline: 2px solid var(--ls-focus); outline-offset: 2px; }
+
+/* Segment-Steuerung (Tabs ① ② ③, Umschalter Gas/Öl) */
+.ls-seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--ls-surface-3); border-radius: var(--ls-r-md); max-width: 100%; overflow-x: auto; }
+.ls-seg > button, .ls-seg > label {
+  appearance: none; border: 0; background: transparent; color: var(--ls-text-2);
+  font: inherit; font-size: var(--ls-fs-sm); font-weight: 500;
+  padding: 0 var(--ls-s3); min-height: 34px; border-radius: calc(var(--ls-r-md) - 3px);
+  cursor: pointer; white-space: nowrap; transition: background .12s ease, color .12s ease; display: inline-flex; align-items: center; gap: var(--ls-s1);
+}
+.ls-seg > [aria-selected="true"], .ls-seg > .is-active, .ls-seg > label:has(input:checked) { background: var(--ls-surface); color: var(--ls-text); box-shadow: var(--ls-shadow-1); font-weight: 600; }
+.ls-seg input { position: absolute; opacity: 0; width: 0; height: 0; }
+.ls-seg--full { display: flex; }
+.ls-seg--full > * { flex: 1 1 0; justify-content: center; }
+
+/* „Erweitert“: selten geänderte Felder eingeklappt, eingestellte Werte als Kurzzeile sichtbar */
+.ls-details { border-top: 1px solid var(--ls-line); padding-top: var(--ls-s2); }
+.ls-details > summary { cursor: pointer; font-size: var(--ls-fs-sm); font-weight: 600; color: var(--ls-text); list-style: none; display: flex; align-items: center; gap: var(--ls-s2); min-height: 32px; }
+.ls-details > summary::-webkit-details-marker { display: none; }
+.ls-details > summary::before { content: ""; width: 7px; height: 7px; border-right: 1.8px solid var(--ls-text-2); border-bottom: 1.8px solid var(--ls-text-2); transform: rotate(-45deg); transition: transform .12s ease; flex: none; margin-left: 2px; }
+.ls-details[open] > summary::before { transform: rotate(45deg); }
+.ls-details > summary .ls-muted { font-weight: 400; }
+.ls-details[open] > summary .ls-muted { display: none; }
+
+/* Touch: größere Ziele auf iPad / Handy [BESTÄTIGT 2026-10-25, WCAG 2.2 Zielgröße] */
+@media (pointer: coarse) {
+  :root { --ls-control-h: var(--ls-touch-h); }
+  .ls-seg > button, .ls-seg > label { min-height: 40px; }
+  .ls-check { min-height: 44px; }
+  .ls-check input { width: 24px; height: 24px; }
+}
+
+/* ------------------------------------------------------------
+   7 · BUTTONS
+   Je Ansicht genau EIN primärer Button (die Hauptaktion).
+   ------------------------------------------------------------ */
+.ls-btn {
+  appearance: none; -webkit-appearance: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--ls-s2);
+  min-height: var(--ls-control-h); padding: 0 var(--ls-s4);
+  font: inherit; font-size: var(--ls-fs-md); font-weight: 600; line-height: 1;
+  border-radius: var(--ls-r-md); border: 1px solid transparent;
+  cursor: pointer; text-decoration: none; white-space: nowrap;
+  transition: background .12s ease, border-color .12s ease, transform .06s ease, box-shadow .12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.ls-btn:active { transform: scale(0.98); }
+.ls-btn:disabled, .ls-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; transform: none; }
+.ls-btn svg { width: 18px; height: 18px; flex: none; }
+.ls-btn--primary { background: var(--ls-primary); color: var(--ls-on-primary); }
+.ls-btn--primary:hover { background: var(--ls-primary-hover); }
+.ls-btn--primary:active { background: var(--ls-primary-active); }
+.ls-btn--secondary { background: var(--ls-surface); color: var(--ls-text); border-color: var(--ls-line-strong); }
+.ls-btn--secondary:hover { background: var(--ls-surface-2); }
+.ls-btn--ghost { background: transparent; color: var(--ls-link); border-color: transparent; }
+.ls-btn--ghost:hover { background: var(--ls-surface-3); }
+.ls-btn--danger { background: var(--ls-surface); color: var(--ls-danger); border-color: var(--ls-danger); }
+.ls-btn--danger:hover { background: var(--ls-danger-bg); }
+.ls-btn--sm { min-height: 32px; padding: 0 var(--ls-s3); font-size: var(--ls-fs-sm); border-radius: var(--ls-r-sm); }
+.ls-btn--lg { min-height: 48px; padding: 0 var(--ls-s5); font-size: var(--ls-fs-lg); }
+.ls-btn--block { width: 100%; }
+.ls-btn--icon { padding: 0; width: var(--ls-control-h); }
+.ls-toolbar { display: flex; flex-wrap: wrap; gap: var(--ls-s2); align-items: center; }
+.ls-toolbar__spacer { flex: 1 1 auto; }
+@media (max-width: 480px) { .ls-toolbar--stack .ls-btn { flex: 1 1 100%; } }
+
+/* ------------------------------------------------------------
+   8 · ERGEBNISSE: Kennzahlen, Tabellen, Listen
+   ------------------------------------------------------------ */
+.ls-num, .ls-table td.ls-num, .ls-kpi__value { font-variant-numeric: tabular-nums; }
+.ls-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: var(--ls-s3); }
+.ls-kpi { display: grid; gap: 2px; padding: var(--ls-s3) var(--ls-s4); background: var(--ls-surface-2); border-radius: var(--ls-r-md); border: 1px solid var(--ls-line); min-width: 0; }
+.ls-kpi__label { font-size: var(--ls-fs-xs); color: var(--ls-text-2); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.ls-kpi__value { font-size: var(--ls-fs-kpi); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; color: var(--ls-text); }
+.ls-kpi__value small { font-size: 0.5em; font-weight: 600; color: var(--ls-text-2); margin-left: 2px; letter-spacing: 0; }
+.ls-kpi__note { font-size: var(--ls-fs-xs); color: var(--ls-text-2); }
+.ls-kpi--ok .ls-kpi__value { color: var(--ls-ok); }
+.ls-kpi--warn .ls-kpi__value { color: var(--ls-warn); }
+.ls-kpi--danger .ls-kpi__value { color: var(--ls-danger); }
+
+/* Label/Wert-Liste (Bericht) */
+.ls-dl { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 1.4fr); margin: 0; font-size: var(--ls-fs-md); }
+.ls-dl > dt, .ls-dl > dd { margin: 0; padding: var(--ls-s2) 0; border-top: 1px solid var(--ls-line); min-width: 0; }
+.ls-dl > dt { color: var(--ls-text-2); padding-right: var(--ls-s3); }
+.ls-dl > dd { font-weight: 500; }
+.ls-dl > dt:first-of-type, .ls-dl > dd:first-of-type { border-top: 0; }
+.ls-dl > dt.ls-dl__strong, .ls-dl > dd.ls-dl__strong { font-weight: 700; color: var(--ls-text); }
+
+/* Tabellen: dicht, Zahlen rechts, Kopf fixiert, breite Tabellen scrollen im Rahmen */
+.ls-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--ls-line); border-radius: var(--ls-r-md); background: var(--ls-surface); }
+.ls-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--ls-fs-sm); }
+.ls-table th, .ls-table td { padding: var(--ls-s2) var(--ls-s3); text-align: left; vertical-align: top; border-bottom: 1px solid var(--ls-line); }
+.ls-table th { position: sticky; top: 0; z-index: 1; background: var(--ls-surface-2); color: var(--ls-text-2); font-weight: 600; font-size: var(--ls-fs-xs); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+.ls-table tbody tr:last-child td { border-bottom: 0; }
+.ls-table tbody tr:hover td { background: var(--ls-surface-2); }
+.ls-table .ls-num, .ls-table th.ls-num { text-align: right; }
+.ls-table tr.is-selected td { background: var(--ls-info-bg); }
+.ls-table tr.is-selected td:first-child { box-shadow: inset 3px 0 0 var(--ls-primary); }
+.ls-table tr[role="button"], .ls-table tr.is-clickable { cursor: pointer; }
+.ls-table tfoot td { font-weight: 600; background: var(--ls-surface-2); border-top: 1px solid var(--ls-line-strong); }
+.ls-table--compact th, .ls-table--compact td { padding: var(--ls-s1) var(--ls-s2); }
+
+/* Ergebnis-Zeilenliste (Alternative zur Tabelle auf schmalen Schirmen) */
+.ls-list { display: grid; }
+.ls-list__item { display: flex; align-items: center; gap: var(--ls-s3); padding: var(--ls-s3) 0; border-top: 1px solid var(--ls-line); }
+.ls-list__item:first-child { border-top: 0; }
+.ls-list__main { flex: 1 1 auto; min-width: 0; }
+.ls-list__main b { display: block; font-weight: 600; }
+.ls-list__main span { display: block; font-size: var(--ls-fs-sm); color: var(--ls-text-2); overflow-wrap: anywhere; }
+
+/* ------------------------------------------------------------
+   9 · STATUS: Badges, Hinweise, Leerzustände
+   ------------------------------------------------------------ */
+.ls-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: var(--ls-r-pill); font-size: var(--ls-fs-xs); font-weight: 600; white-space: nowrap; background: var(--ls-surface-3); color: var(--ls-text-2); line-height: 1.6; }
+.ls-badge--ok { background: var(--ls-ok-bg); color: var(--ls-ok); }
+.ls-badge--warn { background: var(--ls-warn-bg); color: var(--ls-warn); }
+.ls-badge--danger { background: var(--ls-danger-bg); color: var(--ls-danger); }
+.ls-badge--info { background: var(--ls-info-bg); color: var(--ls-info); }
+.ls-badge--navy { background: var(--ls-navy); color: var(--ls-on-navy); }
+.ls-badge--yellow { background: var(--ls-yellow); color: #1d1d1f; }
+
+.ls-note { display: grid; grid-template-columns: auto 1fr; gap: var(--ls-s3); padding: var(--ls-s3) var(--ls-s4); border-radius: var(--ls-r-md); border: 1px solid var(--ls-line); background: var(--ls-surface-2); font-size: var(--ls-fs-sm); }
+.ls-note > svg, .ls-note > .ls-note__icon { width: 18px; height: 18px; margin-top: 2px; flex: none; }
+.ls-note b { font-weight: 600; }
+.ls-note--info   { background: var(--ls-info-bg);   border-color: transparent; color: var(--ls-text); }
+.ls-note--ok     { background: var(--ls-ok-bg);     border-color: transparent; }
+.ls-note--warn   { background: var(--ls-warn-bg);   border-color: transparent; }
+.ls-note--danger { background: var(--ls-danger-bg); border-color: transparent; }
+.ls-note--info .ls-note__icon { color: var(--ls-info); }
+.ls-note--ok .ls-note__icon { color: var(--ls-ok); }
+.ls-note--warn .ls-note__icon { color: var(--ls-warn); }
+.ls-note--danger .ls-note__icon { color: var(--ls-danger); }
+.ls-note--plain { grid-template-columns: 1fr; }
+
+/* Notizfeld im Bericht (gelb hinterlegt, wie bisher) */
+.ls-notiz { padding: var(--ls-s3) var(--ls-s4); border-radius: var(--ls-r-md); background: rgba(255, 242, 0, 0.16); border: 1px solid rgba(255, 242, 0, 0.5); font-size: var(--ls-fs-sm); }
+.ls-notiz b { color: var(--ls-yellow-ink); letter-spacing: 0.04em; font-size: var(--ls-fs-xs); }
+
+.ls-empty { text-align: center; padding: var(--ls-s6) var(--ls-s4); color: var(--ls-text-2); border: 1px dashed var(--ls-line-strong); border-radius: var(--ls-r-lg); }
+.ls-empty b { display: block; color: var(--ls-text); font-weight: 600; margin-bottom: var(--ls-s1); }
+
+/* Statuszeile oben (z. B. „Lagerbestand geladen: 14 Positionen · Stand …“) */
+.ls-status { display: flex; align-items: center; gap: var(--ls-s2); font-size: var(--ls-fs-sm); color: var(--ls-text-2); padding: var(--ls-s2) var(--ls-s3); border-radius: var(--ls-r-sm); background: var(--ls-surface); border: 1px solid var(--ls-line); }
+.ls-status__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ls-text-3); flex: none; }
+.ls-status--ok .ls-status__dot { background: var(--ls-ok); }
+.ls-status--warn .ls-status__dot { background: var(--ls-warn); }
+
+/* Fortschritt / Deckung */
+.ls-meter { height: 6px; border-radius: var(--ls-r-pill); background: var(--ls-surface-3); overflow: hidden; }
+.ls-meter > i { display: block; height: 100%; background: var(--ls-primary); border-radius: inherit; }
+.ls-meter--ok > i { background: var(--ls-ok); }
+.ls-meter--warn > i { background: var(--ls-warn); }
+.ls-meter--danger > i { background: var(--ls-danger); }
+
+/* Lade-Skelett */
+@keyframes ls-pulse { 50% { opacity: .45; } }
+.ls-skeleton { background: var(--ls-surface-3); border-radius: var(--ls-r-sm); min-height: 1em; animation: ls-pulse 1.4s ease-in-out infinite; }
+
+
+/* ------------------------------------------------------------
+   10 · WEITERE BAUSTEINE (2.1)
+   ------------------------------------------------------------ */
+
+/* 10.1 Startseiten-Kacheln (index.html): Bild 16:9, Titel, ein Satz, „Öffnen“ */
+.ls-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: var(--ls-s4); }
+.ls-tile { display: grid; grid-template-rows: auto 1fr; background: var(--ls-surface); border: 1px solid var(--ls-line); border-radius: var(--ls-r-lg); overflow: hidden; box-shadow: var(--ls-shadow-1); color: inherit; text-decoration: none; transition: transform .12s ease, box-shadow .12s ease; min-width: 0; }
+.ls-tile:hover { transform: translateY(-2px); box-shadow: var(--ls-shadow-2); text-decoration: none; }
+.ls-tile:active { transform: none; }
+.ls-tile__img { aspect-ratio: 16 / 9; width: 100%; object-fit: cover; background: var(--ls-surface-3); display: block; }
+.ls-tile__img--placeholder { display: grid; place-items: center; color: var(--ls-text-3); font-size: var(--ls-fs-sm); }
+.ls-tile__body { padding: var(--ls-s4); display: grid; gap: var(--ls-s1); align-content: start; }
+.ls-tile__title { font-size: var(--ls-fs-lg); font-weight: 600; letter-spacing: -0.01em; }
+.ls-tile__text { font-size: var(--ls-fs-sm); color: var(--ls-text-2); }
+.ls-tile__cta { margin-top: var(--ls-s2); font-size: var(--ls-fs-sm); font-weight: 600; color: var(--ls-link); display: inline-flex; align-items: center; gap: 4px; }
+.ls-tile__cta::after { content: "›"; font-size: 1.1em; }
+
+/* 10.2 Gespeicherte Einträge (Räume, Positionen) mit Aktionen */
+.ls-items { display: grid; gap: var(--ls-s2); }
+.ls-item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--ls-s3); padding: var(--ls-s2) var(--ls-s3); background: var(--ls-surface-2); border: 1px solid var(--ls-line); border-radius: var(--ls-r-md); min-width: 0; }
+.ls-item__no { width: 26px; height: 26px; border-radius: var(--ls-r-pill); background: var(--ls-navy); color: var(--ls-on-navy); font-size: var(--ls-fs-xs); font-weight: 700; display: grid; place-items: center; }
+.ls-item__main { min-width: 0; display: grid; gap: 1px; }
+.ls-item__main b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ls-item__main span { font-size: var(--ls-fs-sm); color: var(--ls-text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ls-item__actions { display: flex; gap: 2px; }
+.ls-item__actions .ls-btn { min-height: 32px; width: 32px; padding: 0; border-radius: var(--ls-r-sm); color: var(--ls-text-2); }
+.ls-item__actions .ls-btn:hover { color: var(--ls-text); }
+.ls-item__actions .ls-btn--danger { color: var(--ls-danger); border-color: transparent; background: transparent; }
+.ls-item.is-active { border-color: var(--ls-primary); box-shadow: 0 0 0 2px var(--ls-focus-ring); background: var(--ls-surface); }
+@media (max-width: 480px) { .ls-item { grid-template-columns: auto 1fr; } .ls-item__actions { grid-column: 1 / -1; justify-content: flex-end; } }
+
+/* 10.3 Rückfrage vor Löschen/Verwerfen – inline statt Browser-Dialog */
+.ls-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ls-s2) var(--ls-s3); padding: var(--ls-s3) var(--ls-s4); background: var(--ls-danger-bg); border-radius: var(--ls-r-md); font-size: var(--ls-fs-sm); }
+.ls-confirm > b { font-weight: 600; flex: 1 1 auto; }
+.ls-confirm .ls-btn { min-height: 32px; }
+/* Natives <dialog> für größere Rückfragen oder Datei-Hinweise */
+.ls-dialog { border: 0; border-radius: var(--ls-r-lg); padding: 0; max-width: min(92vw, 440px); background: var(--ls-surface); color: var(--ls-text); box-shadow: var(--ls-shadow-2); }
+.ls-dialog::backdrop { background: rgba(0, 0, 0, 0.35); backdrop-filter: blur(2px); }
+.ls-dialog__body { padding: var(--ls-s5); display: grid; gap: var(--ls-s3); }
+.ls-dialog__body h3 { margin: 0; }
+.ls-dialog__actions { display: flex; justify-content: flex-end; gap: var(--ls-s2); padding: var(--ls-s3) var(--ls-s5) var(--ls-s4); border-top: 1px solid var(--ls-line); }
+
+/* 10.4 Rückmeldung nach Aktionen (Toast), unten über dem Haus-Icon */
+.ls-toasts { position: fixed; left: 50%; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: grid; gap: var(--ls-s2); z-index: 60; width: max-content; max-width: calc(100vw - 32px); pointer-events: none; }
+.ls-toast { padding: var(--ls-s2) var(--ls-s4); border-radius: var(--ls-r-pill); background: var(--ls-text); color: var(--ls-bg); font-size: var(--ls-fs-sm); font-weight: 500; box-shadow: var(--ls-shadow-2); display: flex; align-items: center; gap: var(--ls-s2); animation: ls-toast-in .18s ease; }
+.ls-toast--ok::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ls-ok); }
+.ls-toast--danger::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ls-danger); }
+@keyframes ls-toast-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* 10.5 Stepper für Stückzahlen (Bestandsaufnahme) */
+.ls-stepper { display: inline-grid; grid-template-columns: var(--ls-control-h) 1fr var(--ls-control-h); border: 1px solid var(--ls-line); border-radius: var(--ls-r-sm); overflow: hidden; background: var(--ls-surface-2); min-width: 120px; }
+.ls-stepper > button { appearance: none; border: 0; background: transparent; color: var(--ls-text); font: inherit; font-size: 18px; font-weight: 500; cursor: pointer; min-height: var(--ls-control-h); }
+.ls-stepper > button:hover { background: var(--ls-surface-3); }
+.ls-stepper > button:disabled { color: var(--ls-text-3); cursor: not-allowed; }
+.ls-stepper > input { border: 0; border-inline: 1px solid var(--ls-line); background: var(--ls-surface); text-align: center; font: inherit; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 0; color: var(--ls-text); padding: 0; }
+.ls-stepper > input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--ls-focus-ring); }
+
+/* 10.6 Datenstand veränderlicher Werte (Fördersätze, Energiepreise, Normwerte) */
+.ls-stand { display: inline-flex; align-items: center; gap: var(--ls-s2); padding: 3px 10px 3px 8px; border-radius: var(--ls-r-pill); background: var(--ls-warn-bg); color: var(--ls-warn); font-size: var(--ls-fs-xs); font-weight: 600; }
+.ls-stand::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.ls-stand--ok { background: var(--ls-ok-bg); color: var(--ls-ok); }
+
+/* 10.7 „So geht’s“: Anleitung eingeklappt statt Erklärtext */
+.ls-help { border: 1px solid var(--ls-line); border-radius: var(--ls-r-md); background: var(--ls-surface); padding: 0 var(--ls-s4); }
+.ls-help > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: var(--ls-s2); min-height: 40px; font-size: var(--ls-fs-sm); font-weight: 600; }
+.ls-help > summary::-webkit-details-marker { display: none; }
+.ls-help > summary::before { content: "?"; width: 20px; height: 20px; border-radius: 50%; background: var(--ls-info-bg); color: var(--ls-info); font-size: 12px; font-weight: 700; display: grid; place-items: center; flex: none; }
+.ls-help > div { padding: 0 0 var(--ls-s3); font-size: var(--ls-fs-sm); color: var(--ls-text-2); }
+.ls-help ol, .ls-help ul { margin: var(--ls-s1) 0 0; padding-left: 18px; }
+
+/* 10.8 Auswahltabellen auf schmalen Schirmen als Karten (data-label am <td>) */
+@media (max-width: 699.98px) {
+  .ls-table--cards { font-size: var(--ls-fs-md); }
+  .ls-table--cards thead { display: none; }
+  .ls-table--cards tbody, .ls-table--cards tr, .ls-table--cards td { display: block; }
+  .ls-table--cards tr { padding: var(--ls-s3) var(--ls-s3) var(--ls-s2); border-bottom: 1px solid var(--ls-line); }
+  .ls-table--cards tr:last-child { border-bottom: 0; }
+  .ls-table--cards td { border: 0; padding: 2px 0; display: flex; justify-content: space-between; gap: var(--ls-s3); text-align: left !important; }
+  .ls-table--cards td[data-label]::before { content: attr(data-label); color: var(--ls-text-2); font-size: var(--ls-fs-xs); text-transform: uppercase; letter-spacing: .05em; flex: none; padding-top: 2px; }
+  .ls-table--cards td.ls-table__title { display: block; font-weight: 600; font-size: var(--ls-fs-md); padding-bottom: var(--ls-s1); }
+  .ls-table--cards tr.is-selected td:first-child { box-shadow: none; }
+  .ls-table--cards tr.is-selected { background: var(--ls-info-bg); box-shadow: inset 3px 0 0 var(--ls-primary); }
+}
+
+/* 10.9 Diagramme: Grundgerüst für SVG/Canvas-Charts in Karten */
+.ls-chart { width: 100%; max-width: 100%; height: auto; display: block; }
+.ls-chart text { font-family: var(--ls-font); font-size: 11px; fill: var(--ls-chart-text); }
+.ls-chart .grid line { stroke: var(--ls-chart-grid); stroke-width: 1; }
+.ls-chart .axis line, .ls-chart .axis path { stroke: var(--ls-line-strong); }
+.ls-chart .wp { fill: var(--ls-chart-wp); stroke: var(--ls-chart-wp); }
+.ls-chart .alt { fill: var(--ls-chart-alt); stroke: var(--ls-chart-alt); }
+.ls-chart .pv { fill: var(--ls-chart-pv); stroke: var(--ls-chart-pv); }
+.ls-chart .c2 { fill: var(--ls-chart-2); stroke: var(--ls-chart-2); }
+.ls-chart .value { font-weight: 600; fill: var(--ls-text); font-variant-numeric: tabular-nums; }
+.ls-legend { display: flex; flex-wrap: wrap; gap: var(--ls-s2) var(--ls-s4); font-size: var(--ls-fs-sm); color: var(--ls-text-2); }
+.ls-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+/* 10.10 Datei-Hinweis für iPad (Projekt sichern/laden, lager.json) */
+.ls-filehint { font-size: var(--ls-fs-xs); color: var(--ls-text-2); }
+input[type="file"].ls-file { font: inherit; font-size: var(--ls-fs-sm); }
+input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 600; font-size: var(--ls-fs-sm); border: 1px solid var(--ls-line-strong); background: var(--ls-surface); color: var(--ls-text); border-radius: var(--ls-r-sm); padding: 6px 12px; margin-right: var(--ls-s2); cursor: pointer; }
+
+/* 10.11 Bericht (Druckdokument): Deckkopf, Positionstabelle, Summen, Unterschrift */
+.ls-report { display: grid; gap: var(--ls-s4); }
+.ls-report__meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: var(--ls-s2) var(--ls-s4); font-size: var(--ls-fs-sm); }
+.ls-report__meta div { display: grid; gap: 1px; }
+.ls-report__meta span { color: var(--ls-text-2); font-size: var(--ls-fs-xs); text-transform: uppercase; letter-spacing: .05em; }
+.ls-report__meta b { font-weight: 600; }
+.ls-report__sum td { font-weight: 700; font-size: var(--ls-fs-md); background: var(--ls-surface-2); border-top: 2px solid var(--ls-navy); }
+.ls-report__sign { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: var(--ls-s6); margin-top: var(--ls-s6); font-size: var(--ls-fs-xs); color: var(--ls-text-2); }
+.ls-report__sign div { border-top: 1px solid var(--ls-line-strong); padding-top: var(--ls-s1); }
+.ls-report__legal { font-size: var(--ls-fs-xs); color: var(--ls-text-2); max-width: 90ch; }
+
+/* 10.12 Regler mit Zahlenfeld (kostenvergleich): Werte, die im Kundengespräch durchgespielt werden.
+   Das Zahlenfeld ist maßgeblich (Komma/Punkt, Einheit als Suffix); der Regler ist Komfort. Verhalten: LS.regler(). */
+.ls-range { display: grid; grid-template-columns: minmax(0, 1fr) 7.5em; gap: var(--ls-s3); align-items: center; }
+.ls-range input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 32px; margin: 0; background: transparent; cursor: pointer; }
+.ls-range input[type="range"]:disabled { cursor: not-allowed; opacity: .45; }
+.ls-range input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: var(--ls-r-pill); background: var(--ls-surface-3); border: 1px solid var(--ls-line); }
+.ls-range input[type="range"]::-moz-range-track { height: 6px; border-radius: var(--ls-r-pill); background: var(--ls-surface-3); border: 1px solid var(--ls-line); }
+.ls-range input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; margin-top: -10px; border-radius: 50%; background: var(--ls-primary); border: 3px solid var(--ls-surface); box-shadow: var(--ls-shadow-1); }
+.ls-range input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--ls-primary); border: 3px solid var(--ls-surface); box-shadow: var(--ls-shadow-1); }
+.ls-range input[type="range"]:focus-visible { outline: none; }
+.ls-range input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--ls-focus-ring); }
+.ls-range input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px var(--ls-focus-ring); }
+@media (pointer: coarse) {
+  .ls-range input[type="range"] { height: 44px; }
+  .ls-range input[type="range"]::-webkit-slider-thumb { width: 28px; height: 28px; margin-top: -12px; }
+}
+
+/* ------------------------------------------------------------
+   11 · HILFSKLASSEN
+   ------------------------------------------------------------ */
+.ls-muted { color: var(--ls-text-2); }
+.ls-accent { color: var(--ls-yellow-ink); }
+.ls-right { text-align: right; }
+.ls-center { text-align: center; }
+.ls-nowrap { white-space: nowrap; }
+.ls-break { overflow-wrap: anywhere; }
+.ls-approx::before { content: "≈ "; }           /* Richtwert [BESTÄTIGT: immer mit ≈] */
+.ls-caps { font-size: var(--ls-fs-xs); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--ls-text-2); }
+.ls-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.ls-mt-0 { margin-top: 0 !important; } .ls-mt-2 { margin-top: var(--ls-s2); } .ls-mt-4 { margin-top: var(--ls-s4); } .ls-mt-5 { margin-top: var(--ls-s5); }
+.ls-mb-2 { margin-bottom: var(--ls-s2); } .ls-mb-4 { margin-bottom: var(--ls-s4); }
+.ls-print-only { display: none; }
+
+/* ------------------------------------------------------------
+   12 · DRUCK / PDF („Als PDF sichern“ aus Safari)
+   Bericht in Hell, Hintergrundfarben erzwungen, Karten ohne Umbruch.
+   Gedruckt werden nur Kopf, Ergebnis, Bericht und Fuß – nie das Formular. Keine Seitenzahlen.
+   ------------------------------------------------------------ */
+@media print {
+  @page { size: A4; margin: 12mm 12mm 14mm; }
+  :root, :root[data-theme="dark"] {
+    color-scheme: light;
+    --ls-bg: #ffffff; --ls-surface: #ffffff; --ls-surface-2: #f4f3ee; --ls-surface-3: #ebeae4;
+    --ls-text: #1d1d1f; --ls-text-2: #55555a; --ls-line: rgba(0,0,0,.18); --ls-line-strong: rgba(0,0,0,.3);
+    --ls-navy: #1a2b4a; --ls-primary: #1a2b4a; --ls-link: #1a2b4a; --ls-yellow-ink: #8a6d00;
+    --ls-ok: #1a7a36; --ls-ok-bg: #e3f3e7; --ls-warn: #b25000; --ls-warn-bg: #fdebdd; --ls-danger: #d70015; --ls-danger-bg: #fde4e6; --ls-info: #1a2b4a; --ls-info-bg: #e8edf6;
+    --ls-shadow-1: none; --ls-shadow-2: none;
   }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { background: #fff !important; padding: 0 !important; font-size: 11pt; }
+  .ls-container { max-width: none; }
+  .ls-no-print, .ls-home, .ls-toolbar, .ls-btn, nav, .ls-seg, .ls-status, .ls-skeleton,
+  .ls-form, form, .ls-help, .ls-toasts, .ls-confirm, .ls-dialog, .ls-items, .ls-stepper, .ls-tiles, .ls-filehint, .ls-details { display: none !important; }
+  .ls-print-form { display: block !important; } /* Ausnahme: ein Formular, das bewusst gedruckt wird */
+  .ls-report, .ls-report__sign { break-inside: avoid; }
+  .ls-page-break { break-before: page; }
+  .ls-print-only { display: block; }
+  .ls-report__sign.ls-print-only, .ls-report__meta.ls-print-only { display: grid; }
+  .ls-header { border-radius: 8px; box-shadow: none; padding: 10mm 8mm 6mm; break-after: avoid; }
+  .ls-card, .ls-kpi, .ls-table-wrap, .ls-note, .ls-notiz, .ls-steps > .ls-card { break-inside: avoid; page-break-inside: avoid; box-shadow: none; }
+  .ls-card { border-color: rgba(0,0,0,.18); }
+  .ls-section, h2, h3 { break-after: avoid; }
+  .ls-table th { position: static; }
+  .ls-table-wrap { overflow: visible; }
+  a { color: inherit; text-decoration: none; }
+  .ls-footer { font-size: 8.5pt; color: #55555a; max-width: none; }
+  /* Druckkopfzeile: Datum/Projekt stehen im Header, keine Browserkopfzeile nötig */
+}
+</style>
+<!-- design.css:end -->
+<style>
+  /* Nur toolspezifische Ergänzungen hier. Farben ausschließlich über var(--ls-…). */
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="ls-container ls-stack ls-stack--loose">
 
-  <header>
-    <div class="brand">
-      <img class="logo-img" src="logo.png" alt="Lutz Spring GmbH">
-      <div class="brand-sub">Heizung · Sanitär · Wärmepumpen</div>
+  <!-- 2 · Kopf -->
+  <header class="ls-header">
+    <div class="ls-header__brand">
+      <!-- Logo Variante B (Wortmarke mit Slogan) als Inline-SVG, Quelle assets/logo/logo-variante-b.svg. Farbe über currentColor = var(--ls-yellow). -->
+      <svg class="ls-header__logo" role="img" aria-label="Lutz Spring GmbH · Heizung · Sanitär · Wärmepumpen" xmlns="http://www.w3.org/2000/svg" viewBox="1 1 716 172">
+<path fill-rule="evenodd" fill="currentColor" d="M 705.394531 44.726562 L 687.242188 44.726562 L 687.242188 41.660156 L 694.769531 41.660156 L 694.769531 35.132812 L 687.242188 35.132812 L 687.242188 32.050781 L 705.394531 32.050781 L 705.394531 35.132812 L 697.109375 35.132812 L 697.109375 41.660156 L 705.394531 41.660156 Z M 699.136719 55.363281 C 700.765625 55.363281 701.90625 55.207031 702.554688 54.890625 C 703.273438 54.554688 703.632812 53.945312 703.632812 53.054688 C 703.632812 51.597656 702.132812 50.871094 699.136719 50.871094 C 696.011719 50.871094 694.453125 51.597656 694.453125 53.054688 C 694.453125 53.847656 694.96875 54.453125 696.003906 54.863281 C 696.847656 55.199219 697.890625 55.363281 699.136719 55.363281 Z M 687.242188 55.363281 L 694.371094 55.363281 L 694.371094 55.3125 C 693.183594 54.566406 692.589844 53.488281 692.589844 52.078125 C 692.589844 49.199219 694.769531 47.761719 699.136719 47.761719 C 703.503906 47.761719 705.6875 49.523438 705.6875 53.054688 C 705.6875 54.726562 705.21875 56.003906 704.273438 56.894531 C 703.316406 57.820312 701.917969 58.28125 700.078125 58.28125 L 687.242188 58.28125 Z M 705.394531 77.984375 L 692.871094 77.984375 L 692.871094 75.054688 L 694.796875 75.054688 L 694.796875 75.003906 C 693.324219 74.375 692.589844 73.277344 692.589844 71.714844 C 692.589844 69.96875 693.414062 68.921875 695.078125 68.570312 L 695.078125 68.507812 C 694.472656 68.273438 693.9375 67.894531 693.472656 67.363281 C 692.882812 66.671875 692.589844 65.875 692.589844 64.984375 C 692.589844 64.003906 692.914062 63.203125 693.578125 62.597656 C 694.304688 61.929688 695.351562 61.597656 696.710938 61.597656 L 705.394531 61.597656 L 705.394531 64.511719 L 698.238281 64.511719 C 697.1875 64.511719 696.558594 64.535156 696.363281 64.578125 C 695.671875 64.730469 695.324219 65.136719 695.324219 65.796875 C 695.324219 66.578125 695.851562 67.210938 696.902344 67.695312 C 697.820312 68.117188 698.84375 68.324219 699.976562 68.324219 L 705.394531 68.324219 L 705.394531 71.242188 L 698.238281 71.242188 C 697.1875 71.242188 696.558594 71.269531 696.363281 71.320312 C 695.671875 71.464844 695.324219 71.875 695.324219 72.539062 C 695.324219 73.3125 695.851562 73.9375 696.902344 74.425781 C 697.820312 74.847656 698.84375 75.054688 699.976562 75.054688 L 705.394531 75.054688 Z M 694.824219 81.234375 L 704.03125 81.234375 C 704.398438 81.722656 704.738281 82.40625 705.046875 83.277344 C 705.472656 84.460938 705.6875 85.683594 705.6875 86.953125 C 705.6875 89.535156 704.789062 91.503906 702.992188 92.847656 C 701.355469 94.070312 699.121094 94.683594 696.289062 94.683594 C 690.058594 94.683594 686.949219 92.289062 686.949219 87.507812 C 686.949219 85.464844 687.425781 83.929688 688.371094 82.894531 C 689.246094 81.933594 690.46875 81.453125 692.035156 81.453125 L 692.035156 84.871094 C 691.261719 84.871094 690.621094 85.0625 690.097656 85.449219 C 689.453125 85.910156 689.132812 86.597656 689.132812 87.507812 C 689.132812 90.03125 691.519531 91.292969 696.289062 91.292969 C 701.097656 91.292969 703.503906 89.847656 703.503906 86.953125 C 703.503906 85.632812 703.265625 84.757812 702.785156 84.316406 L 697.007812 84.316406 L 697.007812 87.734375 L 694.824219 87.734375 Z M 678.390625 34.554688 L 674.285156 35.5 L 674.285156 76.722656 L 678.390625 75.777344 Z M 712.878906 84.925781 C 712.878906 86.886719 712.511719 88.65625 711.773438 90.238281 C 711.039062 91.8125 709.9375 93.441406 708.464844 95.125 C 705.871094 97.929688 702.328125 100.101562 697.84375 101.644531 C 694.128906 102.90625 686.976562 104.765625 676.390625 107.21875 C 675.339844 107.429688 672.445312 108.023438 667.714844 109.007812 C 662.984375 109.988281 659.074219 110.761719 655.988281 111.320312 C 654.378906 111.601562 652.796875 111.738281 651.257812 111.738281 C 648.804688 111.738281 646.875 111.285156 645.472656 110.375 C 643.160156 109.042969 641.546875 107.445312 640.636719 105.589844 C 639.726562 103.730469 639.269531 101.855469 639.269531 99.960938 L 674.285156 92.179688 L 674.285156 97.335938 L 678.390625 96.386719 L 678.390625 86.082031 L 656.515625 90.726562 C 655.042969 90.988281 653.535156 91.128906 651.992188 91.128906 C 649.117188 91.128906 646.804688 90.570312 645.050781 89.449219 C 642.527344 87.90625 640.882812 86.046875 640.109375 83.875 C 639.96875 83.03125 639.796875 81.894531 639.585938 80.457031 C 639.371094 79.019531 639.269531 77.808594 639.269531 76.828125 C 639.269531 72.273438 639.304688 67.765625 639.371094 63.316406 C 639.445312 58.863281 639.550781 54.183594 639.691406 49.277344 C 639.691406 46.542969 640.039062 44.175781 640.738281 42.175781 C 641.441406 40.179688 642.457031 38.480469 643.789062 37.078125 C 646.171875 34.484375 649.1875 32.484375 652.835938 31.082031 C 654.585938 30.382812 656.515625 29.699219 658.617188 29.035156 C 660.722656 28.367188 662.738281 27.804688 664.664062 27.351562 C 666.59375 26.894531 668.222656 26.664062 669.554688 26.664062 C 670.464844 26.664062 671.621094 26.703125 673.023438 26.773438 C 674.425781 26.84375 676.214844 27.015625 678.390625 27.296875 L 678.390625 24.246094 L 713.40625 16.46875 L 713.40625 67.890625 C 713.40625 71.253906 713.335938 74.339844 713.195312 77.144531 C 713.054688 79.949219 712.949219 82.539062 712.878906 84.925781 Z M 562.605469 32.976562 L 597.625 25.195312 L 597.625 28.246094 L 605.195312 24.460938 C 607.511719 23.335938 609.511719 22.566406 611.191406 22.144531 C 612.875 21.722656 614.414062 21.375 615.816406 21.09375 C 618.484375 20.53125 620.828125 20.253906 622.863281 20.253906 L 624.441406 20.253906 C 627.035156 20.253906 629.347656 20.882812 631.382812 22.144531 C 633.90625 23.6875 635.429688 26.121094 635.953125 29.453125 C 636.480469 32.785156 636.746094 38.726562 636.746094 47.277344 L 636.746094 78.195312 L 601.726562 86.082031 L 601.726562 34.554688 L 597.625 35.5 L 597.625 87.027344 L 562.605469 94.808594 Z M 453.140625 32.976562 L 488.15625 25.195312 L 488.15625 28.246094 L 495.726562 24.460938 C 498.039062 23.335938 500.039062 22.566406 501.722656 22.144531 C 503.402344 21.722656 504.945312 21.375 506.351562 21.09375 C 509.011719 20.53125 511.359375 20.253906 513.394531 20.253906 L 514.972656 20.253906 C 517.425781 20.253906 519.792969 20.9375 522.070312 22.304688 C 523.15625 22.953125 524.046875 23.722656 524.75 24.609375 L 524.75 12.367188 L 559.769531 4.585938 L 559.769531 21.09375 L 526.5 28.484375 C 526.785156 29.738281 526.992188 31.0625 527.117188 32.453125 L 559.769531 25.195312 L 559.769531 87.027344 L 524.75 94.808594 L 524.75 36.585938 L 492.257812 43.808594 L 492.257812 34.554688 L 488.15625 35.5 L 488.15625 87.027344 L 453.140625 94.808594 Z M 416.226562 34.554688 L 412.128906 35.5 L 412.128906 76.722656 L 416.226562 75.777344 Z M 450.722656 64.421875 C 450.722656 66.3125 450.351562 68.082031 449.617188 69.730469 C 448.878906 71.375 447.777344 73.007812 446.304688 74.621094 C 443.847656 77.421875 440.171875 79.597656 435.261719 81.140625 C 433.300781 81.773438 429.265625 82.820312 423.167969 84.296875 C 418.539062 85.488281 414.863281 86.398438 412.128906 87.027344 L 412.128906 107.535156 L 377.109375 115.421875 L 377.109375 32.976562 L 412.128906 25.195312 L 412.128906 28.246094 L 419.800781 24.355469 C 420.855469 23.863281 421.855469 23.445312 422.800781 23.089844 C 423.746094 22.742188 424.574219 22.460938 425.273438 22.25 C 428.214844 21.621094 430.636719 21.128906 432.527344 20.777344 C 434.421875 20.429688 436.035156 20.253906 437.363281 20.253906 L 438.941406 20.253906 C 441.535156 20.253906 443.847656 20.882812 445.882812 22.144531 C 448.410156 23.6875 449.933594 26.121094 450.457031 29.453125 C 450.984375 32.785156 451.246094 38.726562 451.246094 47.277344 C 451.246094 50.574219 451.175781 53.660156 451.035156 56.53125 C 450.894531 59.40625 450.789062 62.035156 450.722656 64.421875 Z M 334.941406 72.308594 L 334.941406 54.742188 C 322.8125 57.410156 314.121094 59.195312 308.863281 60.105469 C 306.546875 60.457031 304.65625 60.632812 303.183594 60.632812 C 300.238281 60.632812 297.820312 60.035156 295.929688 58.847656 C 292.910156 56.953125 291.035156 54.847656 290.300781 52.535156 C 289.5625 50.222656 289.195312 47.3125 289.195312 43.808594 C 289.195312 41.773438 289.25 39.988281 289.355469 38.445312 C 289.460938 36.902344 289.863281 35.324219 290.566406 33.710938 C 291.546875 31.257812 293.578125 28.386719 296.664062 25.089844 C 298.347656 23.40625 302.164062 21.550781 308.125 19.515625 C 314.085938 17.480469 322.179688 15.3125 332.417969 12.996094 C 337.117188 11.945312 340.550781 11.210938 342.722656 10.789062 C 346.859375 9.945312 351.238281 9.140625 355.867188 8.371094 C 357.339844 8.160156 358.339844 8.019531 358.863281 7.945312 C 359.390625 7.878906 360.214844 7.84375 361.335938 7.84375 C 364.140625 7.84375 366.59375 8.476562 368.695312 9.738281 C 371.574219 11.347656 373.394531 13.558594 374.164062 16.363281 C 374.9375 19.164062 375.320312 22.773438 375.320312 27.191406 L 334.941406 36.234375 L 334.941406 24.882812 L 330 26.035156 L 330 43.492188 C 341.425781 40.898438 349.90625 39.109375 355.445312 38.128906 C 357.6875 37.78125 359.550781 37.605469 361.019531 37.605469 C 364.246094 37.605469 366.910156 38.234375 369.015625 39.496094 C 372.097656 41.390625 373.988281 43.386719 374.691406 45.488281 C 375.390625 47.59375 375.746094 50.539062 375.746094 54.324219 C 375.746094 58.671875 375.25 62.085938 374.269531 64.578125 C 373.289062 67.066406 371.449219 69.746094 368.75 72.621094 C 366.050781 75.496094 361.511719 77.808594 355.132812 79.5625 C 353.027344 80.191406 349.59375 81.070312 344.824219 82.191406 C 338.238281 83.804688 334.101562 84.785156 332.417969 85.136719 C 329.191406 85.90625 325.671875 86.675781 321.847656 87.449219 C 318.03125 88.21875 313.523438 89.097656 308.335938 90.078125 C 306.863281 90.359375 305.917969 90.515625 305.496094 90.550781 C 305.078125 90.585938 304.304688 90.601562 303.183594 90.601562 C 300.589844 90.601562 298.347656 90.042969 296.453125 88.921875 C 293.578125 87.238281 291.652344 85.277344 290.671875 83.03125 C 289.6875 80.789062 289.195312 76.652344 289.195312 70.625 L 330 61.582031 L 330 73.355469 L 334.941406 72.308594 "/>
+<path fill-rule="evenodd" fill="currentColor" d="M 242.402344 20.042969 L 223.894531 75.691406 L 242.402344 71.570312 L 242.402344 81.875 L 184.25 94.808594 L 202.757812 39.164062 L 185.933594 42.933594 L 185.933594 32.660156 L 242.402344 20.042969 "/>
+<path fill-rule="evenodd" fill="currentColor" d="M 103.277344 86.082031 L 103.277344 82.929688 L 95.707031 87.027344 C 94.652344 87.378906 93.605469 87.765625 92.550781 88.183594 C 91.5 88.605469 90.691406 88.886719 90.132812 89.027344 C 87.820312 89.585938 86.171875 89.972656 85.191406 90.183594 C 82.527344 90.742188 80.070312 91.023438 77.828125 91.023438 L 76.460938 91.023438 C 73.941406 91.023438 71.625 90.394531 69.523438 89.132812 C 66.996094 87.660156 65.472656 85.222656 64.949219 81.820312 C 64.421875 78.421875 64.15625 72.445312 64.15625 63.894531 L 64.15625 32.976562 L 99.175781 25.195312 L 99.175781 76.722656 L 103.277344 75.777344 L 103.277344 24.246094 L 138.296875 16.46875 L 138.296875 33.726562 L 144.078125 32.453125 L 144.078125 22.25 L 179.097656 14.363281 L 179.097656 24.671875 L 185.195312 23.199219 L 185.195312 33.503906 L 179.097656 34.976562 L 179.097656 86.5 L 144.078125 94.28125 L 144.078125 42.753906 L 138.296875 44.03125 L 138.296875 78.195312 L 103.277344 86.082031 "/>
+<path fill-rule="evenodd" fill="currentColor" d="M 4.746094 22.671875 L 4.746094 94.808594 L 64.050781 81.5625 L 64.050781 69.152344 L 45.546875 73.394531 L 45.546875 13.628906 L 4.746094 22.671875 "/>
+<path fill-rule="nonzero" fill="currentColor" d="M 349.4375 168.765625 L 349.4375 137.335938 L 358.539062 137.335938 C 361.261719 137.339844 363.410156 137.949219 364.988281 139.160156 C 366.828125 140.574219 367.746094 142.714844 367.746094 145.59375 C 367.746094 149.539062 365.6875 152.007812 361.566406 152.996094 L 361.566406 153.089844 C 363.460938 153.507812 364.808594 154.367188 365.613281 155.667969 C 366.058594 156.410156 366.507812 157.863281 366.972656 160.03125 L 368.835938 168.765625 L 364.699219 168.765625 L 362.789062 161.804688 C 362.074219 159.207031 361.429688 157.554688 360.851562 156.824219 C 360.015625 155.769531 358.601562 155.242188 356.578125 155.242188 L 353.996094 155.242188 L 353.996094 168.765625 Z M 333.820312 133.03125 L 333.820312 128.003906 L 339.425781 128.003906 L 339.425781 133.03125 Z M 324.441406 133.03125 L 324.441406 128.003906 L 330.042969 128.003906 L 330.042969 133.03125 Z M 331.914062 141.519531 L 327.355469 156.160156 L 336.320312 156.160156 L 332 141.519531 Z M 318.414062 168.765625 L 329.132812 137.339844 L 334.742188 137.339844 L 345.484375 168.765625 L 340.65625 168.765625 L 337.566406 159.800781 L 326.308594 159.800781 L 323.265625 168.765625 Z M 305.621094 168.765625 L 305.621094 140.984375 L 297.796875 140.984375 L 297.796875 137.339844 L 318.015625 137.339844 L 318.015625 140.984375 L 310.1875 140.984375 L 310.1875 168.765625 Z M 289.652344 168.765625 L 289.652344 137.335938 L 294.210938 137.335938 L 294.210938 168.765625 Z M 260.144531 168.765625 L 260.144531 137.335938 L 265.839844 137.335938 L 278.222656 161.941406 L 278.3125 161.941406 L 278.3125 137.335938 L 282.40625 137.335938 L 282.40625 168.765625 L 277.046875 168.765625 L 264.320312 143.5625 L 264.230469 143.5625 L 264.230469 168.765625 Z M 242.585938 141.519531 L 238.019531 156.160156 L 246.984375 156.160156 L 242.664062 141.519531 Z M 229.078125 168.765625 L 239.800781 137.339844 L 245.40625 137.339844 L 256.148438 168.765625 L 251.324219 168.765625 L 248.230469 159.800781 L 236.972656 159.800781 L 233.929688 168.765625 Z M 217.84375 149.867188 L 220.933594 151.683594 C 223.117188 152.976562 224.582031 154.015625 225.359375 154.820312 C 226.808594 156.316406 227.539062 158.15625 227.539062 160.332031 C 227.539062 163.253906 226.453125 165.5 224.289062 167.074219 C 222.28125 168.542969 219.578125 169.277344 216.195312 169.277344 C 213.335938 169.277344 210.667969 168.855469 208.210938 168.03125 L 208.210938 163.292969 C 210.914062 164.847656 213.691406 165.628906 216.554688 165.628906 C 218.234375 165.628906 219.59375 165.28125 220.644531 164.582031 C 221.90625 163.769531 222.535156 162.570312 222.535156 160.984375 C 222.535156 159.539062 221.992188 158.304688 220.890625 157.265625 C 220.359375 156.75 219.203125 155.960938 217.421875 154.910156 L 214.550781 153.242188 C 212.1875 151.847656 210.691406 150.851562 210.066406 150.257812 C 208.507812 148.808594 207.726562 147.042969 207.726562 144.949219 C 207.726562 142.265625 208.726562 140.207031 210.726562 138.792969 C 212.570312 137.484375 215.046875 136.832031 218.15625 136.832031 C 220.585938 136.832031 222.964844 137.132812 225.292969 137.738281 L 225.292969 142.03125 C 221.945312 140.988281 219.484375 140.480469 217.929688 140.480469 C 216.34375 140.480469 215.09375 140.832031 214.171875 141.546875 C 213.207031 142.265625 212.730469 143.28125 212.730469 144.589844 C 212.730469 145.65625 213.289062 146.679688 214.425781 147.640625 C 214.96875 148.109375 216.109375 148.855469 217.84375 149.867188 Z M 353.996094 140.984375 L 353.996094 151.605469 L 356.625 151.605469 C 358.476562 151.605469 359.976562 151.214844 361.117188 150.441406 C 362.492188 149.492188 363.183594 148.058594 363.183594 146.121094 C 363.183594 142.699219 361.34375 140.984375 357.660156 140.984375 L 353.996094 140.984375 "/>
+<path fill-rule="nonzero" fill="currentColor" d="M 4.746094 168.765625 L 4.746094 137.335938 L 9.304688 137.335938 L 9.304688 150.597656 L 21.652344 150.597656 L 21.652344 137.335938 L 26.191406 137.335938 L 26.191406 168.765625 L 21.652344 168.765625 L 21.652344 154.242188 L 9.304688 154.242188 L 9.304688 168.765625 Z M 33.429688 168.765625 L 33.429688 137.335938 L 51.203125 137.335938 L 51.203125 140.980469 L 37.996094 140.980469 L 37.996094 150.597656 L 50.132812 150.597656 L 50.132812 154.238281 L 37.996094 154.238281 L 37.996094 165.117188 L 51.203125 165.117188 L 51.203125 168.761719 Z M 56.199219 168.765625 L 56.199219 137.335938 L 60.761719 137.335938 L 60.761719 168.765625 Z M 65.257812 168.765625 L 65.257812 165.078125 L 80.199219 140.984375 L 66.039062 140.984375 L 66.039062 137.339844 L 85.46875 137.339844 L 85.46875 141.03125 L 70.640625 165.121094 L 85.472656 165.121094 L 85.472656 168.765625 Z M 111.722656 137.339844 L 111.722656 159.46875 C 111.722656 162.714844 110.703125 165.191406 108.675781 166.894531 C 106.789062 168.484375 104.234375 169.277344 101.023438 169.277344 C 97.816406 169.277344 95.285156 168.484375 93.421875 166.894531 C 91.398438 165.191406 90.390625 162.714844 90.390625 159.46875 L 90.390625 137.339844 L 94.953125 137.339844 L 94.953125 158.605469 C 94.953125 160.546875 95.203125 162.003906 95.710938 162.984375 C 96.613281 164.75 98.367188 165.628906 100.980469 165.628906 C 103.65625 165.628906 105.453125 164.75 106.375 162.984375 C 106.898438 162.003906 107.160156 160.546875 107.160156 158.601562 L 107.160156 137.335938 Z M 118.582031 168.765625 L 118.582031 137.335938 L 124.277344 137.335938 L 136.660156 161.941406 L 136.753906 161.941406 L 136.753906 137.335938 L 140.84375 137.335938 L 140.84375 168.765625 L 135.488281 168.765625 L 122.765625 143.5625 L 122.671875 143.5625 L 122.671875 168.765625 Z M 169.53125 150.636719 L 169.53125 166.289062 C 166.945312 168.28125 163.699219 169.277344 159.789062 169.277344 C 150.953125 169.277344 146.535156 163.546875 146.535156 152.09375 C 146.535156 147.460938 147.480469 143.839844 149.359375 141.207031 C 151.464844 138.289062 154.636719 136.832031 158.878906 136.832031 C 161.90625 136.832031 164.367188 137.566406 166.261719 139.03125 C 168.320312 140.636719 169.351562 142.875 169.351562 145.765625 L 164.304688 145.765625 C 164.304688 144.269531 163.886719 143.058594 163.058594 142.125 C 162.09375 141.019531 160.683594 140.480469 158.835938 140.480469 C 153.972656 140.480469 151.542969 144.351562 151.542969 152.09375 C 151.535156 156 151.992188 159.003906 152.894531 161.09375 C 154.171875 164.121094 156.417969 165.628906 159.652344 165.628906 C 160.929688 165.628906 162.121094 165.480469 163.238281 165.179688 C 164.210938 164.917969 164.800781 164.652344 164.988281 164.386719 L 164.988281 154.285156 L 158.296875 154.285156 L 158.296875 150.644531 L 169.53125 150.636719 "/>
+<path fill-rule="nonzero" fill="currentColor" d="M 183.269531 156.328125 L 183.269531 151.6875 L 197.605469 151.6875 L 197.605469 156.328125 L 183.269531 156.328125 "/>
+<path fill-rule="nonzero" fill="currentColor" d="M 380.160156 156.328125 L 380.160156 151.6875 L 394.496094 151.6875 L 394.496094 156.328125 L 380.160156 156.328125 "/>
+<path fill-rule="nonzero" fill="currentColor" d="M 410.234375 168.546875 L 404.410156 137.359375 L 408.535156 137.359375 L 413.105469 162.257812 L 413.195312 162.257812 L 420.914062 137.359375 L 424.882812 137.359375 L 432.566406 162.257812 L 432.652344 162.257812 L 437.226562 137.359375 L 441.351562 137.359375 L 435.632812 168.546875 L 430.625 168.546875 L 422.949219 144.050781 L 422.847656 144.050781 L 415.269531 168.546875 Z M 442.917969 168.546875 L 453.558594 137.359375 L 459.121094 137.359375 L 469.78125 168.546875 L 464.992188 168.546875 L 461.925781 159.648438 L 450.753906 159.648438 L 447.734375 168.546875 Z M 456.320312 141.511719 L 451.792969 156.035156 L 460.6875 156.035156 L 456.398438 141.511719 Z M 448.898438 133.082031 L 448.898438 128.09375 L 454.460938 128.09375 L 454.460938 133.082031 Z M 458.210938 133.082031 L 458.210938 128.09375 L 463.769531 128.09375 L 463.769531 133.082031 Z M 473.703125 168.546875 L 473.703125 137.359375 L 482.738281 137.359375 C 485.4375 137.359375 487.574219 137.960938 489.136719 139.167969 C 490.960938 140.570312 491.871094 142.691406 491.871094 145.546875 C 491.871094 149.464844 489.828125 151.914062 485.742188 152.902344 L 485.742188 152.992188 C 487.625 153.402344 488.957031 154.257812 489.757812 155.550781 C 490.203125 156.28125 490.644531 157.730469 491.105469 159.875 L 492.953125 168.546875 L 488.851562 168.546875 L 486.953125 161.640625 C 486.246094 159.058594 485.605469 157.421875 485.035156 156.699219 C 484.207031 155.648438 482.792969 155.128906 480.789062 155.128906 L 478.230469 155.128906 L 478.230469 168.546875 Z M 478.230469 140.972656 L 478.230469 151.511719 L 480.835938 151.511719 C 482.675781 151.511719 484.160156 151.132812 485.296875 150.359375 C 486.660156 149.417969 487.34375 148 487.34375 146.078125 C 487.34375 142.683594 485.519531 140.976562 481.871094 140.976562 Z M 497.980469 168.546875 L 497.980469 137.359375 L 504.359375 137.359375 L 513.210938 162.894531 L 513.300781 162.894531 L 522.144531 137.359375 L 528.480469 137.359375 L 528.480469 168.546875 L 524.421875 168.546875 L 524.421875 142.703125 L 524.332031 142.703125 L 515.375 168.546875 L 511.097656 168.546875 L 502.128906 142.703125 L 502.039062 142.703125 L 502.039062 168.546875 Z M 535.664062 168.546875 L 535.664062 137.359375 L 553.304688 137.359375 L 553.304688 140.972656 L 540.195312 140.972656 L 540.195312 150.519531 L 552.242188 150.519531 L 552.242188 154.132812 L 540.195312 154.132812 L 540.195312 164.929688 L 553.304688 164.929688 L 553.304688 168.542969 Z M 558.261719 168.546875 L 558.261719 137.359375 L 565.769531 137.359375 C 568.914062 137.359375 571.316406 137.820312 572.96875 138.734375 C 575.453125 140.09375 576.695312 142.589844 576.695312 146.210938 C 576.695312 149.550781 575.449219 151.972656 572.945312 153.472656 C 571.238281 154.488281 569.195312 154.996094 566.808594 154.996094 L 562.789062 154.996094 L 562.789062 168.546875 Z M 562.789062 140.972656 L 562.789062 151.375 L 565.996094 151.375 C 569.820312 151.375 571.734375 149.652344 571.734375 146.207031 C 571.734375 144.050781 571.070312 142.558594 569.742188 141.75 C 568.894531 141.234375 567.644531 140.972656 565.992188 140.972656 Z M 601.660156 137.359375 L 601.660156 159.316406 C 601.660156 162.542969 600.648438 165 598.636719 166.695312 C 596.765625 168.269531 594.234375 169.050781 591.050781 169.050781 C 587.867188 169.050781 585.355469 168.269531 583.496094 166.695312 C 581.496094 165 580.492188 162.542969 580.492188 159.316406 L 580.492188 137.359375 L 585.019531 137.359375 L 585.019531 158.460938 C 585.019531 160.386719 585.265625 161.832031 585.773438 162.804688 C 586.671875 164.558594 588.410156 165.4375 591 165.4375 C 593.660156 165.4375 595.445312 164.558594 596.355469 162.804688 C 596.878906 161.832031 597.132812 160.386719 597.132812 158.460938 L 597.132812 137.359375 Z M 608.429688 168.546875 L 608.429688 137.359375 L 614.8125 137.359375 L 623.664062 162.894531 L 623.753906 162.894531 L 632.597656 137.359375 L 638.933594 137.359375 L 638.933594 168.546875 L 634.871094 168.546875 L 634.871094 142.703125 L 634.785156 142.703125 L 625.828125 168.546875 L 621.546875 168.546875 L 612.582031 142.703125 L 612.492188 142.703125 L 612.492188 168.546875 Z M 646.117188 168.546875 L 646.117188 137.359375 L 653.617188 137.359375 C 656.769531 137.359375 659.171875 137.820312 660.820312 138.734375 C 663.308594 140.09375 664.550781 142.589844 664.550781 146.210938 C 664.550781 149.550781 663.300781 151.972656 660.796875 153.472656 C 659.085938 154.488281 657.050781 154.996094 654.660156 154.996094 L 650.648438 154.996094 L 650.648438 168.546875 Z M 650.644531 140.972656 L 650.644531 151.375 L 653.839844 151.375 C 657.667969 151.375 659.585938 149.652344 659.585938 146.207031 C 659.585938 144.050781 658.921875 142.558594 657.597656 141.75 C 656.746094 141.234375 655.492188 140.972656 653.847656 140.972656 Z M 668.710938 168.546875 L 668.710938 137.359375 L 686.347656 137.359375 L 686.347656 140.972656 L 673.238281 140.972656 L 673.238281 150.519531 L 685.289062 150.519531 L 685.289062 154.132812 L 673.238281 154.132812 L 673.238281 164.929688 L 686.347656 164.929688 L 686.347656 168.542969 Z M 691.3125 168.546875 L 691.3125 137.359375 L 696.964844 137.359375 L 709.257812 161.777344 L 709.347656 161.777344 L 709.347656 137.359375 L 713.40625 137.359375 L 713.40625 168.546875 L 708.089844 168.546875 L 695.464844 143.539062 L 695.371094 143.539062 L 695.371094 168.546875 L 691.3125 168.546875 "/>
+</svg>
     </div>
-    <div class="tool-title">
-      <strong>Förderungsrechner Wärmepumpe</strong>
-      Zuschuss der KfW überschlagen
+    <div class="ls-header__meta">
+      <div class="ls-header__title"><h1>Förderrechner Wärmepumpe</h1></div>
+      <span>Kunde/Projekt: <b id="metaProjekt">BV Muster</b></span>
+      <span>Datum: <b id="metaDatum">–</b></span>
+      <button type="button" class="ls-theme-toggle ls-no-print" id="themeToggle" aria-label="Dunkel- oder Hellmodus umschalten" title="Dunkel / Hell">
+        <svg class="ls-theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+        <svg class="ls-theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>
+      </button>
     </div>
   </header>
 
-  <div class="hinweis">
-    &#9888; Überschlägige Ermittlung nach KfW-Merkblatt 458 (Stand 07/2026).
-    Verbindlich ist allein der Förderbescheid der KfW. Maßgeblich für alle
-    Sätze ist der <b>Tag der Antragstellung</b>.
-  </div>
+  <!-- 2a · So geht’s -->
+  <details class="ls-help ls-no-print">
+    <summary>So geht’s</summary>
+    <div><ol><li>Projekt benennen (ohne Personendaten, z. B. „BV Muster“ oder Ort und Gewerk) und den geplanten Tag der Antragstellung eintragen. Das Datum lässt sich vorstellen, um dem Kunden zu zeigen, wie sich die Bedingungen ändern.</li><li>Wohneinheiten, Investitionskosten und Nutzung eintragen; Bestandsanlage mit Baujahr wählen.</li><li>Bei Selbstnutzung das zu versteuernde Haushaltseinkommen eintragen (Durchschnitt der Steuerjahre 2 und 3 vor dem Antrag) und ein minderjähriges Kind anhaken.</li><li>Das Ergebnis rechnet bei jeder Änderung sofort mit. „Bericht drucken / PDF“ für die Kundenakte.</li></ol>
+    <p class="ls-mt-2">Überschlag nach KfW-Merkblatt 458 (Stand 07/2026). Verbindlich ist allein der Förderbescheid der KfW; maßgeblich für alle Sätze ist der Tag der Antragstellung, nicht der Einbau. Ändert die KfW die Sätze, unter „Fördersätze“ anpassen.</p></div>
+  </details>
 
-  <!-- ============ ERGEBNIS (steht oben, rechnet live mit) ============ -->
-  <section class="ergebnis" aria-live="polite">
-    <h2>Voraussichtlicher Zuschuss</h2>
-    <div class="zuschuss" id="erg-betrag">–</div>
-    <div class="erg-zeilen" id="erg-zeilen"></div>
-    <div class="erg-hinweis" id="erg-hinweis" hidden></div>
-  </section>
-
-  <main>
-
-  <!-- ============ SCHRITT 1 ============ -->
-  <section class="schritt">
-    <div class="schritt-kopf"><span class="schritt-nr">1</span>
-      <h2>Gebäude und Kosten</h2></div>
-
-    <label class="fld"><span>Tag der Antragstellung</span>
-      <input type="date" id="datum"></label>
-
-    <label class="fld"><span>Wohneinheiten im Gebäude: <b id="we-anzeige">1</b></span>
-      <div class="regler-zeile">
-        <input type="range" id="we" min="1" max="20" step="1" value="1"
-               aria-label="Anzahl Wohneinheiten">
-        <input type="number" class="zahl" id="we-zahl" min="1" max="20" step="1" value="1"
-               aria-label="Anzahl Wohneinheiten, Zahleneingabe">
-      </div></label>
-
-    <label class="fld"><span>Investitionskosten brutto</span>
-      <div class="regler-zeile">
-        <input type="range" id="kosten" min="5000" max="120000" step="500" value="30000"
-               aria-label="Investitionskosten in Euro">
-        <input type="number" class="zahl" id="kosten-zahl" min="300" step="500" value="30000"
-               aria-label="Investitionskosten in Euro, Zahleneingabe">
-      </div></label>
-
-    <div class="fld"><span>Wird eine Wohneinheit selbst bewohnt?</span>
-      <div class="wahl" id="wahl-selbst" role="group" aria-label="Selbstnutzung">
-        <button type="button" data-wert="ja" aria-pressed="true">Ja, selbst bewohnt</button>
-        <button type="button" data-wert="nein" aria-pressed="false">Nein, vermietet</button>
-      </div></div>
-
-    <div class="fld" id="eu-block" hidden>
-      <label class="schalter">
-        <input type="checkbox" id="eu">
-        <span>Wärmepumpe <b>made in EU</b></span>
-      </label>
-    </div>
-
-    <div class="erklaer" id="erklaer1">
-      <div class="erklaer-titel">Warum das zählt</div>
-      <div id="erklaer1-text"></div>
-    </div>
-  </section>
-
-  <!-- ============ SCHRITT 2 ============ -->
-  <section class="schritt">
-    <div class="schritt-kopf"><span class="schritt-nr">2</span>
-      <h2>Bestehende Heizung</h2></div>
-
-    <div class="fld"><span>Was wird ersetzt?</span>
-      <div class="wahl" id="wahl-alt" role="group" aria-label="Bestehende Heizung">
-        <button type="button" data-wert="oel"     aria-pressed="true">Ölheizung</button>
-        <button type="button" data-wert="gas"     aria-pressed="false">Gasheizung</button>
-        <button type="button" data-wert="kohle"   aria-pressed="false">Kohle / Holz</button>
-        <button type="button" data-wert="nacht"   aria-pressed="false">Nachtspeicher</button>
-        <button type="button" data-wert="ee"      aria-pressed="false">Erneuerbare Heizung</button>
-        <button type="button" data-wert="keine"   aria-pressed="false">Keine / Neubau</button>
-      </div></div>
-
-    <label class="fld" id="baujahr-block">
-      <span>Baujahr der Anlage: <b id="baujahr-anzeige">2005</b>
-        <span id="alter-anzeige" style="color:var(--text-3)"></span></span>
-      <div class="regler-zeile">
-        <input type="range" id="baujahr" min="1970" max="2026" step="1" value="2005"
-               aria-label="Baujahr der bestehenden Heizung">
-        <input type="number" class="zahl" id="baujahr-zahl" min="1900" max="2026" step="1" value="2005"
-               aria-label="Baujahr, Zahleneingabe">
-      </div></label>
-
-    <div class="erklaer" id="erklaer2">
-      <div class="erklaer-titel">Warum das zählt</div>
-      <div id="erklaer2-text"></div>
-    </div>
-  </section>
-
-  <!-- ============ SCHRITT 3 ============ -->
-  <section class="schritt" id="schritt3">
-    <div class="schritt-kopf"><span class="schritt-nr">3</span>
-      <h2>Einkommen des Haushalts</h2></div>
-
-    <label class="fld"><span>Zu versteuerndes Haushaltseinkommen (Durchschnitt)</span>
-      <div class="regler-zeile">
-        <input type="range" id="einkommen" min="0" max="90000" step="500" value="45000"
-               aria-label="Zu versteuerndes Haushaltseinkommen">
-        <input type="number" class="zahl" id="einkommen-zahl" min="0" step="500" value="45000"
-               aria-label="Einkommen, Zahleneingabe">
-      </div></label>
-
-    <details class="jahre">
-      <summary>Stattdessen die beiden Steuerjahre einzeln eingeben</summary>
-      <div class="raster">
-        <label class="fld"><span id="jahr-a-label">Jahr A</span>
-          <input type="number" id="jahr-a" min="0" step="500" placeholder="z. B. 44.000"></label>
-        <label class="fld"><span id="jahr-b-label">Jahr B</span>
-          <input type="number" id="jahr-b" min="0" step="500" placeholder="z. B. 46.000"></label>
+  <!-- 3 · Projekt -->
+  <section class="ls-card ls-no-print" aria-labelledby="h-projekt">
+    <div class="ls-card__head"><h2 id="h-projekt">Projekt</h2><span class="ls-card__sub">Eingaben bleiben lokal im Browser erhalten</span></div>
+    <div class="ls-fields">
+      <div class="ls-field">
+        <label class="ls-label" for="projekt">Kunde / Projekt</label>
+        <input class="ls-input" id="projekt" type="text" placeholder="BV Muster" autocomplete="off">
+        <div class="ls-hint">Keine Personendaten – Ort und Gewerk reichen.</div>
       </div>
-    </details>
-
-    <div class="fld">
-      <label class="schalter">
-        <input type="checkbox" id="kind">
-        <span>Mindestens ein minderjähriges Kind im Haushalt (kindergeldberechtigt)</span>
-      </label>
+      <div class="ls-field">
+        <label class="ls-label" for="antragsdatum">Tag der Antragstellung</label>
+        <input class="ls-input" id="antragsdatum" type="date">
+        <div class="ls-hint">Maßgeblich für alle Sätze. Vorstellen, um die Bedingungen zu einem späteren Antrag zu zeigen.</div>
+        <div class="ls-error" id="antragsdatumErr" hidden></div>
+      </div>
     </div>
-
-    <div class="erklaer" id="erklaer3">
-      <div class="erklaer-titel">Warum das zählt</div>
-      <div id="erklaer3-text"></div>
+    <div class="ls-toolbar ls-mt-4">
+      <button type="button" class="ls-btn ls-btn--secondary ls-btn--sm" id="btnNeu">Neues Projekt</button>
     </div>
   </section>
 
-  <!-- ============ SCHRITT 4 ============ -->
-  <section class="schritt">
-    <div class="schritt-kopf"><span class="schritt-nr">4</span>
-      <h2>So kommt der Zuschuss zustande</h2></div>
-    <div class="erklaer" id="erklaer4" style="margin-top:0">
-      <div class="erklaer-titel">Die Rechnung Schritt für Schritt</div>
-      <div id="erklaer4-text"></div>
+  <!-- 4 · Eingaben -->
+  <form class="ls-form" id="formEingaben" aria-label="Eingaben" novalidate>
+
+    <section class="ls-card" aria-labelledby="h-gebaeude">
+      <div class="ls-card__head"><h2 id="h-gebaeude">Gebäude und Kosten</h2><span class="ls-card__sub">Förderhöchstbetrag je Wohneinheit</span></div>
+      <div class="ls-fields">
+        <div class="ls-field">
+          <label class="ls-label" for="wohneinheiten">Wohneinheiten im Gebäude</label>
+          <div class="ls-unit"><input class="ls-input ls-num" id="wohneinheiten" type="text" inputmode="numeric" value="1"><span>WE</span></div>
+          <div class="ls-hint">1 bis 20. Der Höchstbetrag verteilt sich zu gleichen Teilen auf alle Wohneinheiten.</div>
+          <div class="ls-error" id="wohneinheitenErr" hidden></div>
+        </div>
+        <div class="ls-field">
+          <label class="ls-label" for="kosten">Investitionskosten brutto</label>
+          <div class="ls-range">
+            <input type="range" id="kostenR" min="5000" max="120000" step="500" value="30000" aria-label="Investitionskosten Regler">
+            <div class="ls-unit"><input class="ls-input ls-num" id="kosten" type="text" inputmode="decimal" value="30 000"><span>€</span></div>
+          </div>
+          <div class="ls-hint">Förderfähige Gesamtkosten laut Angebot. Gerechnet wird höchstens mit dem Förderhöchstbetrag.</div>
+          <div class="ls-error" id="kostenErr" hidden></div>
+        </div>
+      </div>
+      <div class="ls-fields ls-mt-4">
+        <div class="ls-field">
+          <span class="ls-label" id="selbstnutzungLabel">Nutzung</span>
+          <div class="ls-seg ls-seg--full" role="group" aria-labelledby="selbstnutzungLabel">
+            <label><input type="radio" name="selbstnutzung" id="selbstnutzungJa" value="ja" checked><span>Selbst bewohnt</span></label>
+            <label><input type="radio" name="selbstnutzung" id="selbstnutzungNein" value="nein"><span>Vermietet</span></label>
+          </div>
+          <div class="ls-hint">Klimageschwindigkeits- und Einkommensbonus gibt es nur für die selbst bewohnte Wohneinheit.</div>
+        </div>
+        <div class="ls-field" id="madeInEuFeld" hidden>
+          <span class="ls-label">Herkunft der Wärmepumpe</span>
+          <label class="ls-check"><input type="checkbox" id="madeInEu"> Wärmepumpe aus EU-Fertigung („made in EU“)</label>
+          <div class="ls-hint">Angekündigt für Anträge ab 01.01.2027: Grundförderung 15 % plus 15 % für EU-Fertigung. Noch nicht im Merkblatt 458.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ls-card" aria-labelledby="h-bestand">
+      <div class="ls-card__head"><h2 id="h-bestand">Bestehende Heizung</h2><span class="ls-card__sub">Klimageschwindigkeitsbonus</span></div>
+      <div class="ls-fields">
+        <div class="ls-field">
+          <label class="ls-label" for="altanlage">Bestandsanlage</label>
+          <select class="ls-select" id="altanlage">
+            <option value="oel">Ölheizung</option>
+            <option value="gas">Gasheizung</option>
+            <option value="kohle">Kohle- oder Holzheizung</option>
+            <option value="nacht">Nachtspeicherheizung</option>
+            <option value="ee">Erneuerbare Heizung (Wärmepumpe, Biomasse, Solar)</option>
+            <option value="keine">Keine bestehende Heizung / Neubau</option>
+          </select>
+          <div class="ls-hint">Bonus beim Austausch von Öl, Kohle/Holz, Nachtspeicher oder einer mindestens 20 Jahre alten Gasheizung.</div>
+        </div>
+        <div class="ls-field" id="baujahrFeld">
+          <label class="ls-label" for="baujahr">Baujahr der Bestandsanlage</label>
+          <div class="ls-unit"><input class="ls-input ls-num" id="baujahr" type="text" inputmode="numeric" value="2005"><span>Jahr</span></div>
+          <div class="ls-hint" id="baujahrHint">Laut Typenschild. Alter = Antragsjahr − Baujahr.</div>
+          <div class="ls-error" id="baujahrErr" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ls-card" aria-labelledby="h-einkommen" id="einkommenKarte">
+      <div class="ls-card__head"><h2 id="h-einkommen">Einkommen des Haushalts</h2><span class="ls-card__sub">Einkommensbonus, nur bei Selbstnutzung</span></div>
+      <div class="ls-fields">
+        <div class="ls-field">
+          <label class="ls-label" for="einkommen">Zu versteuerndes Haushaltseinkommen (Durchschnitt)</label>
+          <div class="ls-range">
+            <input type="range" id="einkommenR" min="0" max="90000" step="500" value="45000" aria-label="Einkommen Regler">
+            <div class="ls-unit"><input class="ls-input ls-num" id="einkommen" type="text" inputmode="decimal" value="45 000"><span>€/a</span></div>
+          </div>
+          <div class="ls-hint">Durchschnitt der Steuerjahre 2 und 3 vor dem Antrag, nachgewiesen über die Einkommensteuerbescheide.</div>
+          <div class="ls-error" id="einkommenErr" hidden></div>
+        </div>
+        <div class="ls-field">
+          <span class="ls-label">Familienzuschlag</span>
+          <label class="ls-check"><input type="checkbox" id="kind"> Mindestens ein minderjähriges, kindergeldberechtigtes Kind im Haushalt</label>
+          <div class="ls-hint">Mindert das anzusetzende Einkommen einmalig um den Familienzuschlag (Standard 10 000 €).</div>
+        </div>
+      </div>
+      <details class="ls-details ls-mt-4" id="steuerjahre">
+        <summary>Beide Steuerjahre einzeln eingeben <span class="ls-muted">· Mittelwert wird übernommen</span></summary>
+        <div class="ls-fields ls-mt-2">
+          <div class="ls-field">
+            <label class="ls-label" for="einkommenJahrA" id="einkommenJahrALabel">Zu versteuerndes Einkommen Jahr A</label>
+            <div class="ls-unit"><input class="ls-input ls-num" id="einkommenJahrA" type="text" inputmode="decimal" placeholder="z. B. 44 000"><span>€</span></div>
+            <div class="ls-error" id="einkommenJahrAErr" hidden></div>
+          </div>
+          <div class="ls-field">
+            <label class="ls-label" for="einkommenJahrB" id="einkommenJahrBLabel">Zu versteuerndes Einkommen Jahr B</label>
+            <div class="ls-unit"><input class="ls-input ls-num" id="einkommenJahrB" type="text" inputmode="decimal" placeholder="z. B. 46 000"><span>€</span></div>
+            <div class="ls-error" id="einkommenJahrBErr" hidden></div>
+          </div>
+        </div>
+        <div class="ls-hint ls-mt-2">Sind beide Jahre eingetragen, wird ihr Mittelwert in das Feld oben übernommen.</div>
+      </details>
+    </section>
+
+    <section class="ls-card" aria-labelledby="h-saetze">
+      <div class="ls-card__head"><h2 id="h-saetze">Fördersätze</h2><span class="ls-stand" id="saetzeStand">Fördersätze Stand 07/2026 (Merkblatt 458) · prüfen</span></div>
+      <details class="ls-details" id="saetzeDetails">
+        <summary>Erweitert <span class="ls-muted" id="saetzeKurz">· Standardwerte</span></summary>
+        <div class="ls-hint ls-mt-2">Standardwerte aus dem KfW-Merkblatt 458 „BEG Heizungsförderung für Privatpersonen – Wohngebäude“ (Stand 07/2026, gültig ab 21.07.2026) und IKZ 8/2026, Tabelle 1. Nur ändern, wenn die KfW neue Sätze veröffentlicht; die Stichtage der Absenkung (01.02.2027, dann halbjährlich) sind fest.</div>
+        <h3 class="ls-mt-4">Förderhöchstbeträge</h3>
+        <div class="ls-fields ls-mt-2">
+          <div class="ls-field"><label class="ls-label" for="hb1we">1. Wohneinheit, Startwert</label><div class="ls-unit"><input class="ls-input ls-num" id="hb1we" type="text" inputmode="decimal" value="28 000"><span>€</span></div><div class="ls-error" id="hb1weErr" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="hbSchritt">Absenkung je Halbjahr</label><div class="ls-unit"><input class="ls-input ls-num" id="hbSchritt" type="text" inputmode="decimal" value="750"><span>€</span></div><div class="ls-error" id="hbSchrittErr" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="hb1weMin">1. Wohneinheit, Endwert</label><div class="ls-unit"><input class="ls-input ls-num" id="hb1weMin" type="text" inputmode="decimal" value="22 000"><span>€</span></div><div class="ls-error" id="hb1weMinErr" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="hbWe2bis6">Je Wohneinheit 2 bis 6</label><div class="ls-unit"><input class="ls-input ls-num" id="hbWe2bis6" type="text" inputmode="decimal" value="15 000"><span>€</span></div><div class="ls-error" id="hbWe2bis6Err" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="hbWeAb7">Je Wohneinheit ab der 7.</label><div class="ls-unit"><input class="ls-input ls-num" id="hbWeAb7" type="text" inputmode="decimal" value="8 000"><span>€</span></div><div class="ls-error" id="hbWeAb7Err" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="mindest">Mindestinvestition brutto</label><div class="ls-unit"><input class="ls-input ls-num" id="mindest" type="text" inputmode="decimal" value="300"><span>€</span></div><div class="ls-error" id="mindestErr" hidden></div></div>
+        </div>
+        <h3 class="ls-mt-4">Sätze</h3>
+        <div class="ls-fields ls-mt-2">
+          <div class="ls-field"><label class="ls-label" for="grundsatz">Grundförderung</label><div class="ls-unit"><input class="ls-input ls-num" id="grundsatz" type="text" inputmode="decimal" value="30"><span>%</span></div><div class="ls-hint">Ab 01.01.2027 angekündigt: die Hälfte davon nur mit EU-Fertigung.</div><div class="ls-error" id="grundsatzErr" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="klimaStart">Klimageschwindigkeitsbonus, Startwert</label><div class="ls-unit"><input class="ls-input ls-num" id="klimaStart" type="text" inputmode="decimal" value="16"><span>%</span></div><div class="ls-error" id="klimaStartErr" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="klimaStufe">Absenkung je Halbjahr</label><div class="ls-unit"><input class="ls-input ls-num" id="klimaStufe" type="text" inputmode="decimal" value="4"><span>Punkte</span></div><div class="ls-error" id="klimaStufeErr" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="obergrenze">Obergrenze Fördersatz</label><div class="ls-unit"><input class="ls-input ls-num" id="obergrenze" type="text" inputmode="decimal" value="70"><span>%</span></div><div class="ls-error" id="obergrenzeErr" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="obergrenzeErhoeht">Obergrenze unterste Einkommensstufe</label><div class="ls-unit"><input class="ls-input ls-num" id="obergrenzeErhoeht" type="text" inputmode="decimal" value="80"><span>%</span></div><div class="ls-error" id="obergrenzeErhoehtErr" hidden></div></div>
+        </div>
+        <h3 class="ls-mt-4">Einkommensbonus</h3>
+        <div class="ls-fields ls-mt-2">
+          <div class="ls-field"><label class="ls-label" for="einkGrenze1">Stufe 1 bis</label><div class="ls-unit"><input class="ls-input ls-num" id="einkGrenze1" type="text" inputmode="decimal" value="30 000"><span>€</span></div><div class="ls-error" id="einkGrenze1Err" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="einkBonus1">Bonus Stufe 1</label><div class="ls-unit"><input class="ls-input ls-num" id="einkBonus1" type="text" inputmode="decimal" value="40"><span>%</span></div><div class="ls-error" id="einkBonus1Err" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="einkGrenze2">Stufe 2 bis</label><div class="ls-unit"><input class="ls-input ls-num" id="einkGrenze2" type="text" inputmode="decimal" value="40 000"><span>€</span></div><div class="ls-error" id="einkGrenze2Err" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="einkBonus2">Bonus Stufe 2</label><div class="ls-unit"><input class="ls-input ls-num" id="einkBonus2" type="text" inputmode="decimal" value="30"><span>%</span></div><div class="ls-error" id="einkBonus2Err" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="einkGrenze3">Stufe 3 bis</label><div class="ls-unit"><input class="ls-input ls-num" id="einkGrenze3" type="text" inputmode="decimal" value="50 000"><span>€</span></div><div class="ls-error" id="einkGrenze3Err" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="einkBonus3">Bonus Stufe 3</label><div class="ls-unit"><input class="ls-input ls-num" id="einkBonus3" type="text" inputmode="decimal" value="10"><span>%</span></div><div class="ls-error" id="einkBonus3Err" hidden></div></div>
+          <div class="ls-field"><label class="ls-label" for="familienzuschlag">Familienzuschlag (Abzug vom Einkommen)</label><div class="ls-unit"><input class="ls-input ls-num" id="familienzuschlag" type="text" inputmode="decimal" value="10 000"><span>€</span></div><div class="ls-error" id="familienzuschlagErr" hidden></div></div>
+        </div>
+        <div class="ls-toolbar ls-mt-4 ls-no-print">
+          <button type="button" class="ls-btn ls-btn--secondary ls-btn--sm" id="btnSaetzeStandard">Fördersätze auf Stand 07/2026 zurücksetzen</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- 5 · Aktionen: genau ein primärer Button -->
+    <div class="ls-toolbar ls-no-print ls-mt-0">
+      <button type="button" class="ls-btn ls-btn--primary" id="btnDrucken" data-print>Bericht drucken / PDF</button>
+      <button type="button" class="ls-btn ls-btn--secondary" id="btnReset">Zurücksetzen</button>
     </div>
-  </section>
+  </form>
 
-  </main>
-
-  <!-- ============ KUNDENHINWEIS EE-HEIZUNG ============ -->
-  <section class="ee-hinweis" id="ee-hinweis" hidden>
-    <h3>Ab 2027 ändert sich etwas für Sie</h3>
-    <div id="ee-text"></div>
-    <details class="quelle">
-      <summary>Grundlage dieser Angabe</summary>
-      <p>Angekündigte Änderung der BEG-Förderrichtlinie Wohngebäude
-        (BEG WG Punkt 5.1) in Verbindung mit BEG EM Nr. 5.3, wirksam ab dem
-        ersten Quartal 2027. Betroffen sind alle förderfähigen Heizungen, die
-        nach dem 1. Januar 2008 in Betrieb genommen wurden — Wärmepumpen aller
-        Art, Biomasseheizungen, Solarthermie sowie der Anschluss an ein
-        Gebäude- oder Wärmenetz.</p>
-      <p>Dargestellt in IKZ 8/2026, „BEG-Reform". Im KfW-Merkblatt 458
-        (Stand 07/2026) ist die Änderung noch nicht enthalten.</p>
-    </details>
-  </section>
-
-  <!-- ============ FRISTEN ============ -->
-  <section class="frist">
-    <h3>Wie lange gilt das noch?</h3>
-    <div class="frist-gross" id="frist-text"></div>
-    <div class="tabelle-huelle">
-      <table class="stufen">
-        <thead><tr>
-          <th>Ab Antragstellung</th>
-          <th>Klimageschwindigkeit</th>
-          <th>Höchstbetrag 1. WE</th>
-        </tr></thead>
-        <tbody id="stufen-body"></tbody>
+  <!-- 6 · Ergebnis -->
+  <section class="ls-card" id="ergebnis" aria-labelledby="h-ergebnis">
+    <div class="ls-card__head"><h2 id="h-ergebnis">Voraussichtlicher Zuschuss</h2><span class="ls-card__sub" id="ergebnisSub">rechnet bei jeder Änderung mit</span></div>
+    <div class="ls-note ls-note--warn ls-mb-4" id="hinweisKosten" hidden>
+      <svg class="ls-note__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 3 2.5 16h15L10 3z" stroke-linejoin="round"/><path d="M10 8v4M10 14v.5" stroke-linecap="round"/></svg>
+      <div id="hinweisKostenText"></div>
+    </div>
+    <div class="ls-card ls-card--navy" id="empfehlung">
+      <div class="ls-card__head"><h3 id="zuschussTitel">Zuschuss der KfW, überschlägig</h3><span class="ls-badge ls-badge--yellow">Vorschlag</span></div>
+      <div class="ls-kpis">
+        <div class="ls-kpi"><span class="ls-kpi__label">Voraussichtlicher Zuschuss</span><span class="ls-kpi__value" id="kpiZuschuss">–</span><span class="ls-kpi__note" id="kpiZuschussNote">von – € förderfähigen Kosten</span></div>
+        <div class="ls-kpi"><span class="ls-kpi__label">Fördersatz</span><span class="ls-kpi__value" id="kpiSatz">–</span><span class="ls-kpi__note" id="kpiSatzNote">–</span></div>
+      </div>
+      <p class="ls-muted ls-mt-2">Überschlag nach KfW-Merkblatt 458 zum eingetragenen Tag der Antragstellung. Verbindlich ist allein der Förderbescheid der KfW; keine Zusage zur Förderhöhe.</p>
+    </div>
+    <div class="ls-kpis ls-mt-4">
+      <div class="ls-kpi"><span class="ls-kpi__label">Förderhöchstbetrag</span><span class="ls-kpi__value" id="kpiHoechst">–</span><span class="ls-kpi__note" id="kpiHoechstNote">für – Wohneinheit</span></div>
+      <div class="ls-kpi"><span class="ls-kpi__label">Förderfähige Kosten</span><span class="ls-kpi__value" id="kpiBasis">–</span><span class="ls-kpi__note" id="kpiBasisNote">–</span></div>
+      <div class="ls-kpi" id="kpiSelbstBox" hidden><span class="ls-kpi__label">Selbst bewohnte WE</span><span class="ls-kpi__value" id="kpiSelbst">–</span><span class="ls-kpi__note" id="kpiSelbstNote">–</span></div>
+      <div class="ls-kpi" id="kpiWeitereBox" hidden><span class="ls-kpi__label" id="kpiWeitereLabel">Übrige WE</span><span class="ls-kpi__value" id="kpiWeitere">–</span><span class="ls-kpi__note" id="kpiWeitereNote">–</span></div>
+    </div>
+    <h3 class="ls-mt-4">Bausteine des Fördersatzes</h3>
+    <dl class="ls-dl ls-mt-2" id="bausteine"></dl>
+    <h3 class="ls-mt-4">Wie lange gilt das noch?</h3>
+    <div class="ls-note ls-note--info ls-mt-2">
+      <svg class="ls-note__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M10 9v5M10 6.5v.5" stroke-linecap="round"/></svg>
+      <div id="fristText"></div>
+    </div>
+    <div class="ls-table-wrap ls-mt-2">
+      <table class="ls-table ls-table--compact">
+        <thead><tr><th>Antrag ab</th><th class="ls-num">Klimageschwindigkeitsbonus</th><th class="ls-num">Höchstbetrag 1. WE</th></tr></thead>
+        <tbody id="stufenBody"></tbody>
       </table>
     </div>
+    <div class="ls-note ls-note--warn ls-mt-4" id="eeHinweis" hidden>
+      <svg class="ls-note__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 3 2.5 16h15L10 3z" stroke-linejoin="round"/><path d="M10 8v4M10 14v.5" stroke-linecap="round"/></svg>
+      <div><b>Ab 2027 ändert sich etwas für Sie.</b> <span id="eeText"></span>
+        <p class="ls-small ls-mt-2">Grundlage: angekündigte Änderung der BEG-Förderrichtlinie Wohngebäude (BEG WG Punkt 5.1) in Verbindung mit BEG EM Nr. 5.3, wirksam ab dem ersten Quartal 2027. Betroffen sind alle förderfähigen Heizungen, die nach dem 1. Januar 2008 in Betrieb genommen wurden – Wärmepumpen aller Art, Biomasseheizungen, Solarthermie sowie der Anschluss an ein Gebäude- oder Wärmenetz. Dargestellt in IKZ 8/2026, „BEG-Reform“. Im KfW-Merkblatt 458 (Stand 07/2026) ist die Änderung noch nicht enthalten.</p>
+      </div>
+    </div>
   </section>
 
-  <footer>
-    <a href="index.html">&larr; Zurück zur Übersicht</a>
-    <div class="fuss-text">
-      Quellen: KfW-Merkblatt 458 „BEG Heizungsförderung für Privatpersonen –
-      Wohngebäude", Stand 07/2026, gültig ab 21.07.2026 · IKZ 8/2026,
-      Tabelle 1. Alle Angaben ohne Gewähr.
+  <!-- 7 · Bericht: Grundlage (erscheint im Druck, weil das Formular nicht gedruckt wird) -->
+  <section class="ls-card ls-report" id="bericht" aria-labelledby="h-bericht">
+    <div class="ls-card__head"><h2 id="h-bericht">Grundlage</h2><span class="ls-card__sub">Eingaben zum Förderüberschlag</span></div>
+    <div class="ls-report__meta">
+      <div><span>Kunde / Projekt</span><b id="berichtProjekt">BV Muster</b></div>
+      <div><span>Erstellt am</span><b id="berichtDatum">–</b></div>
+      <div><span>Tag der Antragstellung</span><b id="berichtAntrag">–</b></div>
+      <div><span>Fördersätze</span><b id="berichtStand">Stand 07/2026 (Merkblatt 458), zu prüfen</b></div>
     </div>
-  </footer>
+    <dl class="ls-dl" id="eingabenListe"></dl>
+  </section>
 
+  <section class="ls-card ls-report" id="rechenweg" aria-labelledby="h-rechenweg">
+    <div class="ls-card__head"><h2 id="h-rechenweg">So kommt der Zuschuss zustande</h2><span class="ls-card__sub">Rechenweg Schritt für Schritt</span></div>
+    <div class="ls-stack" id="rechenwegInhalt"></div>
+  </section>
+
+  <!-- 8 · Fuß -->
+  <footer class="ls-footer">
+    Quellen: KfW-Merkblatt 458 „BEG Heizungsförderung für Privatpersonen – Wohngebäude“, Stand 07/2026, gültig ab 21.07.2026 · IKZ 8/2026, Tabelle 1. Angekündigte, noch nicht im Merkblatt enthaltene Regeln (Grundförderung 15 % + 15 % EU-Fertigung ab 2027; Wegfall der Förderung für erneuerbare Anlagen ab Baujahr 2008) sind als solche gekennzeichnet. Rechenmodell je Wohneinheit: förderfähig = min(Kosten; Förderhöchstbetrag), Anteil je WE, selbst bewohnte WE × min(Grund + Klima + Einkommen; Obergrenze), übrige WE × Grundförderung. Überschlägige Ermittlung für das Kundengespräch, kein Antragsersatz und keine Zusage zur Förderhöhe. Verbindlich ist allein der Förderbescheid der KfW. Angaben ohne Gewähr. Erstellt mit dem internen Förderrechner der Lutz Spring GmbH · foerderung.html · Stand 27.10.2026.
+  </footer>
 </div>
 
+<!-- 9 · Haus-Icon (Rücklink, im Druck ausgeblendet) -->
+<a class="ls-home ls-no-print" href="index.html" aria-label="Zur Startseite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3.5l9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9.75 20v-5.5h4.5V20"/></svg>
+</a>
+
+<!-- ls.js:start -->
 <script>
-(function(){
-  "use strict";
+/* ============================================================
+   ls.js · Lutz Spring GmbH · gemeinsame Hilfsfunktionen der Tools
+   Version 2.1.1 · Stand 2026-10-25 (LS.regler)
+   Wird beim Veröffentlichen von _build/inline.py in jedes Tool eingefügt
+   (Marker ls.js:start / ls.js:end im HTML).
+   Globales Objekt: LS
+   ============================================================ */
+(function (w, d) {
+  'use strict';
+  var LS = {};
 
-  var $ = function(id){ return document.getElementById(id); };
+  /* ---------- Zahlen ---------- */
+  /* Liest deutsche Eingaben: "1.234,5", "12.450", "−12,7", "≈ 7,2", "640 W". Gibt null bei Unsinn. */
+  LS.zahl = function (v) {
+    if (v == null) return null;
+    v = String(v).replace(/[≈\s  ]/g, '').replace(/−/g, '-').replace(/[^0-9.,\-]/g, '');
+    if (v.indexOf(',') > -1) v = v.replace(/\./g, '').replace(',', '.');
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(v)) v = v.replace(/\./g, '');
+    var n = parseFloat(v);
+    return isNaN(n) ? null : n;
+  };
+  /* Liest ein Feld per id. */
+  LS.lesen = function (id) { var el = d.getElementById(id); return el ? LS.zahl(el.value) : null; };
+  /* Schreibt deutsch mit festen Nachkommastellen, echtes Minus, schmales Leerzeichen als Tausender. */
+  LS.fmt = function (n, stellen) {
+    if (n == null || isNaN(n)) return '–';
+    var s = Number(n).toLocaleString('de-DE', { minimumFractionDigits: stellen || 0, maximumFractionDigits: stellen || 0 });
+    return s.replace(/\./g, ' ').replace('-', '−');
+  };
+  /* Zahl mit Einheit: LS.einheit(1472,'W') → "1 472 W" ; LS.einheit(7.2,'kW',1,true) → "≈ 7,2 kW" */
+  LS.einheit = function (n, einheit, stellen, richtwert) {
+    return (richtwert ? '≈ ' : '') + LS.fmt(n, stellen) + (einheit ? ' ' + einheit : '');
+  };
+  LS.datum = function (dt) { return (dt || new Date()).toLocaleDateString('de-DE'); };
+  LS.datumISO = function (dt) { dt = dt || new Date(); return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0'); };
 
-  /* ============================================================
-     RECHENKERN
-
-     Quellen:
-       - KfW-Merkblatt 458 "BEG Heizungsförderung für Privatpersonen –
-         Wohngebäude", Stand 07/2026, gültig ab 21.07.2026
-       - IKZ 8/2026 "BEG-Reform", Tabelle 1
-
-     Das Modell wurde gegen die IKZ-Tabelle nachgerechnet:
-       EFH 2026:  22.400 / 19.600 / 15.680 / 12.880 €
-       2 WE, 0-30k:  23.650 €      3 WE, 0-30k:  27.067 €
-       ohne Selbstnutzung, 8 WE:  35.700 €
-     Alle Werte stimmen exakt.
-     ============================================================ */
-
-  var HB_1WE_START = 28000;   // Förderhöchstbetrag 1. Wohneinheit
-  var HB_1WE_MIN   = 22000;   // Endstufe ab 01.08.2030
-  var HB_SCHRITT   = 750;     // Absenkung je Halbjahr
-  var HB_WE_2_6    = 15000;   // je Wohneinheit 2 bis 6
-  var HB_WE_AB7    = 8000;    // je weitere Wohneinheit ab der 7.
-  var GRUND        = 30;      // Grundförderung in Prozent
-  var KLIMA_START  = 16;      // Klimageschwindigkeitsbonus
-  var KLIMA_STUFE  = 4;       // Absenkung je Halbjahr in Prozentpunkten
-  var MINDEST      = 300;     // Mindestinvestition brutto
-
-  var START_NOVELLE = new Date(2026, 6, 21);  // 21.07.2026
-  var ERSTE_STUFE   = new Date(2027, 1, 1);   // 01.02.2027
-  var EU_SPLIT      = new Date(2027, 0, 1);   // ab hier 15 % + 15 % "made in EU"
-
-  /* Anzahl abgeschlossener Absenkungsschritte zum Datum.
-     Stichtage: 01.02.2027, 01.08.2027, 01.02.2028, … (Merkblatt 458) */
-  function stufen(d){
-    if(d < ERSTE_STUFE) return 0;
-    var monate = (d.getFullYear() - 2027) * 12 + (d.getMonth() - 1);
-    return Math.floor(monate / 6) + 1;
-  }
-
-  function klimasatz(d){
-    return Math.max(0, KLIMA_START - KLIMA_STUFE * stufen(d));
-  }
-  function hoechstbetrag1WE(d){
-    return Math.max(HB_1WE_MIN, HB_1WE_START - HB_SCHRITT * stufen(d));
-  }
-
-  /* Ab 01.01.2027 sinkt die Grundförderung auf 15 %; weitere 15 % gibt es
-     für "made in EU"-Wärmepumpen. ANGEKÜNDIGT, im Merkblatt 458 (Stand
-     07/2026) noch nicht enthalten — deshalb hier an einer Stelle änderbar. */
-  function grundsatz(d, eu){
-    if(d < EU_SPLIT) return GRUND;
-    return eu ? GRUND : GRUND / 2;
-  }
-
-  /* Familienzuschlag: mindestens ein minderjähriges, kindergeldberechtigtes
-     Kind mindert das anzusetzende Haushaltsjahreseinkommen einmalig um
-     10.000 Euro (Merkblatt 458). */
-  function anzusetzendesEinkommen(zve, kind){
-    return Math.max(0, zve - (kind ? 10000 : 0));
-  }
-  function einkommensbonus(zve, kind){
-    var e = anzusetzendesEinkommen(zve, kind);
-    if(e <= 30000) return 40;
-    if(e <= 40000) return 30;
-    if(e <= 50000) return 10;
-    return 0;
-  }
-  /* Obergrenze: grundsätzlich 70 %, für die unterste Einkommensstufe 80 %.
-     Die 80-Prozent-Grenze fällt genau mit dem 40-Prozent-Bonus zusammen. */
-  function obergrenze(bonus){
-    return bonus === 40 ? 80 : 70;
-  }
-
-  function foerderhoechstbetrag(d, we){
-    return hoechstbetrag1WE(d)
-         + HB_WE_2_6 * Math.min(Math.max(we - 1, 0), 5)
-         + HB_WE_AB7 * Math.max(we - 6, 0);
-  }
-
-  /* Klimageschwindigkeitsbonus: nur bei Selbstnutzung und nur beim Austausch
-     einer alten Öl-, Kohle-, Nachtspeicher- oder mindestens 20 Jahre alten
-     Gasheizung. */
-  function klimaBerechtigt(art, baujahr, jahr){
-    if(art === 'oel' || art === 'kohle' || art === 'nacht') return true;
-    if(art === 'gas') return (jahr - baujahr) >= 20;
-    return false;
-  }
-
-  function rechne(e){
-    var hb      = foerderhoechstbetrag(e.datum, e.we);
-    var basis   = Math.min(e.kosten, hb);      // förderfähige Gesamtkosten
-    var anteil  = basis / e.we;                // verteilt sich zu gleichen Teilen
-    var grund   = grundsatz(e.datum, e.eu);
-    var klima   = (e.selbst && klimaBerechtigt(e.art, e.baujahr, e.datum.getFullYear()))
-                ? klimasatz(e.datum) : 0;
-    var eink    = e.selbst ? einkommensbonus(e.einkommen, e.kind) : 0;
-    var grenze  = obergrenze(eink);
-    var roh     = grund + klima + eink;
-    var satz    = e.selbst ? Math.min(roh, grenze) : grund;
-
-    var zuschussSelbst  = e.selbst ? anteil * satz / 100 : 0;
-    var zuschussWeitere = (e.selbst ? (e.we - 1) : e.we) * anteil * grund / 100;
-
-    return {
-      hoechstbetrag: hb, basis: basis, anteil: anteil,
-      grund: grund, klima: klima, eink: eink,
-      roh: roh, satz: satz, grenze: grenze, gedeckelt: e.selbst && roh > grenze,
-      zuschuss: zuschussSelbst + zuschussWeitere,
-      zuschussSelbst: zuschussSelbst, zuschussWeitere: zuschussWeitere,
-      gedeckelteKosten: e.kosten > hb
-    };
-  }
-
-  /* ---------- Darstellung ---------- */
-  function euro(v){
-    return Math.round(v).toLocaleString('de-DE') + ' €';
-  }
-  function datumTxt(d){
-    return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
-  }
-  function esc(s){
-    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  /* ---------- Zustand aus der Oberfläche lesen ---------- */
-  var selbst = true, art = 'oel';
-
-  function eingaben(){
-    var roh = $('datum').value;                 // "JJJJ-MM-TT"
-    var d;
-    if(/^\d{4}-\d{2}-\d{2}$/.test(roh)){
-      var p = roh.split('-');
-      d = new Date(+p[0], +p[1] - 1, +p[2]);     // lokale Mitternacht, nicht UTC
-    } else {
-      d = new Date();
-    }
-    return {
-      datum: d,
-      we: parseInt($('we').value, 10) || 1,
-      kosten: Math.max(MINDEST, parseFloat($('kosten-zahl').value) || 0),
-      selbst: selbst,
-      art: art,
-      baujahr: parseInt($('baujahr-zahl').value, 10) || 2005,
-      einkommen: Math.max(0, parseFloat($('einkommen-zahl').value) || 0),
-      kind: $('kind').checked,
-      eu: $('eu').checked
-    };
-  }
-
-  /* ============================================================
-     ERKLÄRTEXTE
-     Die Szenarien sind fest — deshalb werden die Texte aus dem
-     tatsächlichen Ergebnis gebaut, nicht aus Bausteinen geraten.
-     ============================================================ */
-
-  function erklaerung1(e, r){
-    var t = [];
-    var weTxt = e.we === 1 ? 'einer Wohneinheit' : e.we + ' Wohneinheiten';
-
-    t.push('<p>Die KfW rechnet nicht mit Ihren tatsächlichen Kosten, sondern höchstens '
-      + 'mit dem <b>Förderhöchstbetrag</b>. Er hängt allein von der Zahl der Wohneinheiten ab '
-      + 'und beträgt bei ' + weTxt + ' <b>' + euro(r.hoechstbetrag) + '</b>.</p>');
-
-    if(e.we > 1){
-      var teile = [euro(hoechstbetrag1WE(e.datum)) + ' für die erste'];
-      var mittel = Math.min(Math.max(e.we - 1, 0), 5);
-      if(mittel > 0) teile.push(mittel + ' × ' + euro(HB_WE_2_6) + ' für die zweite bis sechste');
-      var oben = Math.max(e.we - 6, 0);
-      if(oben > 0) teile.push(oben + ' × ' + euro(HB_WE_AB7) + ' für jede weitere');
-      t.push('<div class="rechnung">' + esc(teile.join('\n+ ')) + '\n= '
-        + esc(euro(r.hoechstbetrag)) + '</div>');
-    }
-
-    if(r.gedeckelteKosten){
-      t.push('<p>Ihre Kosten von ' + euro(e.kosten) + ' liegen <b>darüber</b>. '
-        + 'Gerechnet wird deshalb mit ' + euro(r.basis) + ' — der Rest bleibt gefördert außen vor.</p>');
-    } else {
-      t.push('<p>Ihre Kosten von ' + euro(e.kosten) + ' liegen darunter. '
-        + 'Gerechnet wird also mit dem vollen Betrag.</p>');
-    }
-
-    if(e.we > 1){
-      t.push('<p>Der Betrag verteilt sich zu gleichen Teilen auf alle Wohneinheiten, '
-        + 'hier <b>' + euro(r.anteil) + ' je Wohneinheit</b>. Das ist wichtig, weil die '
-        + 'Boni nur für die selbst bewohnte Einheit gelten.</p>');
-    }
-
-    if(!e.selbst){
-      t.push('<p><b>Ohne Selbstnutzung</b> gibt es nur die Grundförderung — '
-        + 'Klimageschwindigkeits- und Einkommensbonus setzen voraus, dass Sie '
-        + 'selbst in der Wohnung leben.</p>');
-    }
-
-    if(e.datum >= EU_SPLIT){
-      t.push('<p>Ab dem 1. Januar 2027 sinkt die Grundförderung auf 15 %. Weitere 15 % gibt es '
-        + 'für Wärmepumpen aus europäischer Fertigung. '
-        + (e.eu
-            ? '<b>Angehakt</b> — es bleibt bei ' + r.grund + ' %.'
-            : '<b>Nicht angehakt</b> — gerechnet wird mit ' + r.grund + ' %.')
-        + '</p>');
-    }
-    return t.join('');
-  }
-
-  function erklaerung2(e, r){
-    var t = [];
-    var alter = e.datum.getFullYear() - e.baujahr;
-    var namen = {oel:'Ölheizung', gas:'Gasheizung', kohle:'Kohle- oder Holzheizung',
-                 nacht:'Nachtspeicherheizung', ee:'Heizung auf Basis erneuerbarer Energien',
-                 keine:'keine bestehende Heizung'};
-
-    if(!e.selbst){
-      t.push('<p>Der Klimageschwindigkeitsbonus gilt nur für selbst bewohnte Wohneinheiten. '
-        + 'Da Sie vermieten, spielt die Altanlage für die Förderhöhe keine Rolle.</p>');
-      return t.join('');
-    }
-
-    if(e.art === 'oel' || e.art === 'kohle' || e.art === 'nacht'){
-      t.push('<p>Für den Austausch einer ' + namen[e.art] + ' gibt es den '
-        + '<b>Klimageschwindigkeitsbonus</b> — unabhängig vom Alter der Anlage. '
-        + 'Derzeit sind das <b>' + r.klima + ' %</b>.</p>');
-    } else if(e.art === 'gas'){
-      if(alter >= 20){
-        t.push('<p>Ihre Gasheizung ist Baujahr ' + e.baujahr + ', also rund <b>' + alter
-          + ' Jahre alt</b>. Ab 20 Jahren zählt sie für den Klimageschwindigkeitsbonus — '
-          + 'er greift mit <b>' + r.klima + ' %</b>.</p>');
-      } else {
-        t.push('<p>Ihre Gasheizung ist Baujahr ' + e.baujahr + ', also rund <b>' + alter
-          + ' Jahre alt</b>. Der Klimageschwindigkeitsbonus verlangt bei Gas '
-          + '<b>mindestens 20 Jahre</b> — er greift hier <b>nicht</b>. '
-          + 'Ab Baujahr ' + (e.datum.getFullYear() - 20) + ' oder älter wäre er möglich.</p>');
+  /* ---------- Speicher im Browser (Eingaben bleiben erhalten) ---------- */
+  LS.speicher = {
+    lesen: function (key, fallback) { try { var v = localStorage.getItem(key); return v == null ? fallback : JSON.parse(v); } catch (e) { return fallback; } },
+    schreiben: function (key, wert) { try { localStorage.setItem(key, JSON.stringify(wert)); return true; } catch (e) { return false; } },
+    loeschen: function (key) { try { localStorage.removeItem(key); } catch (e) {} }
+  };
+  /* Alle Felder eines Formulars merken und wiederherstellen (per id). */
+  LS.formularMerken = function (formId, key) {
+    var f = d.getElementById(formId); if (!f) return;
+    var felder = f.querySelectorAll('input[id], select[id], textarea[id]');
+    var gespeichert = LS.speicher.lesen(key, {});
+    felder.forEach(function (el) {
+      if (gespeichert.hasOwnProperty(el.id)) {
+        if (el.type === 'checkbox' || el.type === 'radio') el.checked = !!gespeichert[el.id]; else el.value = gespeichert[el.id];
       }
-    } else if(e.art === 'ee'){
-      t.push('<p>Sie ersetzen eine Heizung, die bereits erneuerbare Energie nutzt. '
-        + 'Dafür gibt es <b>keinen Klimageschwindigkeitsbonus</b> — der Bonus belohnt '
-        + 'den Ausstieg aus fossilen Brennstoffen.</p>');
-      t.push('<p>Beachten Sie zusätzlich den Hinweis weiter unten zur geplanten Änderung ab 2027.</p>');
-    } else {
-      t.push('<p>Ohne bestehende Heizung, die ersetzt wird, gibt es keinen '
-        + '<b>Klimageschwindigkeitsbonus</b>. Es bleibt bei der Grundförderung '
-        + 'und gegebenenfalls dem Einkommensbonus.</p>');
-    }
-
-    if(r.klima > 0){
-      var s = stufen(e.datum);
-      if(s === 0){
-        t.push('<p>Der Bonus steht noch auf dem Anfangswert von 16 %. '
-          + 'Ab dem 1. Februar 2027 sinkt er halbjährlich um 4 Prozentpunkte.</p>');
-      } else {
-        t.push('<p>Der Bonus ist bereits ' + s + '-mal abgesenkt worden — von 16 % auf '
-          + r.klima + ' %.</p>');
-      }
-    }
-    return t.join('');
-  }
-
-  function erklaerung3(e, r){
-    if(!e.selbst){
-      return '<p>Der Einkommensbonus gilt nur für selbst bewohnte Wohneinheiten. '
-        + 'Bei Vermietung bleibt es bei der Grundförderung.</p>';
-    }
-    var t = [];
-    var anzu = anzusetzendesEinkommen(e.einkommen, e.kind);
-
-    if(e.kind){
-      t.push('<p>Mit mindestens einem minderjährigen Kind im Haushalt zieht die KfW '
-        + '<b>10.000 € vom Einkommen ab</b>. Aus ' + euro(e.einkommen) + ' werden damit '
-        + '<b>' + euro(anzu) + '</b>, die für die Einstufung zählen.</p>');
-    } else {
-      t.push('<p>Für die Einstufung zählt Ihr zu versteuerndes Haushaltseinkommen von '
-        + '<b>' + euro(e.einkommen) + '</b>.</p>');
-    }
-
-    var stufeTxt;
-    if(r.eink === 40)      stufeTxt = 'bis 30.000 € → <b>40 %</b>';
-    else if(r.eink === 30) stufeTxt = 'über 30.000 bis 40.000 € → <b>30 %</b>';
-    else if(r.eink === 10) stufeTxt = 'über 40.000 bis 50.000 € → <b>10 %</b>';
-    else                   stufeTxt = 'über 50.000 € → <b>kein Einkommensbonus</b>';
-    t.push('<p>Damit fallen Sie in die Stufe ' + stufeTxt + '.</p>');
-
-    if(r.eink === 40){
-      t.push('<p>Diese unterste Stufe hebt zugleich die Obergrenze: Statt 70 % sind '
-        + '<b>bis zu 80 %</b> der förderfähigen Kosten möglich.</p>');
-    }
-
-    if(!e.kind && r.eink < 40){
-      var mitKind = einkommensbonus(e.einkommen, true);
-      if(mitKind > r.eink){
-        t.push('<p>Zum Vergleich: <b>mit</b> einem minderjährigen Kind im Haushalt wären es '
-          + mitKind + ' % statt ' + r.eink + ' %.</p>');
-      }
-    }
-
-    t.push('<p>Maßgeblich ist nicht das heutige Einkommen, sondern der <b>Durchschnitt der '
-      + 'beiden Steuerjahre</b>, die zwei und drei Jahre vor dem Antrag liegen — '
-      + 'nachgewiesen über die Einkommensteuerbescheide.</p>');
-    return t.join('');
-  }
-
-  function erklaerung4(e, r){
-    var t = [];
-    var z = [];
-
-    if(e.selbst){
-      z.push('Grundförderung'.padEnd(28) + String(r.grund).padStart(4) + ' %');
-      if(r.klima > 0) z.push('Klimageschwindigkeitsbonus'.padEnd(28) + '+' + String(r.klima).padStart(3) + ' %');
-      if(r.eink  > 0) z.push('Einkommensbonus'.padEnd(28) + '+' + String(r.eink).padStart(3) + ' %');
-      z.push(''.padEnd(28) + '─────');
-      z.push('Summe'.padEnd(28) + String(r.roh).padStart(4) + ' %');
-      if(r.gedeckelt){
-        z.push('Obergrenze'.padEnd(28) + String(r.grenze).padStart(4) + ' %  ← gilt');
-      }
-      t.push('<div class="rechnung">' + esc(z.join('\n')) + '</div>');
-
-      if(r.gedeckelt){
-        t.push('<p>Die Bausteine ergeben zusammen ' + r.roh + ' %. Die KfW deckelt den '
-          + 'Fördersatz aber bei <b>' + r.grenze + ' %</b>'
-          + (r.grenze === 80
-              ? ' — diese erhöhte Grenze gilt für die unterste Einkommensstufe.'
-              : ' — das ist die allgemeine Obergrenze.')
-          + ' Gerechnet wird deshalb mit ' + r.satz + ' %.</p>');
-      } else {
-        t.push('<p>Zusammen ergibt das <b>' + r.satz + ' %</b>. Die Obergrenze von '
-          + r.grenze + ' % ist damit nicht erreicht, es zählt die volle Summe.</p>');
-      }
-    } else {
-      t.push('<div class="rechnung">' + esc('Grundförderung'.padEnd(28)
-        + String(r.grund).padStart(4) + ' %') + '</div>');
-      t.push('<p>Ohne Selbstnutzung bleibt es bei der Grundförderung von ' + r.grund + ' %.</p>');
-    }
-
-    var b = [];
-    if(e.selbst && e.we > 1){
-      b.push('selbst bewohnte WE'.padEnd(20)
-        + euro(r.anteil) + ' × ' + r.satz + ' % = ' + euro(r.zuschussSelbst));
-      b.push(('übrige ' + (e.we - 1) + ' WE').padEnd(20)
-        + euro(r.anteil) + ' × ' + r.grund + ' % = ' + euro(r.zuschussWeitere));
-      b.push(''.padEnd(20) + '───────');
-      b.push('Zuschuss'.padEnd(20) + euro(r.zuschuss));
-    } else if(e.selbst){
-      b.push(euro(r.basis) + ' × ' + r.satz + ' % = ' + euro(r.zuschuss));
-    } else {
-      b.push(euro(r.basis) + ' × ' + r.grund + ' % = ' + euro(r.zuschuss));
-    }
-    t.push('<div class="rechnung">' + esc(b.join('\n')) + '</div>');
-
-    if(e.selbst && e.we > 1){
-      t.push('<p>Nur die selbst bewohnte Wohneinheit bekommt die Boni. Für alle anderen '
-        + 'Einheiten gibt es die Grundförderung — deshalb steigt der Zuschuss mit jeder '
-        + 'weiteren Wohneinheit, aber nicht im gleichen Verhältnis.</p>');
-    }
-    return t.join('');
-  }
-
-  /* ---------- Fristen ---------- */
-  function naechsterStichtag(d){
-    if(d < ERSTE_STUFE) return new Date(ERSTE_STUFE);
-    var j = d.getFullYear(), m = d.getMonth();
-    if(m < 1)  return new Date(j, 1, 1);
-    if(m < 7)  return new Date(j, 7, 1);
-    return new Date(j + 1, 1, 1);
-  }
-
-  function rendereFrist(e, r){
-    var naechst = naechsterStichtag(e.datum);
-    var tage = Math.ceil((naechst - e.datum) / 86400000);
-    var klimaDanach = Math.max(0, r.klima - KLIMA_STUFE);
-    var hbDanach = Math.max(HB_1WE_MIN, hoechstbetrag1WE(e.datum) - HB_SCHRITT);
-
-    var txt = 'Die heutigen Bedingungen gelten noch <b>' + tage + ' Tage</b>, '
-      + 'bis zum ' + datumTxt(new Date(naechst - 86400000)) + '.';
-    var teile = [];
-    if(r.klima > 0)
-      teile.push('der Klimageschwindigkeitsbonus auf ' + klimaDanach + ' %');
-    if(hoechstbetrag1WE(e.datum) > HB_1WE_MIN)
-      teile.push('der Höchstbetrag der ersten Wohneinheit auf ' + euro(hbDanach));
-    if(teile.length){
-      txt += ' Ab dem <b>' + datumTxt(naechst) + '</b> '
-           + (teile.length > 1 ? 'sinken ' : 'sinkt ') + teile.join(' und ') + '.';
-    } else {
-      txt += ' Weitere Absenkungen wirken sich auf Ihre Konstellation nicht mehr aus.';
-    }
-    $('frist-text').innerHTML = txt;
-
-    // Stufentabelle
-    var reihen = [], d = new Date(START_NOVELLE);
-    reihen.push({ab: new Date(START_NOVELLE), klima: 16, hb: 28000});
-    var cur = new Date(ERSTE_STUFE);
-    for(var i = 0; i < 8; i++){
-      reihen.push({ab: new Date(cur), klima: klimasatz(cur), hb: hoechstbetrag1WE(cur)});
-      cur = naechsterStichtag(new Date(cur.getFullYear(), cur.getMonth(), 2));
-    }
-    var jetztIdx = 0;
-    reihen.forEach(function(z, i){ if(e.datum >= z.ab) jetztIdx = i; });
-
-    $('stufen-body').innerHTML = reihen.map(function(z, i){
-      return '<tr' + (i === jetztIdx ? ' class="jetzt"' : '') + '>'
-        + '<td>' + datumTxt(z.ab) + (i === jetztIdx ? ' &nbsp;← jetzt' : '') + '</td>'
-        + '<td>' + (z.klima > 0 ? z.klima + ' %' : 'entfällt') + '</td>'
-        + '<td>' + euro(z.hb) + '</td></tr>';
-    }).join('');
-  }
-
-  /* ---------- EE-Hinweis ---------- */
-  function rendereEeHinweis(e){
-    var box = $('ee-hinweis');
-    if(e.art !== 'ee'){ box.hidden = true; return; }
-    box.hidden = false;
-    var nach2008 = e.baujahr > 2008;
-    var t = [];
-    t.push('<p>Ihre Heizung nutzt bereits erneuerbare Energie und wurde <b>'
-      + e.baujahr + '</b> eingebaut.</p>');
-    if(nach2008){
-      t.push('<p>Für solche Anlagen soll die Förderung beim Austausch <b>ab 2027 entfallen</b> — '
-        + 'betroffen sind alle, die nach dem 1. Januar 2008 eingebaut wurden.</p>');
-      t.push('<p><b>Heute wird Ihr Tausch noch gefördert.</b> Steht er ohnehin an, kann ein '
-        + 'früherer Termin sich lohnen. Sprechen Sie uns gerne darauf an.</p>');
-    } else {
-      t.push('<p>Anlagen aus der Zeit <b>vor dem 1. Januar 2008</b> sind von der geplanten '
-        + 'Streichung nach heutigem Stand nicht betroffen. Wie die Förderung ab 2027 für sie '
-        + 'genau aussieht, ist noch nicht abschließend geregelt.</p>');
-    }
-    t.push('<p class="klein">Die Änderung ist angekündigt, aber noch nicht in den '
-      + 'KfW-Bedingungen festgeschrieben.</p>');
-    $('ee-text').innerHTML = t.join('');
-  }
-
-  /* ---------- Gesamtausgabe ---------- */
-  function aktualisiere(){
-    var e = eingaben();
-    var r = rechne(e);
-
-    // Ergebnisblock
-    $('erg-betrag').innerHTML = euro(r.zuschuss)
-      + ' <small>von ' + euro(r.basis) + ' förderfähigen Kosten</small>';
-
-    var zeilen = [];
-    zeilen.push(['Förderhöchstbetrag', euro(r.hoechstbetrag)]);
-    zeilen.push(['Förderfähige Kosten', euro(r.basis)]);
-    if(e.selbst){
-      zeilen.push(['Grundförderung', r.grund + ' %']);
-      if(r.klima > 0) zeilen.push(['Klimageschwindigkeitsbonus', r.klima + ' %']);
-      if(r.eink  > 0) zeilen.push(['Einkommensbonus', r.eink + ' %']);
-      zeilen.push([r.gedeckelt ? 'Fördersatz (gedeckelt auf ' + r.grenze + ' %)' : 'Fördersatz',
-                   r.satz + ' %']);
-    } else {
-      zeilen.push(['Fördersatz (ohne Selbstnutzung)', r.grund + ' %']);
-    }
-    $('erg-zeilen').innerHTML = zeilen.map(function(z, i){
-      return '<div class="erg-zeile' + (i === zeilen.length - 1 ? ' summe' : '') + '">'
-        + '<span class="lbl">' + z[0] + '</span><span>' + z[1] + '</span></div>';
-    }).join('');
-
-    var hw = $('erg-hinweis');
-    if(e.kosten <= MINDEST){
-      hw.hidden = false;
-      hw.innerHTML = 'Die Mindestinvestition liegt bei ' + euro(MINDEST) + ' brutto.';
-    } else if(r.gedeckelteKosten){
-      hw.hidden = false;
-      hw.innerHTML = 'Ihre Kosten liegen über dem Förderhöchstbetrag. '
-        + euro(e.kosten - r.hoechstbetrag) + ' bleiben unberücksichtigt.';
-    } else {
-      hw.hidden = true;
-    }
-
-    // Erklärtexte
-    $('erklaer1-text').innerHTML = erklaerung1(e, r);
-    $('erklaer2-text').innerHTML = erklaerung2(e, r);
-    $('erklaer3-text').innerHTML = erklaerung3(e, r);
-    $('erklaer4-text').innerHTML = erklaerung4(e, r);
-
-    rendereFrist(e, r);
-    rendereEeHinweis(e);
-
-    // Sichtbarkeiten
-    $('schritt3').style.display = e.selbst ? '' : 'none';
-    $('baujahr-block').style.display = (e.art === 'keine') ? 'none' : '';
-    $('eu-block').hidden = !(e.datum >= EU_SPLIT);
-
-    // Jahresbeschriftungen: zweites und drittes Jahr vor Antragstellung
-    var j = e.datum.getFullYear();
-    $('jahr-a-label').textContent = 'Zu versteuerndes Einkommen ' + (j - 3);
-    $('jahr-b-label').textContent = 'Zu versteuerndes Einkommen ' + (j - 2);
-
-    $('we-anzeige').textContent = e.we;
-    $('baujahr-anzeige').textContent = e.baujahr;
-    var alter = j - e.baujahr;
-    $('alter-anzeige').textContent = (e.art === 'keine') ? '' : ' · rund ' + alter + ' Jahre alt';
-  }
-
-  /* ---------- Verdrahtung ---------- */
-  function koppeln(reglerId, zahlId){
-    var r = $(reglerId), z = $(zahlId);
-    r.addEventListener('input', function(){ z.value = r.value; aktualisiere(); });
-    z.addEventListener('input', function(){
-      var v = parseFloat(z.value);
-      if(isFinite(v)){
-        if(v >= +r.min && v <= +r.max) r.value = v;
-        else r.value = Math.min(Math.max(v, +r.min), +r.max);
-      }
-      aktualisiere();
     });
-  }
-  koppeln('we', 'we-zahl');
-  koppeln('kosten', 'kosten-zahl');
-  koppeln('baujahr', 'baujahr-zahl');
-  koppeln('einkommen', 'einkommen-zahl');
+    f.addEventListener('input', function () {
+      var o = {};
+      felder.forEach(function (el) { o[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value; });
+      LS.speicher.schreiben(key, o);
+    });
+  };
 
-  function wahlGruppe(id, setzen){
-    $(id).addEventListener('click', function(ev){
-      var b = ev.target.closest('button[data-wert]');
-      if(!b) return;
-      [].forEach.call(this.querySelectorAll('button'), function(x){
-        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+  /* ---------- Theme ---------- */
+  LS.theme = {
+    KEY: 'ls-theme',
+    setzen: function (t) {
+      var r = d.documentElement;
+      if (t === 'dark' || t === 'light') r.setAttribute('data-theme', t); else r.removeAttribute('data-theme');
+      var b = d.getElementById('themeToggle');
+      if (b) b.setAttribute('aria-pressed', r.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    },
+    istDunkel: function () {
+      var r = d.documentElement;
+      return r.getAttribute('data-theme') === 'dark' || (!r.getAttribute('data-theme') && w.matchMedia && w.matchMedia('(prefers-color-scheme: dark)').matches);
+    },
+    start: function () {
+      var s = null; try { s = localStorage.getItem(LS.theme.KEY); } catch (e) {}
+      LS.theme.setzen(s);
+      d.addEventListener('click', function (ev) {
+        var b = ev.target.closest && ev.target.closest('#themeToggle'); if (!b) return;
+        var n = LS.theme.istDunkel() ? 'light' : 'dark';
+        LS.theme.setzen(n); try { localStorage.setItem(LS.theme.KEY, n); } catch (e) {}
       });
-      setzen(b.getAttribute('data-wert'));
-      aktualisiere();
-    });
-  }
-  wahlGruppe('wahl-selbst', function(v){ selbst = (v === 'ja'); });
-  wahlGruppe('wahl-alt',    function(v){ art = v; });
+    }
+  };
 
-  ['datum','kind','eu'].forEach(function(id){
-    $(id).addEventListener('change', aktualisiere);
-  });
+  /* ---------- Rückmeldungen ---------- */
+  LS.toast = function (text, art, ms) {
+    var box = d.querySelector('.ls-toasts');
+    if (!box) { box = d.createElement('div'); box.className = 'ls-toasts'; box.setAttribute('aria-live', 'polite'); d.body.appendChild(box); }
+    var t = d.createElement('div'); t.className = 'ls-toast' + (art ? ' ls-toast--' + art : ''); t.textContent = text;
+    box.appendChild(t);
+    setTimeout(function () { t.remove(); }, ms || 2600);
+  };
+  /* Inline-Rückfrage: ersetzt den Auslöser-Button vorübergehend durch „Frage · Ja · Abbrechen“. */
+  LS.rueckfrage = function (anker, frage, jaText, onJa) {
+    var box = d.createElement('div'); box.className = 'ls-confirm'; box.setAttribute('role', 'alertdialog');
+    box.innerHTML = '<b></b><button type="button" class="ls-btn ls-btn--danger ls-btn--sm"></button><button type="button" class="ls-btn ls-btn--secondary ls-btn--sm">Abbrechen</button>';
+    box.firstChild.textContent = frage; box.children[1].textContent = jaText || 'Löschen';
+    anker.insertAdjacentElement('afterend', box); anker.hidden = true; box.children[1].focus();
+    box.children[1].addEventListener('click', function () { box.remove(); anker.hidden = false; onJa(); });
+    box.children[2].addEventListener('click', function () { box.remove(); anker.hidden = false; anker.focus(); });
+  };
+  /* Nach „Berechnen“: auf Touchgeräten zum Ergebnis scrollen und Fokus setzen. */
+  LS.zumErgebnis = function (id) {
+    var el = d.getElementById(id); if (!el) return;
+    var touch = w.matchMedia && w.matchMedia('(pointer: coarse)').matches;
+    if (touch) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+    el.focus({ preventScroll: true });
+  };
 
-  // Zwei Steuerjahre -> Durchschnitt ins Hauptfeld
-  ['jahr-a','jahr-b'].forEach(function(id){
-    $(id).addEventListener('input', function(){
-      var a = parseFloat($('jahr-a').value), b = parseFloat($('jahr-b').value);
-      if(isFinite(a) && isFinite(b)){
-        var m = Math.round((a + b) / 2);
-        $('einkommen-zahl').value = m;
-        $('einkommen').value = Math.min(Math.max(m, +$('einkommen').min), +$('einkommen').max);
-        aktualisiere();
-      }
-    });
-  });
+  /* ---------- Fehler an Feldern ---------- */
+  LS.fehler = function (id, text) {
+    var inp = d.getElementById(id), err = d.getElementById(id + 'Err');
+    if (!inp) return;
+    if (text) { inp.setAttribute('aria-invalid', 'true'); if (err) { err.textContent = text; err.hidden = false; inp.setAttribute('aria-describedby', err.id); } }
+    else { inp.removeAttribute('aria-invalid'); if (err) { err.hidden = true; err.textContent = ''; } }
+  };
+  /* Prüft eine Zahl gegen Bereich; gibt Fehlertext oder null. */
+  LS.pruefen = function (n, min, max, beispiel) {
+    if (n == null) return 'Bitte eine Zahl eintragen' + (beispiel != null ? ', z. B. ' + beispiel : '') + '.';
+    if (min != null && n < min) return 'Wert muss mindestens ' + LS.fmt(min, 1).replace(',0', '') + ' sein.';
+    if (max != null && n > max) return 'Wert darf höchstens ' + LS.fmt(max, 1).replace(',0', '') + ' sein.';
+    return null;
+  };
+
+  /* ---------- Dateien (JSON-Projekte) ---------- */
+  /* Sichern: lädt eine .json herunter. Auf dem iPad erscheint das Teilen-Blatt → „In Dateien sichern“. */
+  LS.datei = {
+    sichern: function (name, daten) {
+      var blob = new Blob([JSON.stringify(daten, null, 2)], { type: 'application/json' });
+      var a = d.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; d.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    },
+    /* Laden über <input type="file">; ruft onDaten(objekt) oder onFehler(text). */
+    laden: function (inputEl, onDaten, onFehler) {
+      inputEl.addEventListener('change', function () {
+        var f = inputEl.files && inputEl.files[0]; if (!f) return;
+        var r = new FileReader();
+        r.onload = function () { try { onDaten(JSON.parse(r.result)); } catch (e) { onFehler && onFehler('Datei konnte nicht gelesen werden. Es wird eine .json aus „Projekt sichern (Datei)“ erwartet.'); } };
+        r.onerror = function () { onFehler && onFehler('Datei konnte nicht gelesen werden.'); };
+        r.readAsText(f); inputEl.value = '';
+      });
+    },
+    /* Feldnamen alter Projektdateien zuordnen: mapping = { altesFeld: 'neuesFeld', … }, je Objekt in liste. */
+    migrieren: function (daten, mapping, listeKey) {
+      var liste = listeKey ? (daten[listeKey] || []) : [daten];
+      liste.forEach(function (o) { Object.keys(mapping).forEach(function (alt) { if (o.hasOwnProperty(alt) && !o.hasOwnProperty(mapping[alt])) { o[mapping[alt]] = o[alt]; delete o[alt]; } }); });
+      return daten;
+    },
+    /* Externe JSON (z. B. lager.json) laden; funktioniert nur über eine echte Adresse (GitHub Pages), nicht lokal. */
+    extern: function (url, onDaten, onFehler) {
+      if (!w.fetch || location.protocol === 'file:') { onFehler && onFehler('lokal'); return; }
+      fetch(url, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(onDaten).catch(function (e) { onFehler && onFehler(String(e)); });
+    }
+  };
+  /* Dateiname ohne Personendaten: "Heizkoerper-Auslegung_BV-Muster_2026-10-25.json" */
+  LS.dateiname = function (tool, projekt, endung) {
+    var p = (projekt || 'BV-Muster').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ß/g, 'ss').replace(/[^A-Za-z0-9-]+/g, '-').replace(/^-|-$/g, '');
+    return tool + '_' + p + '_' + LS.datumISO() + '.' + (endung || 'json');
+  };
+
+  /* ---------- Regler mit Zahlenfeld (.ls-range) ---------- */
+  /* Hält Regler und Zahlenfeld synchron. Das Zahlenfeld ist maßgeblich; stellen = Nachkommastellen der Anzeige.
+     Der Regler klemmt an seinen Grenzen, das Zahlenfeld darf darüber hinausgehen (Prüfung über LS.pruefen im Tool). */
+  LS.regler = function (rangeId, inputId, stellen) {
+    var r = d.getElementById(rangeId), i = d.getElementById(inputId); if (!r || !i) return;
+    r.addEventListener('input', function () { i.value = LS.fmt(+r.value, stellen || 0); i.dispatchEvent(new Event('input', { bubbles: true })); });
+    i.addEventListener('input', function (ev) { if (ev.isTrusted) { var n = LS.zahl(i.value); if (n != null) r.value = n; } });
+    var n0 = LS.zahl(i.value); if (n0 != null) r.value = n0;
+  };
+
+  /* ---------- Drucken ---------- */
+  LS.drucken = function () { w.print(); };
 
   /* ---------- Start ---------- */
-  var heute = new Date();
-  $('datum').value = heute.getFullYear() + '-'
-    + String(heute.getMonth() + 1).padStart(2, '0') + '-'
-    + String(heute.getDate()).padStart(2, '0');
-  $('baujahr').max = heute.getFullYear();
-  $('baujahr-zahl').max = heute.getFullYear();
-  aktualisiere();
-})();
+  LS.start = function () {
+    LS.theme.start();
+    var dat = d.getElementById('metaDatum'); if (dat && !dat.textContent.trim().replace('–', '')) dat.textContent = LS.datum();
+    d.querySelectorAll('[data-print]').forEach(function (b) { b.addEventListener('click', LS.drucken); });
+    /* Kachelbild fehlt → Platzhalter statt kaputtem Bildsymbol */
+    d.querySelectorAll('img.ls-tile__img').forEach(function (img) {
+      img.addEventListener('error', function () { var ph = d.createElement('div'); ph.className = 'ls-tile__img ls-tile__img--placeholder'; ph.textContent = 'Bild folgt'; img.replaceWith(ph); });
+    });
+    d.querySelectorAll('.ls-stepper').forEach(function (st) {
+      var inp = st.querySelector('input'), minus = st.children[0], plus = st.children[2];
+      function set(v) { var min = inp.min !== '' ? +inp.min : 0; v = Math.max(min, v); inp.value = v; inp.dispatchEvent(new Event('input', { bubbles: true })); minus.disabled = v <= min; }
+      minus.addEventListener('click', function () { set((+inp.value || 0) - 1); });
+      plus.addEventListener('click', function () { set((+inp.value || 0) + 1); });
+      inp.addEventListener('change', function () { set(+inp.value || 0); });
+      set(+inp.value || 0);
+    });
+  };
+  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', LS.start); else LS.start();
+  w.LS = LS;
+})(window, document);
+</script>
+<!-- ls.js:end -->
+<script>
+/* ============================================================
+   foerderung.html · Förderrechner Wärmepumpe (BEG EM, KfW-Zuschuss für Privatpersonen)
+   Rechenkern unverändert aus der Altfassung (alt/foerderung_2026-10-26.html): stufen, klimasatz, hoechstbetrag1WE,
+   grundsatz, anzusetzendesEinkommen, einkommensbonus, obergrenze, foerderhoechstbetrag, klimaBerechtigt, rechne,
+   naechsterStichtag, Stufentabelle. Die Konstanten der Altfassung sind jetzt Eingaben unter „Fördersätze“ (Standardwerte
+   = alte Konstanten, Datenstand 07/2026); die Zahlen aus den Feldern werden vor jeder Rechnung in dieselben Variablen gelesen.
+   Feldnamen neu nach tests/feldliste-foerderung.md (alt → neu dort; die Altfassung hatte keine Projektdateien).
+   Gewollte Abweichung (06_entscheidungen.md, Fabian 2026-10-27): Tage bis zum nächsten Stichtag kalendarisch
+   (Altfassung rundete die Millisekunden-Differenz auf; bei Zeitumstellung ein Tag zu viel). Baujahr-Obergrenze = Antragsjahr.
+   Die Erklärtexte werden wie in der Altfassung aus dem Ergebnis erzeugt (Sie-Form, der Kunde liest mit).
+   Theme-Schalter, Datum und Drucken übernimmt ls.js (LS.start).
+   ============================================================ */
+var PROJEKT_KEY = 'foerderung-projekt';
+function $(id) { return document.getElementById(id); }
+
+/* Stichtage: Struktur der Absenkung, bleiben im Code (Merkblatt 458) */
+var START_NOVELLE = new Date(2026, 6, 21);  // 21.07.2026
+var ERSTE_STUFE   = new Date(2027, 1, 1);   // 01.02.2027, danach halbjährlich
+var EU_SPLIT      = new Date(2027, 0, 1);   // ab hier 15 % + 15 % „made in EU“ (angekündigt)
+
+/* Fördersätze: Standardwerte = Konstanten der Altfassung (Merkblatt 458, Stand 07/2026; IKZ 8/2026, Tabelle 1) */
+var SAETZE_STANDARD = {
+  hb1we: 28000, hb1weMin: 22000, hbSchritt: 750, hbWe2bis6: 15000, hbWeAb7: 8000, mindest: 300,
+  grundsatz: 30, klimaStart: 16, klimaStufe: 4, obergrenze: 70, obergrenzeErhoeht: 80,
+  einkGrenze1: 30000, einkBonus1: 40, einkGrenze2: 40000, einkBonus2: 30, einkGrenze3: 50000, einkBonus3: 10, familienzuschlag: 10000
+};
+var SAETZE_FELDER = {   /* id: [min, max, Nachkommastellen] */
+  hb1we: [0, 1000000, 0], hb1weMin: [0, 1000000, 0], hbSchritt: [0, 100000, 0], hbWe2bis6: [0, 1000000, 0], hbWeAb7: [0, 1000000, 0], mindest: [0, 100000, 0],
+  grundsatz: [0, 100, 0], klimaStart: [0, 100, 0], klimaStufe: [0, 100, 0], obergrenze: [0, 100, 0], obergrenzeErhoeht: [0, 100, 0],
+  einkGrenze1: [0, 10000000, 0], einkBonus1: [0, 100, 0], einkGrenze2: [0, 10000000, 0], einkBonus2: [0, 100, 0], einkGrenze3: [0, 10000000, 0], einkBonus3: [0, 100, 0], familienzuschlag: [0, 1000000, 0]
+};
+
+/* Variablen des Rechenkerns (Namen wie in der Altfassung); werden aus den Feldern gefüllt */
+var HB_1WE_START, HB_1WE_MIN, HB_SCHRITT, HB_WE_2_6, HB_WE_AB7, GRUND, KLIMA_START, KLIMA_STUFE, MINDEST,
+    EINK_GRENZE_1, EINK_GRENZE_2, EINK_GRENZE_3, EINK_BONUS_1, EINK_BONUS_2, EINK_BONUS_3, FAMILIENZUSCHLAG, OBERGRENZE, OBERGRENZE_ERHOEHT;
+function saetzeAnwenden(s) {
+  HB_1WE_START = s.hb1we; HB_1WE_MIN = s.hb1weMin; HB_SCHRITT = s.hbSchritt; HB_WE_2_6 = s.hbWe2bis6; HB_WE_AB7 = s.hbWeAb7; MINDEST = s.mindest;
+  GRUND = s.grundsatz; KLIMA_START = s.klimaStart; KLIMA_STUFE = s.klimaStufe; OBERGRENZE = s.obergrenze; OBERGRENZE_ERHOEHT = s.obergrenzeErhoeht;
+  EINK_GRENZE_1 = s.einkGrenze1; EINK_GRENZE_2 = s.einkGrenze2; EINK_GRENZE_3 = s.einkGrenze3;
+  EINK_BONUS_1 = s.einkBonus1; EINK_BONUS_2 = s.einkBonus2; EINK_BONUS_3 = s.einkBonus3; FAMILIENZUSCHLAG = s.familienzuschlag;
+}
+saetzeAnwenden(SAETZE_STANDARD);
+
+/* ============================================================
+   RECHENKERN (Altfassung; Konstanten → Variablen oben)
+   ============================================================ */
+/* Anzahl abgeschlossener Absenkungsschritte zum Datum.
+   Stichtage: 01.02.2027, 01.08.2027, 01.02.2028, … (Merkblatt 458) */
+function stufen(d) {
+  if (d < ERSTE_STUFE) return 0;
+  var monate = (d.getFullYear() - 2027) * 12 + (d.getMonth() - 1);
+  return Math.floor(monate / 6) + 1;
+}
+function klimasatz(d) { return Math.max(0, KLIMA_START - KLIMA_STUFE * stufen(d)); }
+function hoechstbetrag1WE(d) { return Math.max(HB_1WE_MIN, HB_1WE_START - HB_SCHRITT * stufen(d)); }
+/* Ab 01.01.2027 sinkt die Grundförderung auf die Hälfte; die andere Hälfte gibt es für „made in EU“-Wärmepumpen.
+   ANGEKÜNDIGT, im Merkblatt 458 (Stand 07/2026) noch nicht enthalten – deshalb hier an einer Stelle änderbar. */
+function grundsatz(d, eu) {
+  if (d < EU_SPLIT) return GRUND;
+  return eu ? GRUND : GRUND / 2;
+}
+/* Familienzuschlag: mindestens ein minderjähriges, kindergeldberechtigtes Kind mindert das anzusetzende
+   Haushaltsjahreseinkommen einmalig um den Familienzuschlag (Merkblatt 458: 10 000 €). */
+function anzusetzendesEinkommen(zve, kind) { return Math.max(0, zve - (kind ? FAMILIENZUSCHLAG : 0)); }
+function einkommensbonus(zve, kind) {
+  var e = anzusetzendesEinkommen(zve, kind);
+  if (e <= EINK_GRENZE_1) return EINK_BONUS_1;
+  if (e <= EINK_GRENZE_2) return EINK_BONUS_2;
+  if (e <= EINK_GRENZE_3) return EINK_BONUS_3;
+  return 0;
+}
+/* Obergrenze: grundsätzlich 70 %, für die unterste Einkommensstufe 80 %.
+   Die 80-Prozent-Grenze fällt genau mit dem höchsten Einkommensbonus zusammen. */
+function obergrenze(bonus) { return bonus === EINK_BONUS_1 && bonus > 0 ? OBERGRENZE_ERHOEHT : OBERGRENZE; }
+function foerderhoechstbetrag(d, we) {
+  return hoechstbetrag1WE(d) + HB_WE_2_6 * Math.min(Math.max(we - 1, 0), 5) + HB_WE_AB7 * Math.max(we - 6, 0);
+}
+/* Klimageschwindigkeitsbonus: nur bei Selbstnutzung und nur beim Austausch einer alten Öl-, Kohle-, Nachtspeicher-
+   oder mindestens 20 Jahre alten Gasheizung. */
+function klimaBerechtigt(art, baujahr, jahr) {
+  if (art === 'oel' || art === 'kohle' || art === 'nacht') return true;
+  if (art === 'gas') return (jahr - baujahr) >= 20;
+  return false;
+}
+function rechne(e) {
+  var hb      = foerderhoechstbetrag(e.datum, e.we);
+  var basis   = Math.min(e.kosten, hb);      // förderfähige Gesamtkosten
+  var anteil  = basis / e.we;                // verteilt sich zu gleichen Teilen
+  var grund   = grundsatz(e.datum, e.eu);
+  var klima   = (e.selbst && klimaBerechtigt(e.art, e.baujahr, e.datum.getFullYear())) ? klimasatz(e.datum) : 0;
+  var eink    = e.selbst ? einkommensbonus(e.einkommen, e.kind) : 0;
+  var grenze  = obergrenze(eink);
+  var roh     = grund + klima + eink;
+  var satz    = e.selbst ? Math.min(roh, grenze) : grund;
+  var zuschussSelbst  = e.selbst ? anteil * satz / 100 : 0;
+  var zuschussWeitere = (e.selbst ? (e.we - 1) : e.we) * anteil * grund / 100;
+  return {
+    hoechstbetrag: hb, basis: basis, anteil: anteil, grund: grund, klima: klima, eink: eink,
+    roh: roh, satz: satz, grenze: grenze, gedeckelt: e.selbst && roh > grenze,
+    zuschuss: zuschussSelbst + zuschussWeitere, zuschussSelbst: zuschussSelbst, zuschussWeitere: zuschussWeitere,
+    gedeckelteKosten: e.kosten > hb
+  };
+}
+/* Fristen: nächster Stichtag der Absenkung */
+function naechsterStichtag(d) {
+  if (d < ERSTE_STUFE) return new Date(ERSTE_STUFE);
+  var j = d.getFullYear(), m = d.getMonth();
+  if (m < 1) return new Date(j, 1, 1);
+  if (m < 7) return new Date(j, 7, 1);
+  return new Date(j + 1, 1, 1);
+}
+/* Tage bis zum Stichtag, kalendarisch (gewollte Abweichung zur Altfassung, 06 2026-10-27) */
+function tageBis(von, bis) {
+  return Math.round((Date.UTC(bis.getFullYear(), bis.getMonth(), bis.getDate()) - Date.UTC(von.getFullYear(), von.getMonth(), von.getDate())) / 86400000);
+}
+function stufentabelle() {
+  var reihen = [{ ab: new Date(START_NOVELLE), klima: KLIMA_START, hb: HB_1WE_START }];
+  var cur = new Date(ERSTE_STUFE);
+  for (var i = 0; i < 8; i++) {
+    reihen.push({ ab: new Date(cur), klima: klimasatz(cur), hb: hoechstbetrag1WE(cur) });
+    cur = naechsterStichtag(new Date(cur.getFullYear(), cur.getMonth(), 2));
+  }
+  return reihen;
+}
+/* ============================================================
+   Ende Rechenkern
+   ============================================================ */
+
+/* ---------- Darstellung ---------- */
+function euro(v) { return LS.fmt(Math.round(v), 0) + ' €'; }
+function prozent(v) { return LS.fmt(v, v % 1 ? 1 : 0) + ' %'; }
+function datumTxt(d) { return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function kpi(id, text, einheit, richtwert) {
+  $(id).innerHTML = (richtwert ? '<span class="ls-approx">' : '<span>') + esc(text) + '</span>' + (einheit ? ' <small>' + einheit + '</small>' : '');
+}
+/* Label/Wert-Liste als HTML (.ls-dl); Zeile = [Label, Wert, stark?] */
+function dlHtml(zeilen) {
+  return '<dl class="ls-dl">' + zeilen.map(function (z) {
+    var c = z[2] ? ' class="ls-dl__strong"' : '';
+    return '<dt' + c + '>' + esc(z[0]) + '</dt><dd' + c + '>' + esc(z[1]) + '</dd>';
+  }).join('') + '</dl>';
+}
+function p(html) { return '<p>' + html + '</p>'; }
+
+/* ---------- Eingaben lesen und prüfen ---------- */
+function wert(id, min, max, beispiel) {
+  var n = LS.lesen(id), f = LS.pruefen(n, min, max, beispiel);
+  LS.fehler(id, f); return f ? null : n;
+}
+function ganz(id, min, max, beispiel) {
+  var n = wert(id, min, max, beispiel);
+  if (n != null && n % 1 !== 0) { LS.fehler(id, 'Bitte eine ganze Zahl eintragen, z. B. ' + beispiel + '.'); return null; }
+  return n;
+}
+function selbst() { return $('selbstnutzungJa').checked; }
+function antragsdatum() {
+  var roh = $('antragsdatum').value, d = null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(roh)) { var t = roh.split('-'); d = new Date(+t[0], +t[1] - 1, +t[2]); }   // lokale Mitternacht, nicht UTC
+  LS.fehler('antragsdatum', d && !isNaN(d) ? null : 'Bitte ein Datum wählen; ohne Datum gilt heute.');
+  return d && !isNaN(d) ? d : new Date();
+}
+function saetzeLesen() {
+  var s = {}, fehler = false, standard = true;
+  Object.keys(SAETZE_FELDER).forEach(function (id) {
+    var f = SAETZE_FELDER[id], n = wert(id, f[0], f[1], LS.fmt(SAETZE_STANDARD[id], f[2]));
+    if (n == null) fehler = true; else { s[id] = n; if (n !== SAETZE_STANDARD[id]) standard = false; }
+  });
+  $('saetzeKurz').textContent = fehler ? '· Eingabe prüfen' : (standard ? '· Standardwerte' : '· geändert, nicht Stand 07/2026');
+  $('saetzeStand').textContent = standard ? 'Fördersätze Stand 07/2026 (Merkblatt 458) · prüfen' : 'Fördersätze geändert · Quelle im Bericht nennen';
+  $('berichtStand').textContent = standard ? 'Stand 07/2026 (Merkblatt 458), zu prüfen' : 'vom Standard 07/2026 abweichend eingetragen';
+  return fehler ? null : s;
+}
+function eingaben() {
+  var d = antragsdatum(), jahr = d.getFullYear();
+  var art = $('altanlage').value;
+  var we = ganz('wohneinheiten', 1, 20, '1');
+  var kosten = wert('kosten', 0, null, '30 000');
+  var baujahr = art === 'keine' ? 2005 : ganz('baujahr', 1900, jahr, '2005');
+  var einkommen = selbst() ? wert('einkommen', 0, null, '45 000') : 0;
+  if (!selbst()) LS.fehler('einkommen', null);
+  if (art === 'keine') LS.fehler('baujahr', null);
+  var s = saetzeLesen();
+  if (we == null || kosten == null || baujahr == null || einkommen == null || !s) return null;
+  saetzeAnwenden(s);
+  return {
+    datum: d, we: we, kosten: Math.max(MINDEST, kosten), kostenRoh: kosten, selbst: selbst(), art: art, baujahr: baujahr,
+    einkommen: einkommen, kind: $('kind').checked, eu: $('madeInEu').checked
+  };
+}
+
+/* ============================================================
+   ERKLÄRTEXTE – aus dem tatsächlichen Ergebnis gebaut (Inhalt wie Altfassung, Sie-Form)
+   ============================================================ */
+var NAMEN = { oel: 'Ölheizung', gas: 'Gasheizung', kohle: 'Kohle- oder Holzheizung', nacht: 'Nachtspeicherheizung',
+              ee: 'Heizung auf Basis erneuerbarer Energien', keine: 'keine bestehende Heizung' };
+
+function erklaerung1(e, r) {
+  var t = [], weTxt = e.we === 1 ? 'einer Wohneinheit' : e.we + ' Wohneinheiten';
+  t.push(p('Die KfW rechnet nicht mit Ihren tatsächlichen Kosten, sondern höchstens mit dem <b>Förderhöchstbetrag</b>. '
+    + 'Er hängt allein von der Zahl der Wohneinheiten ab und beträgt bei ' + weTxt + ' <b>' + euro(r.hoechstbetrag) + '</b>.'));
+  if (e.we > 1) {
+    var z = [['1. Wohneinheit', euro(hoechstbetrag1WE(e.datum))]];
+    var mittel = Math.min(Math.max(e.we - 1, 0), 5), oben = Math.max(e.we - 6, 0);
+    if (mittel > 0) z.push([mittel + ' × ' + euro(HB_WE_2_6) + ' (2. bis 6. Wohneinheit)', '+ ' + euro(mittel * HB_WE_2_6)]);
+    if (oben > 0) z.push([oben + ' × ' + euro(HB_WE_AB7) + ' (ab der 7. Wohneinheit)', '+ ' + euro(oben * HB_WE_AB7)]);
+    z.push(['Förderhöchstbetrag', euro(r.hoechstbetrag), true]);
+    t.push(dlHtml(z));
+  }
+  if (r.gedeckelteKosten) {
+    t.push(p('Ihre Kosten von ' + euro(e.kosten) + ' liegen <b>darüber</b>. Gerechnet wird deshalb mit ' + euro(r.basis) + '; der Rest bleibt bei der Förderung außen vor.'));
+  } else {
+    t.push(p('Ihre Kosten von ' + euro(e.kosten) + ' liegen darunter. Gerechnet wird also mit dem vollen Betrag.'));
+  }
+  if (e.we > 1) {
+    t.push(p('Der Betrag verteilt sich zu gleichen Teilen auf alle Wohneinheiten, hier <b>' + euro(r.anteil) + ' je Wohneinheit</b>. '
+      + 'Das ist wichtig, weil die Boni nur für die selbst bewohnte Einheit gelten.'));
+  }
+  if (!e.selbst) {
+    t.push(p('<b>Ohne Selbstnutzung</b> gibt es nur die Grundförderung. Klimageschwindigkeits- und Einkommensbonus setzen voraus, dass Sie selbst in der Wohnung leben.'));
+  }
+  if (e.datum >= EU_SPLIT) {
+    t.push(p('Ab dem 1. Januar 2027 sinkt die Grundförderung auf ' + prozent(GRUND / 2) + '. Weitere ' + prozent(GRUND / 2) + ' gibt es für Wärmepumpen aus europäischer Fertigung. '
+      + (e.eu ? '<b>Angehakt</b>, es bleibt bei ' + prozent(r.grund) + '.' : '<b>Nicht angehakt</b>, gerechnet wird mit ' + prozent(r.grund) + '.')
+      + ' Diese Regel ist angekündigt und noch nicht im Merkblatt 458 enthalten.'));
+  }
+  return t.join('');
+}
+
+function erklaerung2(e, r) {
+  var t = [], alter = e.datum.getFullYear() - e.baujahr;
+  if (!e.selbst) {
+    return p('Der Klimageschwindigkeitsbonus gilt nur für selbst bewohnte Wohneinheiten. Da Sie vermieten, spielt die Altanlage für die Förderhöhe keine Rolle.');
+  }
+  if (e.art === 'oel' || e.art === 'kohle' || e.art === 'nacht') {
+    t.push(p('Für den Austausch einer ' + NAMEN[e.art] + ' gibt es den <b>Klimageschwindigkeitsbonus</b>, unabhängig vom Alter der Anlage. Derzeit sind das <b>' + prozent(r.klima) + '</b>.'));
+  } else if (e.art === 'gas') {
+    if (alter >= 20) {
+      t.push(p('Ihre Gasheizung ist Baujahr ' + e.baujahr + ', also rund <b>' + alter + ' Jahre alt</b>. Ab 20 Jahren zählt sie für den Klimageschwindigkeitsbonus; er greift mit <b>' + prozent(r.klima) + '</b>.'));
+    } else {
+      t.push(p('Ihre Gasheizung ist Baujahr ' + e.baujahr + ', also rund <b>' + alter + ' Jahre alt</b>. Der Klimageschwindigkeitsbonus verlangt bei Gas <b>mindestens 20 Jahre</b>; er greift hier <b>nicht</b>. '
+        + 'Ab Baujahr ' + (e.datum.getFullYear() - 20) + ' oder älter wäre er möglich.'));
+    }
+  } else if (e.art === 'ee') {
+    t.push(p('Sie ersetzen eine Heizung, die bereits erneuerbare Energie nutzt. Dafür gibt es <b>keinen Klimageschwindigkeitsbonus</b>; der Bonus belohnt den Ausstieg aus fossilen Brennstoffen.'));
+    t.push(p('Beachten Sie zusätzlich den Hinweis zur geplanten Änderung ab 2027.'));
+  } else {
+    t.push(p('Ohne bestehende Heizung, die ersetzt wird, gibt es keinen <b>Klimageschwindigkeitsbonus</b>. Es bleibt bei der Grundförderung und gegebenenfalls dem Einkommensbonus.'));
+  }
+  if (r.klima > 0) {
+    var s = stufen(e.datum);
+    if (s === 0) t.push(p('Der Bonus steht noch auf dem Anfangswert von ' + prozent(KLIMA_START) + '. Ab dem 1. Februar 2027 sinkt er halbjährlich um ' + LS.fmt(KLIMA_STUFE, 0) + ' Prozentpunkte.'));
+    else t.push(p('Der Bonus ist bereits ' + s + '-mal abgesenkt worden, von ' + prozent(KLIMA_START) + ' auf ' + prozent(r.klima) + '.'));
+  }
+  return t.join('');
+}
+
+function erklaerung3(e, r) {
+  if (!e.selbst) return p('Der Einkommensbonus gilt nur für selbst bewohnte Wohneinheiten. Bei Vermietung bleibt es bei der Grundförderung.');
+  var t = [], anzu = anzusetzendesEinkommen(e.einkommen, e.kind);
+  if (e.kind) {
+    t.push(p('Mit mindestens einem minderjährigen Kind im Haushalt zieht die KfW <b>' + euro(FAMILIENZUSCHLAG) + ' vom Einkommen ab</b>. Aus ' + euro(e.einkommen) + ' werden damit <b>' + euro(anzu) + '</b>, die für die Einstufung zählen.'));
+  } else {
+    t.push(p('Für die Einstufung zählt Ihr zu versteuerndes Haushaltseinkommen von <b>' + euro(e.einkommen) + '</b>.'));
+  }
+  var stufeTxt;
+  if (r.eink === EINK_BONUS_1 && r.eink > 0)      stufeTxt = 'bis ' + euro(EINK_GRENZE_1) + ' → <b>' + prozent(EINK_BONUS_1) + '</b>';
+  else if (r.eink === EINK_BONUS_2 && r.eink > 0) stufeTxt = 'über ' + euro(EINK_GRENZE_1) + ' bis ' + euro(EINK_GRENZE_2) + ' → <b>' + prozent(EINK_BONUS_2) + '</b>';
+  else if (r.eink === EINK_BONUS_3 && r.eink > 0) stufeTxt = 'über ' + euro(EINK_GRENZE_2) + ' bis ' + euro(EINK_GRENZE_3) + ' → <b>' + prozent(EINK_BONUS_3) + '</b>';
+  else                                            stufeTxt = 'über ' + euro(EINK_GRENZE_3) + ' → <b>kein Einkommensbonus</b>';
+  t.push(p('Damit fallen Sie in die Stufe ' + stufeTxt + '.'));
+  if (r.eink === EINK_BONUS_1 && r.eink > 0) {
+    t.push(p('Diese unterste Stufe hebt zugleich die Obergrenze: Statt ' + prozent(OBERGRENZE) + ' sind <b>bis zu ' + prozent(OBERGRENZE_ERHOEHT) + '</b> der förderfähigen Kosten möglich.'));
+  }
+  if (!e.kind && r.eink < EINK_BONUS_1) {
+    var mitKind = einkommensbonus(e.einkommen, true);
+    if (mitKind > r.eink) t.push(p('Zum Vergleich: <b>mit</b> einem minderjährigen Kind im Haushalt wären es ' + prozent(mitKind) + ' statt ' + prozent(r.eink) + '.'));
+  }
+  t.push(p('Maßgeblich ist nicht das heutige Einkommen, sondern der <b>Durchschnitt der beiden Steuerjahre</b>, die zwei und drei Jahre vor dem Antrag liegen, nachgewiesen über die Einkommensteuerbescheide.'));
+  return t.join('');
+}
+
+function erklaerung4(e, r) {
+  var t = [], z = [];
+  if (e.selbst) {
+    z.push(['Grundförderung', prozent(r.grund)]);
+    if (r.klima > 0) z.push(['Klimageschwindigkeitsbonus', '+ ' + prozent(r.klima)]);
+    if (r.eink > 0) z.push(['Einkommensbonus', '+ ' + prozent(r.eink)]);
+    z.push(['Summe', prozent(r.roh), !r.gedeckelt]);
+    if (r.gedeckelt) z.push(['Obergrenze (gilt)', prozent(r.grenze), true]);
+    t.push(dlHtml(z));
+    if (r.gedeckelt) {
+      t.push(p('Die Bausteine ergeben zusammen ' + prozent(r.roh) + '. Die KfW deckelt den Fördersatz aber bei <b>' + prozent(r.grenze) + '</b>'
+        + (r.grenze === OBERGRENZE_ERHOEHT ? '; diese erhöhte Grenze gilt für die unterste Einkommensstufe.' : '; das ist die allgemeine Obergrenze.')
+        + ' Gerechnet wird deshalb mit ' + prozent(r.satz) + '.'));
+    } else {
+      t.push(p('Zusammen ergibt das <b>' + prozent(r.satz) + '</b>. Die Obergrenze von ' + prozent(r.grenze) + ' ist damit nicht erreicht, es zählt die volle Summe.'));
+    }
+  } else {
+    t.push(dlHtml([['Grundförderung', prozent(r.grund), true]]));
+    t.push(p('Ohne Selbstnutzung bleibt es bei der Grundförderung von ' + prozent(r.grund) + '.'));
+  }
+  var b = [];
+  if (e.selbst && e.we > 1) {
+    b.push(['Selbst bewohnte Wohneinheit', euro(r.anteil) + ' × ' + prozent(r.satz) + ' = ' + euro(r.zuschussSelbst)]);
+    b.push(['Übrige ' + (e.we - 1) + ' Wohneinheiten', euro(r.anteil) + ' × ' + prozent(r.grund) + ' = ' + euro(r.zuschussWeitere)]);
+    b.push(['Zuschuss', euro(r.zuschuss), true]);
+  } else if (e.selbst) {
+    b.push(['Zuschuss', euro(r.basis) + ' × ' + prozent(r.satz) + ' = ' + euro(r.zuschuss), true]);
+  } else {
+    b.push(['Zuschuss', euro(r.basis) + ' × ' + prozent(r.grund) + ' = ' + euro(r.zuschuss), true]);
+  }
+  t.push(dlHtml(b));
+  if (e.selbst && e.we > 1) {
+    t.push(p('Nur die selbst bewohnte Wohneinheit bekommt die Boni. Für alle anderen Einheiten gibt es die Grundförderung; deshalb steigt der Zuschuss mit jeder weiteren Wohneinheit, aber nicht im gleichen Verhältnis.'));
+  }
+  return t.join('');
+}
+
+/* ---------- Fristen und Hinweise ---------- */
+function rendereFrist(e, r) {
+  var naechst = naechsterStichtag(e.datum), tage = tageBis(e.datum, naechst);
+  var klimaDanach = Math.max(0, r.klima - KLIMA_STUFE);
+  var hbJetzt = hoechstbetrag1WE(e.datum), hbDanach = Math.max(HB_1WE_MIN, hbJetzt - HB_SCHRITT);
+  var txt = '<b>Die Bedingungen zum ' + datumTxt(e.datum) + ' gelten noch ' + tage + ' Tage</b>, bis zum ' + datumTxt(new Date(naechst.getTime() - 86400000)) + '.';
+  var teile = [];
+  if (r.klima > 0) teile.push('der Klimageschwindigkeitsbonus auf ' + prozent(klimaDanach));
+  if (hbJetzt > HB_1WE_MIN) teile.push('der Höchstbetrag der ersten Wohneinheit auf ' + euro(hbDanach));
+  if (teile.length) txt += ' Ab dem ' + datumTxt(naechst) + ' ' + (teile.length > 1 ? 'sinken ' : 'sinkt ') + teile.join(' und ') + '.';
+  else txt += ' Weitere Absenkungen wirken sich auf Ihre Konstellation nicht mehr aus.';
+  $('fristText').innerHTML = txt;
+
+  var reihen = stufentabelle(), jetztIdx = 0;
+  reihen.forEach(function (z, i) { if (e.datum >= z.ab) jetztIdx = i; });
+  $('stufenBody').innerHTML = reihen.map(function (z, i) {
+    var jetzt = i === jetztIdx;
+    return '<tr' + (jetzt ? ' class="is-selected"' : '') + '><td>' + datumTxt(z.ab) + (jetzt ? ' <span class="ls-badge ls-badge--navy">jetzt</span>' : '') + '</td>'
+      + '<td class="ls-num">' + (z.klima > 0 ? prozent(z.klima) : 'entfällt') + '</td><td class="ls-num">' + euro(z.hb) + '</td></tr>';
+  }).join('');
+}
+function rendereEeHinweis(e) {
+  var box = $('eeHinweis');
+  if (e.art !== 'ee') { box.hidden = true; return; }
+  box.hidden = false;
+  var t = [];
+  t.push('Ihre Heizung nutzt bereits erneuerbare Energie und wurde <b>' + e.baujahr + '</b> eingebaut. ');
+  if (e.baujahr > 2008) {
+    t.push('Für solche Anlagen soll die Förderung beim Austausch <b>ab 2027 entfallen</b>; betroffen sind alle, die nach dem 1. Januar 2008 eingebaut wurden. ');
+    t.push('<b>Heute wird Ihr Tausch noch gefördert.</b> Steht er ohnehin an, kann ein früherer Termin sich lohnen. Sprechen Sie uns gerne darauf an. ');
+  } else {
+    t.push('Anlagen aus der Zeit <b>vor dem 1. Januar 2008</b> sind von der geplanten Streichung nach heutigem Stand nicht betroffen. Wie die Förderung ab 2027 für sie genau aussieht, ist noch nicht abschließend geregelt. ');
+  }
+  t.push('Die Änderung ist angekündigt, aber noch nicht in den KfW-Bedingungen festgeschrieben.');
+  $('eeText').innerHTML = t.join('');
+}
+
+/* ---------- Sichtbarkeiten, die von Eingaben abhängen ---------- */
+function sichtbarkeiten() {
+  var d = antragsdatum(), j = d.getFullYear();
+  $('einkommenKarte').hidden = !selbst();
+  $('baujahrFeld').hidden = $('altanlage').value === 'keine';
+  $('madeInEuFeld').hidden = !(d >= EU_SPLIT);
+  $('einkommenJahrALabel').textContent = 'Zu versteuerndes Einkommen ' + (j - 3);
+  $('einkommenJahrBLabel').textContent = 'Zu versteuerndes Einkommen ' + (j - 2);
+  var bj = LS.lesen('baujahr');
+  $('baujahrHint').textContent = (bj != null && bj % 1 === 0 && bj >= 1900 && bj <= j)
+    ? 'Laut Typenschild. Rund ' + (j - bj) + ' Jahre alt zum Antragsjahr ' + j + '.'
+    : 'Laut Typenschild. Alter = Antragsjahr − Baujahr (höchstens ' + j + ').';
+  $('berichtAntrag').textContent = datumTxt(d);
+}
+
+/* ---------- Leerzustand bei fehlerhaften Eingaben ---------- */
+function leer() {
+  ['kpiZuschuss', 'kpiSatz', 'kpiHoechst', 'kpiBasis', 'kpiSelbst', 'kpiWeitere'].forEach(function (id) { $(id).textContent = '–'; });
+  $('kpiZuschussNote').textContent = 'Eingaben prüfen'; $('kpiSatzNote').textContent = '–';
+  $('kpiSelbstBox').hidden = true; $('kpiWeitereBox').hidden = true; $('hinweisKosten').hidden = true;
+  $('bausteine').innerHTML = '<dt>Hinweis</dt><dd>Eingaben prüfen, markierte Felder korrigieren.</dd>';
+  $('fristText').textContent = 'Eingaben prüfen.'; $('stufenBody').innerHTML = ''; $('eeHinweis').hidden = true;
+  $('eingabenListe').innerHTML = '<dt>Hinweis</dt><dd>Eingaben unvollständig.</dd>'; $('rechenwegInhalt').innerHTML = '';
+  $('ergebnisSub').textContent = 'Eingaben unvollständig';
+}
+
+/* ---------- Gesamtausgabe ---------- */
+function aktualisiere() {
+  sichtbarkeiten();
+  var e = eingaben();
+  if (!e) { leer(); return; }
+  var r = rechne(e);
+
+  /* Hinweise vor dem Ergebnis */
+  var hw = $('hinweisKosten');
+  if (e.kostenRoh <= MINDEST) {
+    hw.hidden = false; $('hinweisKostenText').innerHTML = '<b>Mindestinvestition.</b> Die Mindestinvestition liegt bei ' + euro(MINDEST) + ' brutto; gerechnet wird damit.';
+  } else if (r.gedeckelteKosten) {
+    hw.hidden = false; $('hinweisKostenText').innerHTML = '<b>Kosten über dem Förderhöchstbetrag.</b> ' + euro(e.kosten - r.hoechstbetrag) + ' bleiben unberücksichtigt; gefördert werden höchstens ' + euro(r.hoechstbetrag) + '.';
+  } else hw.hidden = true;
+
+  /* Empfehlungskarte und Kennzahlen */
+  kpi('kpiZuschuss', euro(r.zuschuss), null, true);
+  $('kpiZuschussNote').textContent = 'von ' + euro(r.basis) + ' förderfähigen Kosten';
+  kpi('kpiSatz', prozent(r.satz));
+  $('kpiSatzNote').textContent = e.selbst ? (r.gedeckelt ? 'gedeckelt auf ' + prozent(r.grenze) : 'Grundförderung und Boni') : 'ohne Selbstnutzung: nur Grundförderung';
+  kpi('kpiHoechst', euro(r.hoechstbetrag)); $('kpiHoechstNote').textContent = 'für ' + (e.we === 1 ? 'eine Wohneinheit' : e.we + ' Wohneinheiten');
+  kpi('kpiBasis', euro(r.basis)); $('kpiBasisNote').textContent = r.gedeckelteKosten ? 'Kosten ' + euro(e.kosten) + ', gedeckelt' : 'volle Investitionskosten';
+  var mehrere = e.selbst && e.we > 1;
+  $('kpiSelbstBox').hidden = !mehrere; $('kpiWeitereBox').hidden = !mehrere;
+  if (mehrere) {
+    kpi('kpiSelbst', euro(r.zuschussSelbst)); $('kpiSelbstNote').textContent = euro(r.anteil) + ' × ' + prozent(r.satz);
+    $('kpiWeitereLabel').textContent = 'Übrige ' + (e.we - 1) + ' WE'; kpi('kpiWeitere', euro(r.zuschussWeitere)); $('kpiWeitereNote').textContent = euro(r.anteil) + ' × ' + prozent(r.grund);
+  }
+  var bs = [];
+  if (e.selbst) {
+    bs.push(['Grundförderung', prozent(r.grund)]);
+    if (r.klima > 0) bs.push(['Klimageschwindigkeitsbonus', '+ ' + prozent(r.klima)]);
+    if (r.eink > 0) bs.push(['Einkommensbonus', '+ ' + prozent(r.eink)]);
+    bs.push(['Summe', prozent(r.roh), !r.gedeckelt]);
+    if (r.gedeckelt) bs.push(['Obergrenze (gilt)', prozent(r.grenze), true]);
+    else bs.push(['Obergrenze', prozent(r.grenze) + ', nicht erreicht']);
+  } else {
+    bs.push(['Grundförderung (ohne Selbstnutzung)', prozent(r.grund), true]);
+  }
+  $('bausteine').innerHTML = dlHtml(bs).replace(/^<dl class="ls-dl">|<\/dl>$/g, '');
+  $('ergebnisSub').textContent = datumTxt(e.datum) + ' · ' + (e.we === 1 ? '1 WE' : e.we + ' WE') + ' · ' + (e.selbst ? 'selbst bewohnt' : 'vermietet') + ' · ' + NAMEN[e.art];
+
+  rendereFrist(e, r);
+  rendereEeHinweis(e);
+
+  /* Bericht: Eingaben und Rechenweg */
+  var eing = [
+    ['Tag der Antragstellung', datumTxt(e.datum)],
+    ['Wohneinheiten', e.we === 1 ? '1 Wohneinheit' : e.we + ' Wohneinheiten'],
+    ['Investitionskosten brutto', euro(e.kosten) + (e.kostenRoh < MINDEST ? ' (Mindestinvestition angesetzt)' : '')],
+    ['Nutzung', e.selbst ? 'eine Wohneinheit selbst bewohnt' : 'vermietet, keine Selbstnutzung'],
+    ['Bestandsanlage', NAMEN[e.art] + (e.art === 'keine' ? '' : ', Baujahr ' + e.baujahr + ' (rund ' + (e.datum.getFullYear() - e.baujahr) + ' Jahre)')]
+  ];
+  if (e.selbst) eing.push(['Zu versteuerndes Haushaltseinkommen', euro(e.einkommen) + (e.kind ? ', mit minderjährigem Kind (Familienzuschlag ' + euro(FAMILIENZUSCHLAG) + ')' : ', ohne Familienzuschlag')]);
+  if (e.datum >= EU_SPLIT) eing.push(['Wärmepumpe aus EU-Fertigung', e.eu ? 'ja (angekündigte Regel ab 2027)' : 'nein (angekündigte Regel ab 2027)']);
+  eing.push(['Voraussichtlicher Zuschuss', '≈ ' + euro(r.zuschuss) + ' (' + prozent(r.satz) + ' von ' + euro(r.basis) + ')', true]);
+  $('eingabenListe').innerHTML = dlHtml(eing).replace(/^<dl class="ls-dl">|<\/dl>$/g, '');
+  $('rechenwegInhalt').innerHTML =
+      '<div><h3>1 · Gebäude und Kosten</h3><div class="ls-mt-2 ls-stack ls-stack--tight">' + erklaerung1(e, r) + '</div></div>'
+    + '<div><h3>2 · Bestehende Heizung</h3><div class="ls-mt-2 ls-stack ls-stack--tight">' + erklaerung2(e, r) + '</div></div>'
+    + '<div><h3>3 · Einkommen des Haushalts</h3><div class="ls-mt-2 ls-stack ls-stack--tight">' + erklaerung3(e, r) + '</div></div>'
+    + '<div><h3>4 · Fördersatz und Zuschuss</h3><div class="ls-mt-2 ls-stack ls-stack--tight">' + erklaerung4(e, r) + '</div></div>'
+    + '<p class="ls-muted">Zwischenwerte gerundet dargestellt, gerechnet wird ungerundet. Überschlag nach Merkblatt 458; verbindlich ist der Förderbescheid der KfW.</p>';
+}
+
+/* ---------- Start und Verdrahtung ---------- */
+var form = $('formEingaben');
+var heuteISO = LS.datumISO();
+LS.formularMerken('formEingaben', PROJEKT_KEY + '-felder');
+/* Das Antragsdatum steht in der Projektkarte (außerhalb des Formulars) und wird eigens gemerkt */
+$('antragsdatum').value = LS.speicher.lesen(PROJEKT_KEY + '-antrag', '') || heuteISO;
+['input', 'change'].forEach(function (ev) { $('antragsdatum').addEventListener(ev, function () { LS.speicher.schreiben(PROJEKT_KEY + '-antrag', $('antragsdatum').value); aktualisiere(); }); });
+$('projekt').value = LS.speicher.lesen(PROJEKT_KEY + '-projekt', '');
+function projektAnzeigen() { var p = $('projekt').value.trim() || 'BV Muster'; $('metaProjekt').textContent = p; $('berichtProjekt').textContent = p; }
+$('projekt').addEventListener('input', function () { LS.speicher.schreiben(PROJEKT_KEY + '-projekt', $('projekt').value); projektAnzeigen(); });
+projektAnzeigen(); $('berichtDatum').textContent = LS.datum();
+
+LS.regler('kostenR', 'kosten', 0);
+LS.regler('einkommenR', 'einkommen', 0);
+function reglerSync() {
+  form.querySelectorAll('.ls-range').forEach(function (b) { var r = b.querySelector('input[type=range]'), i = b.querySelector('.ls-input'); var n = LS.zahl(i.value); if (n != null) r.value = n; });
+}
+
+form.addEventListener('input', aktualisiere);
+form.addEventListener('change', aktualisiere);
+
+/* Zwei Steuerjahre → Mittelwert ins Hauptfeld (wie Altfassung) */
+['einkommenJahrA', 'einkommenJahrB'].forEach(function (id) {
+  $(id).addEventListener('input', function () {
+    var a = LS.lesen('einkommenJahrA'), b = LS.lesen('einkommenJahrB');
+    LS.fehler('einkommenJahrA', $('einkommenJahrA').value && a == null ? 'Bitte eine Zahl eintragen, z. B. 44 000.' : null);
+    LS.fehler('einkommenJahrB', $('einkommenJahrB').value && b == null ? 'Bitte eine Zahl eintragen, z. B. 46 000.' : null);
+    if (a != null && b != null) {
+      var m = Math.round((a + b) / 2);
+      $('einkommen').value = LS.fmt(m, 0); $('einkommenR').value = Math.min(Math.max(m, +$('einkommenR').min), +$('einkommenR').max);
+    }
+  });
+});
+
+function saetzeStandardSetzen() {
+  Object.keys(SAETZE_FELDER).forEach(function (id) { $(id).value = LS.fmt(SAETZE_STANDARD[id], SAETZE_FELDER[id][2]); LS.fehler(id, null); });
+}
+$('btnSaetzeStandard').addEventListener('click', function () { saetzeStandardSetzen(); aktualisiere(); form.dispatchEvent(new Event('input')); LS.toast('Fördersätze auf Stand 07/2026 gesetzt', 'ok'); });
+
+function zuruecksetzen() {
+  form.reset(); LS.speicher.loeschen(PROJEKT_KEY + '-felder'); LS.speicher.loeschen(PROJEKT_KEY + '-antrag');
+  $('antragsdatum').value = heuteISO; LS.fehler('antragsdatum', null); saetzeStandardSetzen(); $('saetzeDetails').open = false; $('steuerjahre').open = false;
+  form.querySelectorAll('.ls-error').forEach(function (el) { el.hidden = true; });
+  form.querySelectorAll('[aria-invalid]').forEach(function (el) { el.removeAttribute('aria-invalid'); });
+  reglerSync(); aktualisiere(); form.dispatchEvent(new Event('input'));
+}
+$('btnReset').addEventListener('click', function () { zuruecksetzen(); LS.toast('Zurückgesetzt', 'ok'); });
+$('btnNeu').addEventListener('click', function () {
+  var b = this;
+  LS.rueckfrage(b, 'Alle Eingaben verwerfen und neues Projekt beginnen?', 'Neues Projekt', function () {
+    zuruecksetzen(); $('projekt').value = ''; LS.speicher.loeschen(PROJEKT_KEY + '-projekt'); projektAnzeigen(); LS.toast('Neues Projekt', 'ok');
+  });
+});
+
+/* FELD_MAPPING alt → neu (nur zur Nachvollziehbarkeit; die Altfassung hatte keine Projektdateien) */
+var FELD_MAPPING = {
+  datum: 'antragsdatum', we: 'wohneinheiten', 'we-zahl': 'wohneinheiten', kosten: 'kosten', 'kosten-zahl': 'kosten',
+  'wahl-selbst': 'selbstnutzung', eu: 'madeInEu', 'wahl-alt': 'altanlage', baujahr: 'baujahr', 'baujahr-zahl': 'baujahr',
+  einkommen: 'einkommen', 'einkommen-zahl': 'einkommen', 'jahr-a': 'einkommenJahrA', 'jahr-b': 'einkommenJahrB', kind: 'kind'
+};
+
+reglerSync(); aktualisiere();
+window.addEventListener('beforeprint', aktualisiere);
 </script>
 </body>
 </html>

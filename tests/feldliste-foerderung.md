@@ -1,6 +1,6 @@
 # Feldliste · foerderung.html (Förderrechner Wärmepumpe)
 
-Stand: 2026-10-26 · Erstellt von: Claude Code (Sitzung Umbau foerderung) · Geprüft von Fabian: ☐ (Datum)
+Stand: 2026-10-26 · Erstellt von: Claude Code (Sitzung Umbau foerderung) · Geprüft von Fabian: ☑ 2026-10-27 („passt“); die Vorschläge zu den offenen Fragen 1–9 gelten damit als angenommen
 Zweck: Vor dem Neubau nach DESIGNREGELN.md 6.1 jedes Feld der Altfassung befragen. Erst nach Freigabe bauen.
 Alle Beispielwerte erfunden, keine Kundendaten. Altfassung: `alt/foerderung_2026-10-26.html` (byteidentisch mit dem Stand im Git, Commit f754073).
 
@@ -100,3 +100,7 @@ var FELD_MAPPING = {
 7. **Fördersätze im Firmengehirn.** Zu Fördersätzen, Merkblatt 458 oder IKZ 8/2026 steht nichts in 05/06/07; Quelle ist nur der Code-Kommentar. Vorschlag: Eintrag in 07_offene-punkte.md („Fördersätze foerderung.html gegen Merkblatt 458 prüfen, Stand 07/2026, zwei angekündigte Regeln“) und Datenstand im Tool. Soll ich das eintragen?
 8. **Abschnitt in 04_tool-konventionen.md fehlt.** Für foerderung.html gibt es dort keinen Abschnitt (Stand, Erkennungsmerkmal, Datenquellen). Vorschlag: in Schritt 8 anlegen mit Stand alt „f754073, Merkblatt 458 07/2026“ und Stand neu. Einverstanden?
 9. **Baujahr-Obergrenze.** Die Altfassung begrenzt das Baujahr auf das aktuelle Kalenderjahr, nicht auf das Antragsjahr; bei einem Antrag 2027 kann 2027 also nicht eingegeben werden. Keine Rechenwirkung in den Referenzfällen. Vorschlag: Obergrenze = Antragsjahr (Feld 1). Einverstanden, oder unverändert lassen?
+
+## Entscheidungen von Fabian nach der Freigabe (2026-10-27, in 06 eingetragen)
+- Fragen 1–9: Vorschläge angenommen („passt“).
+- Befund F5 (Schritt 3): Die Neufassung zählt die Tage bis zum nächsten Stichtag kalendarisch; F5 „neu“ weicht damit gewollt ab (139 statt 140 Tage). Das Antragsdatum bleibt frei wählbar, auch in der Zukunft, weil das Tool zeigen soll, wie sich die Förderbedingungen mit der Zeit ändern; der Hinweis am Feld sagt das ausdrücklich.
