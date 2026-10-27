@@ -2,6 +2,16 @@
 
 Neueste Einträge oben. Format: Datum · Bereich · Fassung · Änderung · Nachweis.
 
+## 2026-10-26 · auslegung.html · Nachbesserung nach Freigabe (Fabian): Bericht nur im Druck
+- Befund (Fabian, iPad/Mac): Die ausgewählte Wärmepumpe erschien zweimal, weil der kompakte Druckbericht (Zusammenfassung, Ergebniskarte, Zusatzpositionen, Rechenweg) auch am Bildschirm unter dem Ergebnis stand. Jetzt tragen die vier Berichtskarten `ls-print-only`: am Bildschirm zeigen Ergebniskarte und die Karte „Zusatzpositionen“ (mit Rechenweg) alles, im Druck erscheint nur der Bericht. Der Block Zusatzpositionen des Berichts bekommt die Klasse nur, wenn Positionen vorhanden sind (sonst würde `.ls-print-only` das `hidden` im Druck überstimmen). Rechnung unverändert; PDFs A1/A2 als Kontrolle neu gedruckt. Hinweis: Safari kann die alte Fassung aus dem Cache zeigen, auf dem iPad die Seite erneut laden.
+
+## 2026-10-26 · foerderung.html · Umbau Schritt 1 (Altfassung festhalten) und Schritt 2 (Feldliste, Testfälle)
+- Altfassung (Stand im Git f754073, unverändert seit der Übernahme aus `Auslegung-WP`; in `04_tool-konventionen.md` gibt es für das Tool keinen Abschnitt, Stand und Erkennungsmerkmal fehlen dort, Feldliste Frage 8) gesichert als `alt/foerderung_2026-10-26.html` (byteidentisch).
+- Zweck: KfW-Zuschuss (BEG EM, Heizungsförderung Privatpersonen) im Kundengespräch überschlagen, mit Fristen der Absenkungsstufen; kein Antragsersatz, verbindlich ist der Förderbescheid. Datenquellen: Konstanten im Skript (Merkblatt 458, Stand 07/2026; IKZ 8/2026, Tabelle 1), keine externe Datei; zwei angekündigte Regeln (Grundförderung 15 % + 15 % „made in EU“ ab 2027, Wegfall für EE-Anlagen ab Baujahr 2008) je an einer Stelle gekapselt. Keine Dateifunktionen, kein Browser-Speicher, keine Druckansicht, kein `noindex`.
+- Rechenteil (wird unverändert übernommen): Konstanten `HB_1WE_START` … `MINDEST` und Stichtage, `stufen`, `klimasatz`, `hoechstbetrag1WE`, `grundsatz`, `anzusetzendesEinkommen`, `einkommensbonus`, `obergrenze`, `foerderhoechstbetrag`, `klimaBerechtigt`, `rechne`, `naechsterStichtag` und die Stufentabelle in `rendereFrist`; die Erklärtexte `erklaerung1` … `erklaerung4` und `rendereEeHinweis` werden aus dem Ergebnis erzeugt und bleiben inhaltlich erhalten. Alles andere (Regler-Kopplung, Button-Gruppen, Kopf, Fuß) ist Oberfläche.
+- Feldliste `tests/feldliste-foerderung.md` angelegt (15 Felder alt plus Konstanten; Vorschlag neu: Doppelungen Regler/Zahlenfeld zu `.ls-range`, Selbstnutzung als `.ls-seg`, Bestandsanlage als `.ls-select`, Steuerjahre einzeln unter „Erweitert“, Fördersätze als Eingaben mit `.ls-stand`; FELD_MAPPING; 9 offene Fragen). Befund: die Altfassung rechnet die Wohneinheiten aus dem Regler (Klemmung auf 20), Baujahr-Obergrenze ist das Kalenderjahr, nicht das Antragsjahr.
+- Testfälle F1–F6 in `tests/referenzwerte.md` angelegt (erfundene Werte; Spalte „erwartet (Formel)“ mit dem Rechenkern in Python nachgerechnet, IKZ-Kontrollwerte bestätigt). F1 EFH Öl 15 680 € · F2 Gas 16 Jahre, Kind, Deckel 80 % → 19 600 € · F3 3 WE Kohle gedeckelt → 27 067 € · F4 8 WE vermietet → 35 700 € · F5 Antrag 09/2027 nach zwei Absenkungen, 2 WE, ohne EU-Haken → 9 960 € · F6 EE-Anlage 2012, Steuerjahre einzeln → 8 000 € mit EE-Hinweis. Freigabe durch Fabian steht aus.
+
 ## 2026-10-26 · auslegung.html · Umbau Schritt 9 (Freigabe)
 - Fabian hat die Neufassung nach Prüfung auf dem iPad (Safari) freigegeben; Feldliste, Referenzwerte A1–A6 und PDF-Vergleich geprüft. Altfassung bleibt unter `alt/auslegung_2026-10-25.html`, bis das nächste Tool umgebaut ist. Live-Adresse im iPad-Safari neu laden; Dateiname unverändert, Homescreen-App bleibt. Damit ist das dritte Tool auf design.css 2.1 (nach index.html und kostenvergleich.html, dessen Freigabe noch offen ist).
 
@@ -115,7 +125,7 @@ Neueste Einträge oben. Format: Datum · Bereich · Fassung · Änderung · Nach
 |---|---|---|---|---|---|
 | index.html | 2026-08-07 | umgebaut 2026-10-25 | entfällt | entfällt (Kacheln/Links erhalten) | Fabian, 2026-10-25 |
 | kostenvergleich.html | 2026-07-26 | umgebaut 2026-10-25 | tests/feldliste-kostenvergleich.md (freigegeben) | K1–K6 alt und neu gemessen (K2/K3 gewollt abweichend: SCOP exakt; K4 neu für W50, K5 für WWP LA, K6 für WAB) | Fabian, 2026-10-26 |
-| foerderung.html | – | offen | – | – | – |
+| foerderung.html | – (kein Abschnitt in 04; Git f754073) | in Arbeit (Schritt 1–2, 2026-10-26) | tests/feldliste-foerderung.md (Freigabe offen) | F1–F6 angelegt (erwartet aus Formel), alt/neu offen | – |
 | auslegung.html | 2026-08-17 | umgebaut 2026-10-26 (Schritt 1–9; Erweiterung Kaskade) | tests/feldliste-auslegung.md (freigegeben 2026-10-25) | A1–A4 alt und neu gemessen (alle gleich), A5 −12,7 °C und A6 Kaskade nur neu | Fabian, 2026-10-26 |
 | heizkoerper.html | 2026-08-14 | offen | – | H1–H6 | – |
 | bestandsaufnahme.html | 2026-08-14 | offen | – | B1–B3 | – |

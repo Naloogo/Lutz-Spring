@@ -5,7 +5,7 @@ Zweck: Nachweis, dass ein Umbau nichts an der Rechnung ändert (UMBAU-ABLAUF.md 
 
 Die Spalte „erwartet (Formel)“ ist aus dem Rechenteil der Altfassung nachgerechnet (Python, gleiche Formeln und Rundung) und dient nur als Plausibilitätsprüfung; maßgeblich ist die Messung in der Altfassung.
 
-Testfälle je Tool: A1–A6 `auslegung.html` (angelegt 2026-10-25; A5 nur neu, A6 Erweiterung Kaskade) · K1–K6 `kostenvergleich.html` · H1–H6 `heizkoerper.html` · B1–B3 `bestandsaufnahme.html`. Die Fälle der noch nicht begonnenen Tools werden beim jeweiligen Umbau (Schritt 2) angelegt.
+Testfälle je Tool: A1–A6 `auslegung.html` (angelegt 2026-10-25; A5 nur neu, A6 Erweiterung Kaskade) · K1–K6 `kostenvergleich.html` · F1–F6 `foerderung.html` (angelegt 2026-10-26) · H1–H6 `heizkoerper.html` · B1–B3 `bestandsaufnahme.html`. Die Fälle der noch nicht begonnenen Tools werden beim jeweiligen Umbau (Schritt 2) angelegt.
 
 ---
 
@@ -271,6 +271,105 @@ Rechenweg: Verbrauch 60 000 × 0,90 ÷ 1 800 = 30,00 kW · Gebäude 600 × 70 ÷
 | Taktungsrisiko | – | nein | – | nein | gleich |
 | Alternative Aeroblock | – | keine (bei Kaskade) | – | keine | gleich |
 | Zusatzpositionen | – | Kaskadenregelung und hydraulische Einbindung (2 Geräte) · WAS 600 l · WES 910 l · Schallgutachten (54 dB(A), optional) | – | Kaskadenregelung und hydraulische Einbindung (2 Geräte) [erforderlich] · WAS 600 l · Trinkwasserspeicher [erforderlich] · WES 910 l · Energiespeicher [erforderlich] · Schallgutachten / Schallschutzmaßnahmen [optional] | gleich |
+
+## foerderung.html · F1–F6
+
+Altfassung: `alt/foerderung_2026-10-26.html` · Feldliste: `tests/feldliste-foerderung.md`.
+Angelegt 2026-10-26 (Schritt 2). Spalte „erwartet (Formel)“ aus dem Rechenkern der Altfassung nachgerechnet (Python, gleiche Stufenlogik und Rundung: Euro auf ganze Zahl, Prozent ganzzahlig; Anzeige mit Tausenderpunkt „15.680 €“). Spalte „alt“ wird in Schritt 3 in der unveränderten Altfassung gemessen, „neu“ in Schritt 5.
+Der Rechenkern hängt vom Tag der Antragstellung ab (Standard: heute); jeder Fall setzt das Datum deshalb ausdrücklich. Kontrolle gegen die IKZ-Tabelle aus dem Code-Kommentar: EFH 2026 → 22 400 / 19 600 / 15 680 / 12 880 €, 3 WE bis 30 T€ → 27 067 €, 8 WE ohne Selbstnutzung → 35 700 € (alle mit dem Python-Nachbau bestätigt).
+Stufentabelle (bei allen Fällen gleich, Antrag ab): 21.07.2026 16 % / 28 000 € · 01.02.2027 12 % / 27 250 € · 01.08.2027 8 % / 26 500 € · 01.02.2028 4 % / 25 750 € · 01.08.2028 entfällt / 25 000 € · 01.02.2029 / 24 250 € · 01.08.2029 / 23 500 € · 01.02.2030 / 22 750 € · 01.08.2030 / 22 000 €.
+
+### F1 · Einfamilienhaus, Öl, mittleres Einkommen (IKZ-Spalte 15 680 €)
+Eingaben: Antrag 26.10.2026 · 1 WE · Kosten 30 000 € · selbst bewohnt · Ölheizung Baujahr 2005 · Einkommen 45 000 €, kein Kind.
+Rechenweg: Stufen 0 · Höchstbetrag 28 000 € · förderfähig min(30 000; 28 000) = 28 000 € · Grund 30 % + Klima 16 % (Öl) + Einkommen 10 % (45 000 ≤ 50 000) = 56 % < 70 % · 28 000 × 56 % = 15 680 €.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
+|---|---|---|---|---|---|
+| Voraussichtlicher Zuschuss | € | 15 680 | | | |
+| Förderhöchstbetrag | € | 28 000 | | | |
+| Förderfähige Kosten | € | 28 000 | | | |
+| Grundförderung | % | 30 | | | |
+| Klimageschwindigkeitsbonus | % | 16 | | | |
+| Einkommensbonus | % | 10 | | | |
+| Fördersatz | % | 56 (nicht gedeckelt, Grenze 70) | | | |
+| Hinweis Kosten | – | „2.000 € bleiben unberücksichtigt“ | | | |
+| Frist | – | noch 98 Tage bis 31.01.2027; ab 01.02.2027 Klimabonus 12 %, Höchstbetrag 27 250 € | | | |
+| Alter der Anlage | Jahre | rund 21 | | | |
+
+### F2 · Einfamilienhaus, Gas 16 Jahre (kein Klimabonus), Kind, unterste Einkommensstufe (IKZ-Spalte 19 600 €)
+Eingaben: Antrag 26.10.2026 · 1 WE · Kosten 40 000 € · selbst bewohnt · Gasheizung Baujahr 2010 · Einkommen 38 000 €, Kind ja.
+Rechenweg: Alter 16 < 20 → kein Klimabonus · anzusetzend 38 000 − 10 000 = 28 000 ≤ 30 000 → 40 %, Obergrenze 80 % · 30 + 0 + 40 = 70 % < 80 % · förderfähig 28 000 € · 28 000 × 70 % = 19 600 €.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
+|---|---|---|---|---|---|
+| Voraussichtlicher Zuschuss | € | 19 600 | | | |
+| Förderhöchstbetrag | € | 28 000 | | | |
+| Förderfähige Kosten | € | 28 000 | | | |
+| Klimageschwindigkeitsbonus | % | 0 (Gas 16 Jahre; Text „ab Baujahr 2006 oder älter wäre er möglich“) | | | |
+| Einkommensbonus | % | 40 (anzusetzend 28 000 €) | | | |
+| Fördersatz | % | 70 (Grenze 80, nicht gedeckelt) | | | |
+| Hinweis Kosten | – | „12.000 € bleiben unberücksichtigt“ | | | |
+| Frist | – | noch 98 Tage bis 31.01.2027; ab 01.02.2027 sinkt nur der Höchstbetrag auf 27 250 € | | | |
+
+### F3 · Drei Wohneinheiten, Kohle, niedriges Einkommen, Deckel 80 % (IKZ 3 WE → 27 067 €)
+Eingaben: Antrag 26.10.2026 · 3 WE · Kosten 70 000 € · selbst bewohnt · Kohle/Holz Baujahr 1995 · Einkommen 25 000 €, kein Kind.
+Rechenweg: Höchstbetrag 28 000 + 2 × 15 000 = 58 000 € · förderfähig 58 000 € · Anteil je WE 19 333,33 € · 30 + 16 + 40 = 86 % > 80 % → 80 % · selbst 19 333,33 × 80 % = 15 466,67 € · übrige 2 × 19 333,33 × 30 % = 11 600 € · Summe 27 066,67 → 27 067 €.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
+|---|---|---|---|---|---|
+| Voraussichtlicher Zuschuss | € | 27 067 | | | |
+| Förderhöchstbetrag | € | 58 000 | | | |
+| Förderfähige Kosten | € | 58 000 | | | |
+| Anteil je Wohneinheit | € | 19 333 | | | |
+| Fördersatz | % | 80 (gedeckelt auf 80 %, Summe 86) | | | |
+| Zuschuss selbst bewohnte WE | € | 15 467 | | | |
+| Zuschuss übrige 2 WE | € | 11 600 | | | |
+| Hinweis Kosten | – | „12.000 € bleiben unberücksichtigt“ | | | |
+
+### F4 · Acht Wohneinheiten, vermietet (IKZ 8 WE ohne Selbstnutzung → 35 700 €)
+Eingaben: Antrag 26.10.2026 · 8 WE · Kosten 150 000 € · vermietet · Gasheizung Baujahr 1998 · (Einkommen ohne Wirkung).
+Rechenweg: Höchstbetrag 28 000 + 5 × 15 000 + 2 × 8 000 = 119 000 € · förderfähig 119 000 € · Anteil 14 875 € · nur Grundförderung 30 % · 8 × 14 875 × 30 % = 35 700 €.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
+|---|---|---|---|---|---|
+| Voraussichtlicher Zuschuss | € | 35 700 | | | |
+| Förderhöchstbetrag | € | 119 000 | | | |
+| Förderfähige Kosten | € | 119 000 | | | |
+| Fördersatz (ohne Selbstnutzung) | % | 30 | | | |
+| Karte Einkommen | – | ausgeblendet | | | |
+| Hinweis Kosten | – | „31.000 € bleiben unberücksichtigt“ | | | |
+| Frist | – | noch 98 Tage; ab 01.02.2027 sinkt nur der Höchstbetrag auf 27 250 € (kein Klimabonus) | | | |
+
+### F5 · Antrag 2027 nach zwei Absenkungen, zwei WE, Gas 21 Jahre, EU-Haken sichtbar und nicht gesetzt
+Eingaben: Antrag 15.09.2027 · 2 WE · Kosten 50 000 € · selbst bewohnt · Gasheizung Baujahr 2006 · Einkommen 45 000 €, kein Kind · „made in EU“ sichtbar, nicht angehakt.
+Rechenweg: Stufen 2 (01.02.2027, 01.08.2027) · Klima 16 − 8 = 8 % · Höchstbetrag 1. WE 28 000 − 1 500 = 26 500 € · gesamt 41 500 € · förderfähig 41 500 € · Anteil 20 750 € · Grund 15 % (ab 2027 ohne EU) + 8 + 10 = 33 % · selbst 20 750 × 33 % = 6 847,5 € · übrige 20 750 × 15 % = 3 112,5 € · Summe 9 960 €.
+Kontrollwert nach Anhaken „made in EU“: Grund 30 % → 48 % → 9 960 + 6 225 = 16 185 €.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
+|---|---|---|---|---|---|
+| Voraussichtlicher Zuschuss | € | 9 960 | | | |
+| Förderhöchstbetrag | € | 41 500 | | | |
+| Grundförderung | % | 15 | | | |
+| Klimageschwindigkeitsbonus | % | 8 (Gas 21 Jahre; „bereits 2-mal abgesenkt“) | | | |
+| Einkommensbonus | % | 10 | | | |
+| Fördersatz | % | 33 | | | |
+| Zuschuss selbst bewohnte WE / übrige WE | € | 6 848 / 3 113 (Anzeige gerundet) | | | |
+| Zuschuss mit EU-Haken (Kontrollwert) | € | 16 185 | | | |
+| Frist | – | noch 139 Tage bis 31.01.2028; ab 01.02.2028 Klimabonus 4 %, Höchstbetrag 25 750 € | | | |
+| Stufentabelle, markierte Zeile | – | 01.08.2027 · 8 % · 26 500 € („jetzt“) | | | |
+
+### F6 · Erneuerbare Bestandsanlage nach 2008, Steuerjahre einzeln, Kosten unter dem Höchstbetrag
+Eingaben: Antrag 26.10.2026 · 1 WE · Kosten 20 000 € · selbst bewohnt · Erneuerbare Heizung Baujahr 2012 · Steuerjahre einzeln 44 000 € (2023) und 46 000 € (2024) → Mittel 45 000 € · kein Kind.
+Rechenweg: kein Klimabonus (EE) · Einkommen 45 000 → 10 % · 30 + 0 + 10 = 40 % · förderfähig min(20 000; 28 000) = 20 000 € · 20 000 × 40 % = 8 000 €. EE-Hinweis sichtbar: Anlage nach 01.01.2008, Förderung soll ab 2027 entfallen.
+
+| Kennzahl | Einheit | erwartet (Formel) | alt (gemessen) | neu (gemessen) | Status |
+|---|---|---|---|---|---|
+| Voraussichtlicher Zuschuss | € | 8 000 | | | |
+| Förderfähige Kosten | € | 20 000 (voller Betrag) | | | |
+| Einkommen (Mittel aus beiden Jahren) | € | 45 000 | | | |
+| Fördersatz | % | 40 | | | |
+| Hinweis Kosten | – | keiner | | | |
+| EE-Hinweis | – | sichtbar: „nach dem 1. Januar 2008 … ab 2027 entfallen“ | | | |
 
 ## heizkoerper.html · H1–H6
 Noch anzulegen beim Umbau des Tools (Schritt 2). Je Fall: Eingaben, alle Kennzahlen, gewählte Artikel, Bestellnummern, Lagerabgleich-Status.

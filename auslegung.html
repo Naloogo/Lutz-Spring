@@ -1331,8 +1331,8 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
     </details>
   </section>
 
-  <!-- 7 · Bericht (Druck): kompakt; kurze Karten, damit der Druck zwischen den Karten umbricht (design.css: Karten brechen nicht) -->
-  <section class="ls-card ls-card--tight ls-report" id="bericht" aria-labelledby="h-bericht">
+  <!-- 7 · Bericht: nur im Druck (ls-print-only), am Bildschirm zeigt die Ergebniskarte alles; kurze Karten, damit der Druck zwischen den Karten umbricht (design.css: Karten brechen nicht) -->
+  <section class="ls-card ls-card--tight ls-report ls-print-only" id="bericht" aria-labelledby="h-bericht">
     <div class="ls-card__head"><h2 id="h-bericht">Zusammenfassung Wärmepumpen-Ersteinschätzung</h2><span class="ls-card__sub">Grundlage des Angebots</span></div>
     <div class="ls-report__meta ls-mt-2">
       <div><span>Kunde / Projekt</span><b id="berichtProjekt">BV Muster</b></div>
@@ -1352,7 +1352,7 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
       </div>
     </div>
   </section>
-  <section class="ls-card ls-card--navy ls-card--tight" id="berichtErgebnisKarte" aria-labelledby="h-bericht-ergebnis">
+  <section class="ls-card ls-card--navy ls-card--tight ls-print-only" id="berichtErgebnisKarte" aria-labelledby="h-bericht-ergebnis">
     <div class="ls-card__head"><h3 id="h-bericht-ergebnis">Ergebnis</h3><span class="ls-badge ls-badge--yellow" id="berichtBadge">Vorschlag</span></div>
     <p class="ls-muted" id="berichtGeraetMeta">–</p>
     <div class="ls-kpis ls-mt-2" id="berichtKpis"></div>
@@ -1362,7 +1362,7 @@ input[type="file"].ls-file::file-selector-button { font: inherit; font-weight: 6
     <div class="ls-card__head"><h3 id="h-bericht-zusatz">Objektabhängige Zusatzpositionen</h3><span class="ls-card__sub">nicht im Standardumfang</span></div>
     <div class="ls-list" id="berichtKomponenten"></div>
   </section>
-  <section class="ls-card ls-card--tight" aria-labelledby="h-bericht-rechenweg">
+  <section class="ls-card ls-card--tight ls-print-only" aria-labelledby="h-bericht-rechenweg">
     <div class="ls-card__head"><h3 id="h-bericht-rechenweg">Rechenweg</h3><span class="ls-card__sub">Formel, Eingangswerte, Zwischenergebnisse</span></div>
     <div class="ls-table-wrap ls-mt-2"><table class="ls-table ls-table--compact"><tbody id="berichtRechenweg"></tbody></table></div>
     <div id="berichtNotizen" class="ls-stack ls-mt-4"></div>
@@ -2080,7 +2080,7 @@ function ergebnisLeer(text){
   ['kpiVerbrauch','kpiGebaeude','kpiHeizlast'].forEach(function(id){ $(id).textContent = '–'; });
   $('plausi').textContent = ''; $('leerzustand').hidden = true; $('empfehlungBlock').hidden = true; $('zusatzCard').hidden = true; $('hinweiseVorab').innerHTML = '';
   $('ergebnisSub').textContent = text; $('rechenweg').innerHTML = ''; $('berichtRechenweg').innerHTML = '';
-  tbl('berichtHeizlast', [['Hinweis', text]]); $('berichtKpis').innerHTML = ''; $('h-bericht-ergebnis').textContent = text; $('berichtKomponentenBlock').hidden = true;
+  tbl('berichtHeizlast', [['Hinweis', text]]); $('berichtKpis').innerHTML = ''; $('h-bericht-ergebnis').textContent = text; $('berichtKomponentenBlock').hidden = true; $('berichtKomponentenBlock').classList.remove('ls-print-only');
 }
 
 /* ---------- Bericht (Druck): kompakt ---------- */
@@ -2126,7 +2126,7 @@ function berichtSchreiben(b, e){
   var k = $('berichtKpis');
   if(!e.gewaehlt){
     $('h-bericht-ergebnis').textContent = 'Keine Baugröße ermittelt'; $('berichtBadge').textContent = 'offen'; $('berichtGeraetMeta').textContent = 'Heizflächen nicht gewählt.';
-    k.innerHTML = ''; $('berichtStatus').className = 'ls-badge'; $('berichtStatus').textContent = '–'; $('berichtBewertung').textContent = ''; $('berichtKomponentenBlock').hidden = true;
+    k.innerHTML = ''; $('berichtStatus').className = 'ls-badge'; $('berichtStatus').textContent = '–'; $('berichtBewertung').textContent = ''; $('berichtKomponentenBlock').hidden = true; $('berichtKomponentenBlock').classList.remove('ls-print-only');
   } else {
     $('h-bericht-ergebnis').textContent = e.geraetText + (e.ausweich ? ' (Ausweichlösung, Standard '+geraeteBez(e.evoWahl)+')' : '');
     $('berichtBadge').textContent = e.ausweich ? 'Ausweichlösung' : 'Vorschlag';
@@ -2143,7 +2143,7 @@ function berichtSchreiben(b, e){
     if(e.taktRisiko) bew += ' Taktungsrisiko: Last am Bivalenzpunkt nahe der unteren Modulationsgrenze; ausreichendes Anlagenvolumen bzw. Pufferspeicher vorsehen.';
     if(e.altVlInfo) bew += ' Heizflächen: '+e.altVlInfo.kurz+' (Altanlage lief mit '+grad(e.altVlInfo.altVl)+').';
     $('berichtBewertung').textContent = bew;
-    $('berichtKomponentenBlock').hidden = !e.komponenten.length;
+    $('berichtKomponentenBlock').hidden = !e.komponenten.length; $('berichtKomponentenBlock').classList.toggle('ls-print-only', e.komponenten.length > 0);
     $('berichtKomponenten').innerHTML = komponentenHtml(e.komponenten, false);
   }
   var n = [['Gebäude','notizGebaeude'],['Bestandsanlage','notizBestand'],['Heizflächen','notizHeizflaechen'],['Auslegung / Aufstellung','notizAuslegung']]
